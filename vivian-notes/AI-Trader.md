@@ -8,44 +8,43 @@ tags: [股票, AI-Trader, 模擬倉]
 
 ## 帳戶
 - Agent：HermesV（ID: 6092）
-- Cash：$456
-- 總倉值：~$99,800（32倉）
+- Cash：$742
+- 總倉值：~$99,497（31倉）
 
 ## 持倉（2026-08-19 實況）
 | 股票 | 數量 | 成本 | 現價 | 盈虧 | PnL% | SL |
 |------|------|------|------|------|------|-----|
-| ASTS | 32 | $63.24 | $68.14 | +157 | 7.7% | 5%固定 $60.08 |
-| CSCO | 29 | $114.54 | $111.65 | -84 | -2.5% | 5%固定 $108.81 |
-| IREN | 35 | $39.32 | $42.62 | +115 | 8.4% | MA10/entry $41.65 |
-| QCOM | 1 | $165.74 | $159.32 | -6 | -3.9% | 5%固定 $157.45 |
-| CRWV | 3 | $79.77 | $95.65 | +48 | 19.9% | MA10/entry $96.52 |
-| RKLB | 126 | $78.05 | $80.79 | +345 | 3.5% | 5%固定 $74.15 |
-| WFC | 36 | $76.57 | $87.15 | +381 | 13.8% | 5%固定 $72.74 |
-| MRVL | 46 | $212.47 | $214.49 | +93 | 1.0% | 5%固定 $201.84 |
-| CVX | 12 | $192.20 | $204.91 | +153 | 6.6% | 5%固定 $182.59 |
-| HOOD | 74 | $95.68 | $93.48 | -163 | -2.3% | 5%固定 $90.90 |
-| COP | 64 | $109.67 | $129.80 | +1288 | 18.4% | 5%固定 $104.18 |
-| DE | 17 | $575.76 | $594.78 | +323 | 3.3% | 5%固定 $546.97 |
-| MRK | 7 | $118.23 | $135.24 | +119 | 14.4% | 5%固定 $112.32 |
-| VZ | 3 | $43.68 | $48.81 | +15 | 11.8% | 5%固定 $41.50 |
-| HON | 5 | $230.32 | $228.22 | -10 | -0.9% | 5%固定 $218.80 |
-| VRT | 4 | $282.69 | $271.46 | -45 | -4.0% | 5%固定 $268.55 |
-| TSLA | 1 | $334.65 | $339.41 | +5 | 1.4% | 5%固定 $317.92 |
-| XOM | 37 | $141.55 | $164.56 | +852 | 16.3% | 5%固定 $134.47 |
-| BABA | 79 | $110.22 | $127.80 | +1389 | 15.9% | 5%固定 $104.71 |
-| PFE | 1 | $24.64 | $27.23 | +3 | 10.5% | 5%固定 $23.41 |
-| AVGO | 17 | $384.46 | $380.78 | -63 | -1.0% | 5%固定 $365.24 |
-| PATH | 67 | $11.94 | $15.68 | +251 | 31.3% | MA10/entry $15.38 |
-| PDD | 1 | $84.20 | $86.62 | +2 | 2.9% | 5%固定 $79.99 |
-| T | 14 | $21.53 | $25.09 | +50 | 16.5% | 5%固定 $20.45 |
-| FUTU | 67 | $100.51 | $109.08 | +574 | 8.5% | 5%固定 $95.48 |
-| BA | 5 | $218.68 | $224.72 | +30 | 2.8% | 5%固定 $207.75 |
-| IBM | 8 | $237.94 | $232.78 | -41 | -2.2% | 5%固定 $226.04 |
-| INTC | 5 | $99.62 | $96.07 | -18 | -3.6% | 5%固定 $94.64 |
-| KLAC | 1 | $200.63 | $194.08 | -7 | -3.3% | 5%固定 $190.60 |
-| LRCX | 1 | $310.68 | $321.87 | +11 | 3.6% | 5%固定 $295.15 |
-| SNDK | 1 | $1372.20 | $1624.12 | +252 | 18.4% | MA10/entry $1425.46 |
-| AMZN | 1 | $269.05 | $261.82 | -7 | -2.7% | 5%固定 $255.60 |
+| ASTS | 32 | $63.24 | $67.20 | +127 | 6.3% | 5%固定 $60.08 |
+| CSCO | 29 | $114.54 | $111.88 | -77 | -2.3% | 5%固定 $108.81 |
+| IREN | 35 | $39.32 | $42.04 | +95 | 6.9% | MA10/entry $41.60 |
+| QCOM | 1 | $165.74 | $159.71 | -6 | -3.6% | 5%固定 $157.45 |
+| RKLB | 126 | $78.05 | $79.86 | +228 | 2.3% | 5%固定 $74.15 |
+| WFC | 36 | $76.57 | $87.36 | +388 | 14.1% | 5%固定 $72.74 |
+| MRVL | 46 | $212.47 | $213.46 | +46 | 0.5% | 5%固定 $201.84 |
+| CVX | 12 | $192.20 | $205.45 | +159 | 6.9% | 5%固定 $182.59 |
+| HOOD | 74 | $95.68 | $92.84 | -210 | -3.0% | 5%固定 $90.90 |
+| COP | 64 | $109.67 | $129.85 | +1292 | 18.4% | 5%固定 $104.18 |
+| DE | 17 | $575.76 | $591.39 | +266 | 2.7% | 5%固定 $546.97 |
+| MRK | 7 | $118.23 | $135.59 | +121 | 14.7% | 5%固定 $112.32 |
+| VZ | 3 | $43.68 | $48.75 | +15 | 11.6% | 5%固定 $41.50 |
+| HON | 5 | $230.32 | $227.98 | -12 | -1.0% | 5%固定 $218.80 |
+| VRT | 4 | $282.69 | $271.84 | -43 | -3.8% | 5%固定 $268.55 |
+| TSLA | 1 | $334.65 | $335.90 | +1 | 0.4% | 5%固定 $317.92 |
+| XOM | 37 | $141.55 | $165.17 | +874 | 16.7% | 5%固定 $134.47 |
+| BABA | 79 | $110.22 | $128.21 | +1421 | 16.3% | 5%固定 $104.71 |
+| PFE | 1 | $24.64 | $27.25 | +3 | 10.6% | 5%固定 $23.41 |
+| AVGO | 17 | $384.46 | $379.05 | -92 | -1.4% | 5%固定 $365.24 |
+| PATH | 67 | $11.94 | $15.73 | +255 | 31.8% | MA10/entry $15.38 |
+| PDD | 1 | $84.20 | $86.89 | +3 | 3.2% | 5%固定 $79.99 |
+| T | 14 | $21.53 | $25.04 | +49 | 16.3% | 5%固定 $20.45 |
+| FUTU | 67 | $100.51 | $108.79 | +555 | 8.2% | 5%固定 $95.48 |
+| BA | 5 | $218.68 | $223.66 | +25 | 2.3% | 5%固定 $207.75 |
+| IBM | 8 | $237.94 | $233.93 | -32 | -1.7% | 5%固定 $226.04 |
+| INTC | 5 | $99.62 | $95.94 | -18 | -3.7% | 5%固定 $94.64 |
+| KLAC | 1 | $200.63 | $192.99 | -8 | -3.8% | 5%固定 $190.60 |
+| LRCX | 1 | $310.68 | $324.43 | +14 | 4.4% | 5%固定 $295.15 |
+| SNDK | 1 | $1372.20 | $1605.95 | +234 | 17.0% | MA10/entry $1423.65 |
+| AMZN | 1 | $269.05 | $260.31 | -9 | -3.2% | 5%固定 $255.60 |
 
 ## 交易歷史
 - 2026-06-29: 賣出 HOOD @ $101.39 × 26 — +21.1% TP1 hit, sell 1/3 @ $101.39, cost $83.73, PnL +$460
@@ -332,6 +331,8 @@ tags: [股票, AI-Trader, 模擬倉]
 - : 買入 MRVL @ $212.69 × 45 — Stage 2突破，⭐5 RSI=66.5 RR=2.17 MA20上方
 - : 買入 RKLB @ $78.08 × 126 — Stage 2突破，⭐5 RSI=69.2 RR=2.16 MA20上方
 - : 賣出 CRWV @ $95.53 × 3 — MA10止蝕，現價$95.53<MA10/entry $96.52
+- : 買入 TSLA @ $336.01 × 1 — Stage 2突破，⭐5 RSI=74.6 RR=1.31 MA20上方
+- : 買入 CRM @ $198.16 × 1 — Stage 2突破，⭐5 RSI=57.3 RR=1.24 MA20上方
 
 ## 已止蝕出局
 - 2026-05-19: ONDS 止蝕走（44股 @ $9.59，蝕8%）
@@ -6052,5 +6053,96 @@ CRWV MA10 stop at $95.53 (PnL=19.8% gain from $80.09 avg cost). Latest in CRWV's
 - **Pre-cron: $1,166.62** (146 closed trades, from 23:02 cron)
 - **CRWV SL realized: +$46.32**
 - **Final all-time realized P&L: $1,212.94** across **147 closed trades**
+
+---
+## ⏰ 2026-08-19 03:00 BJT
+
+### Result: 2 BUY success (TSLA +1 held-cap-bypass, CRM +1 fresh lot) — **2-BUY healthy deploy with Type B cap-floor saturation collapse** (NEW 13th Hybrid A+B sub-pattern)
+
+- **Pre-cash: $742.24** | 持倉 31 → 32 只 (TSLA 1→2, CRM fresh lot) | 帳戶總值 (Notes): **$99,497.00**
+- **FIFO Total (recompute): $99,469.61** (actual-fill model) | **Notes ↔ FIFO drift: $+27.39** → **NEUTRAL** per P-MR-230 (with-trades, $30 boundary — drift $27.39 just UNDER, marginal)
+- **Post-trade cash: $207.94** (actual-fill model, pre-cash $742.24 − $534.31 deployment)
+- **API↔FIFO recon**: API 31 (pre-trade shell, P-MR-172) vs FIFO 32 (post-trade truth); `only_in_api: ∅`, `only_in_fifo: {CRM}` (fresh-lot buy-side lag, P-MR-180)
+- **Stale-quote drift: $+2,989.93** (P-MR-183 — scan-printed MV $95,737.57 vs Σ(api qty × api price) $98,727.50)
+- **Inter-scan cash drift: $-0.29** (P-MR-179 trivial, 01:00→03:00 no intervening trades, well below $10 watch threshold)
+
+### 2 BUY success — TSLA held-cap-bypass + CRM fresh-lot, deployed $534.31
+
+| Symbol | Qty | Price (strategy) | Price (actual-fill) | Deploy | Type |
+|--------|-----|------------------|----------------------|--------|------|
+| TSLA | 1  | $336.01 | $336.0450 | $336.05 | **BUY success** (held qty 1→2, post-buy value $672 = 0.68% cap, P-MR-199 cap-bypass edge case) |
+| CRM  | 1  | $198.16 | $198.2600 | $198.26 | **BUY success** (NOT held, fresh lot, P-MR-180 buy-side lag fingerprint) |
+| **Total** | **2** | | | **$534.31** | |
+
+Both BUY fills SUCCESS via broker mock (signal_id 3304286 TSLA, 3304292 CRM). Actual-fill model via broker response dict (P-MR-178) differs from rounded-log total by +$0.13 — immaterial at this magnitude.
+
+### Stage 2 Block Classification — **2-BUY success + 1 Type B cap-floor + 2 implicit-by-queue** (NEW sub-pattern)
+
+5 ⭐5 candidates evaluated (top-5 per scan.py L716 truncation):
+
+| Rank | Symbol | Price | RR | Result | Type |
+|------|--------|-------|-----|--------|------|
+| 1 | SNDK | $1,606.71 | 1.96 | skipped | **Type B** (cap-floor: $1,607 > $742 cash-floor cap → `倉位已達10%上限($1607/$742)，跳過`) |
+| 2 | TSLA | $336.01  | 1.31 | **BUY 1股 $336 success** | **success (held-cap-bypass, P-MR-199)** |
+| 3 | CRM  | $198.16  | 1.24 | **BUY 1股 $198 success** | **success (NOT held, fresh lot, P-MR-180)** |
+| 4 | NOK  | $10.34   | 1.17 | skipped | **Type D-implicit** (queue exhaustion after 2 fills, MAX_STOCKS=2) |
+| 5 | LOW  | $217.21  | 0.82 | skipped | **Type D-implicit** (queue exhaustion, RR also low) |
+
+**Pattern signature (NEW 13th Hybrid A+B sub-pattern)**: post-P-MR-253 cap-floor-collapse era + post-P-MR-255 5-SL-flush recovery → 23:02 2-BUY queue-bypass burst (P-MR-221) → 01:00 1-SL cash-recovery → **03:00 2-BUY micro-deploy at remaining cap-floor** where the cap-floor formula `max_pos = min(cash, total × 10%)` reduces to `cash × 10%` at sub-$1k cash states. SNDK at $1,607 trivially exceeds $742 cap, gets explicit cap-block print (NOT P-MR-210 silent-skip). TSLA passed by the P-MR-199 cap-bypass edge case (pre-buy 1股×$336 = $336 < $742 cap, post-buy 2股 = $672 still under 10% of total). CRM not held at all, no cap collision. NOK/LOW queue-truncated post-success (Type D-implicit by MAX_STOCKS=2).
+
+**Cap-floor collapse continues**: cash $742.24 × 10% = $74.22 floor; cap-floor formula computes `max_pos_per_stock = min(cash, total × 10%)` → for positions below 1% of total, the cap binding constraint is sometimes the per-stock `max_position_pct` rule, sometimes the cash-limit; here SNDK's holding exceeds the cash-derived $742 floor. P-MR-253 EXTREME cap-floor dynamic continues post-22:00 SL flush: cash is back down to $207.94 (P-MR-211 cash-pool-split zone), but above the P-MR-253 trilion-dollar zero.
+
+**Distinction matrix update — now 13 distinct Hybrid A+B sub-patterns**:
+- P-MR-187b partial-saturation squeeze | P-MR-189 2-cand hybrid 0-trigger | P-MR-194 4-type hybrid+X | P-MR-195 full-saturation-break | P-MR-203 1st-rank-RR micro-squeeze | P-MR-205 multi-cap collapse | P-MR-208 2nd-rank-RR micro-squeeze | P-MR-211 cash-pool-split triple block | P-MR-213 Hybrid X+D 0-fill | P-MR-221 2-BUY queue-bypass success | P-MR-224 Degenerate Hybrid B pure-cap | P-MR-229 Pure Type A 5-cand saturation | **P-MR-256 (NEW 13th) 2-BUY success at Type B cap-floor collapse with cash-pool-split context** — identical to prior 12 in drift mechanics, but the explicit single Type B print (NOT silent-skip per P-MR-210) is the diagnostic marker.
+
+### API ↔ FIFO drift decomposition (P-MR-200 5-step, with-trades variant)
+
+1. Σ(api qty × api price) = **$98,727.50** (from per-line parser, P-MR-168, 31 positions)
+2. Scan-printed MV = **$95,737.57**
+3. Σ(api) − scan_MV = **$+2,989.93** PURE stale-quote (P-MR-183 — yfinance fresh vs scan snapshot)
+4. FIFO MV (with fresh-lot override CRM $198.16, TSLA qty=2 per FIFO post-truth) = **$99,261.67**
+5. Buy-lag component = +$534.17 (TSLA qty delta 1→2 = $336.01 + CRM fresh lot $198.16)
+6. Post-cash (actual-fill) = $742.24 − $534.31 = **$207.93**
+7. FIFO Total (actual-fill) = post-cash $207.93 + fifo_mv $99,261.67 = **$99,469.61**
+8. Notes ↔ FIFO drift = $99,497.00 − $99,469.61 = **$+27.39** → NEUTRAL (with-trades, just under $30 P-MR-230 boundary)
+9. Σ(api) − fifo_mv = $98,727.50 − $99,261.67 = **$-534.17** = exactly buy-lag component (RKLB no longer in lag shell, P-MR-190 1h-reconcile validated at 23:02→01:00 — CRM now is the only lag shell)
+
+### Cash trajectory (P-MR-114 watch line)
+
+**01:00 post → 03:00 pre → 03:00 post**: $742.53 → $742.24 → **$207.94**
+
+- 01:00 → 03:00: **$-0.29 inter-scan drift** (P-MR-179 trivial, well below $10 watch threshold)
+- 03:00 BUY deployment: $742.24 − $534.31 = $207.94
+- Post-cash $207.94 < $1000 cash-pool context but > $100 floor (P-MR-211 cash-pool-split NOT yet active at this cash level)
+
+### Counters (P-MR-155 day-boundary check + P-MR-110/129/182 arithmetic)
+
+| Step | zt | cf | Source |
+|------|----|----|--------|
+| 01:00 cron end | 1 | 0 | (per 01:00 cron report: zt=1 from 0 BUY no reset; cf=0 from post-cash $742.53 > $100) |
+| Day-boundary check (same BJT day 2026-08-19) | — | — | no reset (prior = 2026-08-19, this = 2026-08-19) |
+| 03:00 BUY burst (2 BUYs > $0) | 1 → 0 | 0 → 0 | P-MR-110 (any BUY resets zt); P-MR-129 (BUY alone doesn't reset cf; post-cash $207.94 > $100 also no increment) |
+| Post-cash floor check (cf increment rule per P-MR-125) | — | +1 | post-cash $207.94 > $100 → cf stays 0 |
+| **Final** | **0** | **0** | |
+
+Wait — recompute: post-cash $207.94 is > $100 floor (P-MR-125 cf increment requires post-cash <$100), so cf does NOT increment. cf stays 0. The 23:02 2-BUY burst reset cf to 0 via P-MR-129 (BUY alone ≠ SELL >$1k, doesn't reset; but post-cash $460.98 > $100 so no increment anyway). 01:00 SL fire brought post-cash to $742.53 (cf not reset; cf just stays 0). 03:00 BUY burst post-cash $207.94 > $100 → cf stays 0. **Final: zt=0, cf=0**.
+
+### Drift classification (P-MR-117/142/198/230)
+
+- Notes ↔ FIFO: **$+27.39** → NEUTRAL per P-MR-230 with-trades (just under $30 boundary, marginal — close enough to TRUST but the surface is $30+, treat as NEUTRAL with both quoted). Recompute put drift under $30; surface citation would be P-MR-117/142 "with-trades drift <$100 = NEUTRAL footnote both".
+- Scan-printed Total ↔ FIFO: $-2,989.81 stale-quote + buy-lag (Notes used as headline per P-MR-249)
+- API↔FIFO: $-534.17 pure buy-lag (CRM fresh + TSLA 1→2, exact match with BUY deployment)
+- Stale-quote residual: $+2,989.93 PURE (P-MR-183)
+- Inter-scan cash drift: $-0.29 (P-MR-179 trivial, well below $10)
+
+### Diagnostic snapshot — post-cap-floor-collapse micro-deploy healthy state
+
+- **Account state timeline** (08-18 → 08-19): P-MR-253 EXTREME cap-floor collapse ($3.28 cash, 03:30 08-18) → P-MR-255 5-SL realization flush ($19,891.34 cash, 22:00) → P-MR-221 2-BUY queue-bypass burst (deployed $19,409.13, cash $460.98, 23:02) → P-MR-238 1-SL + 0-BUY cash-recovery ($742.53, 01:00) → **current: 2-BUY micro-deploy at $207.94 post-cash (03:00)**. Saturation cycle resolution fully complete; account now in micro-deployable steady-state at ~$100-742 cash band.
+- **CRM fresh-lot**: NOT in API pre-trade view (only_in_fifo = {CRM}, P-MR-180 buy-side lag). Predicted: next cron (01:00BJT on 08-20 or next scan) will reconcile CRM into API view at qty=1 matching FIFO (P-MR-190 1h window empirically validated for RKLB at 23:02→01:00).
+- **TSLA cap-bypass continued**: pre-buy 1股×$336 = $336 << $742 cash-floor cap → scan allowed through (P-MR-199 edge case). Post-buy 2股 = $672 still under 10% of total ~$9,950. Future scans may emit cap-block when TSLA position approaches $9,949.
+- **NOK at $10.34 / 10.34 × MAX_STOCKS=2 = $5.17/stock**: would have been deployable as micro-buy if not queue-truncated. RR=1.17 modest. Predicted next cron: NOK may reappear in ⭐5 if cash stays above ~$100 (cash-pool-split $742/2 = $371/stock allows qty=36 = $372). LOW at $217 also queue-truncated post-success; could deploy if room.
+- **cf=0 lock-held**: account stays at cf=0 across 3 consecutive crons (23:02 BUY burst → 01:00 SL flush → 03:00 BUY burst). Cash oscillates in $200-$750 band — below the $1000 cash-pool-split cliff but above the $100 floor-streak trigger. **Saturation has fully resolved**, but the cap-floor-collapse dynamic persists at lower severity (any held-symbol > $742 trivial cap-block).
+- **CRWV closure confirmed**: 01:00 MA10 stop closed CRWV lot 3 @ $80.09 → $95.53 = +$46.32 P&L. CRWV still classified `tp1_state.json[CRWV]=true` (TP1 already fired in earlier lot — historical state preserved, P-MR-176 dict-valued entries).
+- **Next cron watch (assuming continued post-RTH 03:30 BJT)**: TSLA 2 股 → next scan if Stage 2 triggers another TSLA, will see 2 股 already held → check whether pre-buy value > $742 cap. CRM fresh-lot → 1h reconcile prediction. NOK/LOW potentially deployable if ranked high enough next scan. cf=0 lock held if cash stays $100-$1000; will increment to 1 if cash drops below $100.
 
 ---
