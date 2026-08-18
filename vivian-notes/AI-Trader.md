@@ -8,43 +8,44 @@ tags: [股票, AI-Trader, 模擬倉]
 
 ## 帳戶
 - Agent：HermesV（ID: 6092）
-- Cash：$742
-- 總倉值：~$99,497（31倉）
+- Cash：$207
+- 總倉值：~$99,625（32倉）
 
 ## 持倉（2026-08-19 實況）
 | 股票 | 數量 | 成本 | 現價 | 盈虧 | PnL% | SL |
 |------|------|------|------|------|------|-----|
-| ASTS | 32 | $63.24 | $67.20 | +127 | 6.3% | 5%固定 $60.08 |
-| CSCO | 29 | $114.54 | $111.88 | -77 | -2.3% | 5%固定 $108.81 |
-| IREN | 35 | $39.32 | $42.04 | +95 | 6.9% | MA10/entry $41.60 |
-| QCOM | 1 | $165.74 | $159.71 | -6 | -3.6% | 5%固定 $157.45 |
-| RKLB | 126 | $78.05 | $79.86 | +228 | 2.3% | 5%固定 $74.15 |
-| WFC | 36 | $76.57 | $87.36 | +388 | 14.1% | 5%固定 $72.74 |
-| MRVL | 46 | $212.47 | $213.46 | +46 | 0.5% | 5%固定 $201.84 |
-| CVX | 12 | $192.20 | $205.45 | +159 | 6.9% | 5%固定 $182.59 |
-| HOOD | 74 | $95.68 | $92.84 | -210 | -3.0% | 5%固定 $90.90 |
-| COP | 64 | $109.67 | $129.85 | +1292 | 18.4% | 5%固定 $104.18 |
-| DE | 17 | $575.76 | $591.39 | +266 | 2.7% | 5%固定 $546.97 |
-| MRK | 7 | $118.23 | $135.59 | +121 | 14.7% | 5%固定 $112.32 |
-| VZ | 3 | $43.68 | $48.75 | +15 | 11.6% | 5%固定 $41.50 |
-| HON | 5 | $230.32 | $227.98 | -12 | -1.0% | 5%固定 $218.80 |
-| VRT | 4 | $282.69 | $271.84 | -43 | -3.8% | 5%固定 $268.55 |
-| TSLA | 1 | $334.65 | $335.90 | +1 | 0.4% | 5%固定 $317.92 |
-| XOM | 37 | $141.55 | $165.17 | +874 | 16.7% | 5%固定 $134.47 |
-| BABA | 79 | $110.22 | $128.21 | +1421 | 16.3% | 5%固定 $104.71 |
-| PFE | 1 | $24.64 | $27.25 | +3 | 10.6% | 5%固定 $23.41 |
-| AVGO | 17 | $384.46 | $379.05 | -92 | -1.4% | 5%固定 $365.24 |
-| PATH | 67 | $11.94 | $15.73 | +255 | 31.8% | MA10/entry $15.38 |
-| PDD | 1 | $84.20 | $86.89 | +3 | 3.2% | 5%固定 $79.99 |
+| ASTS | 32 | $63.24 | $67.43 | +134 | 6.6% | 5%固定 $60.08 |
+| CSCO | 29 | $114.54 | $111.73 | -81 | -2.5% | 5%固定 $108.81 |
+| IREN | 35 | $39.32 | $41.82 | +88 | 6.4% | MA10/entry $41.57 |
+| QCOM | 1 | $165.74 | $161.05 | -5 | -2.8% | 5%固定 $157.45 |
+| RKLB | 126 | $78.05 | $79.90 | +234 | 2.4% | 5%固定 $74.15 |
+| WFC | 36 | $76.57 | $87.33 | +388 | 14.1% | 5%固定 $72.74 |
+| CRM | 1 | $198.26 | $198.53 | +0 | 0.1% | 5%固定 $188.35 |
+| MRVL | 46 | $212.47 | $214.37 | +88 | 0.9% | 5%固定 $201.84 |
+| CVX | 12 | $192.20 | $205.46 | +159 | 6.9% | 5%固定 $182.59 |
+| HOOD | 74 | $95.68 | $92.99 | -199 | -2.8% | 5%固定 $90.90 |
+| COP | 64 | $109.67 | $129.76 | +1286 | 18.3% | 5%固定 $104.18 |
+| DE | 17 | $575.76 | $591.86 | +274 | 2.8% | 5%固定 $546.97 |
+| MRK | 7 | $118.23 | $135.38 | +120 | 14.5% | 5%固定 $112.32 |
+| VZ | 3 | $43.68 | $48.76 | +15 | 11.6% | 5%固定 $41.50 |
+| HON | 5 | $230.32 | $227.79 | -13 | -1.1% | 5%固定 $218.80 |
+| VRT | 4 | $282.69 | $272.78 | -40 | -3.5% | 5%固定 $268.55 |
+| TSLA | 2 | $335.35 | $337.04 | +3 | 0.5% | 5%固定 $318.58 |
+| XOM | 37 | $141.55 | $165.21 | +875 | 16.7% | 5%固定 $134.47 |
+| BABA | 79 | $110.22 | $128.30 | +1428 | 16.4% | 5%固定 $104.71 |
+| PFE | 1 | $24.64 | $27.28 | +3 | 10.7% | 5%固定 $23.41 |
+| AVGO | 17 | $384.46 | $378.70 | -98 | -1.5% | 5%固定 $365.24 |
+| PATH | 67 | $11.94 | $15.85 | +262 | 32.8% | MA10/entry $15.39 |
+| PDD | 1 | $84.20 | $87.30 | +3 | 3.7% | 5%固定 $79.99 |
 | T | 14 | $21.53 | $25.04 | +49 | 16.3% | 5%固定 $20.45 |
-| FUTU | 67 | $100.51 | $108.79 | +555 | 8.2% | 5%固定 $95.48 |
-| BA | 5 | $218.68 | $223.66 | +25 | 2.3% | 5%固定 $207.75 |
-| IBM | 8 | $237.94 | $233.93 | -32 | -1.7% | 5%固定 $226.04 |
-| INTC | 5 | $99.62 | $95.94 | -18 | -3.7% | 5%固定 $94.64 |
-| KLAC | 1 | $200.63 | $192.99 | -8 | -3.8% | 5%固定 $190.60 |
-| LRCX | 1 | $310.68 | $324.43 | +14 | 4.4% | 5%固定 $295.15 |
-| SNDK | 1 | $1372.20 | $1605.95 | +234 | 17.0% | MA10/entry $1423.65 |
-| AMZN | 1 | $269.05 | $260.31 | -9 | -3.2% | 5%固定 $255.60 |
+| FUTU | 67 | $100.51 | $109.29 | +588 | 8.7% | 5%固定 $95.48 |
+| BA | 5 | $218.68 | $223.07 | +22 | 2.0% | 5%固定 $207.75 |
+| IBM | 8 | $237.94 | $234.34 | -29 | -1.5% | 5%固定 $226.04 |
+| INTC | 5 | $99.62 | $96.18 | -17 | -3.5% | 5%固定 $94.64 |
+| KLAC | 1 | $200.63 | $194.13 | -6 | -3.2% | 5%固定 $190.60 |
+| LRCX | 1 | $310.68 | $324.26 | +14 | 4.4% | 5%固定 $295.15 |
+| SNDK | 1 | $1372.20 | $1626.87 | +255 | 18.6% | MA10/entry $1425.73 |
+| AMZN | 1 | $269.05 | $260.17 | -9 | -3.3% | 5%固定 $255.60 |
 
 ## 交易歷史
 - 2026-06-29: 賣出 HOOD @ $101.39 × 26 — +21.1% TP1 hit, sell 1/3 @ $101.39, cost $83.73, PnL +$460
@@ -6146,3 +6147,100 @@ Wait — recompute: post-cash $207.94 is > $100 floor (P-MR-125 cf increment req
 - **Next cron watch (assuming continued post-RTH 03:30 BJT)**: TSLA 2 股 → next scan if Stage 2 triggers another TSLA, will see 2 股 already held → check whether pre-buy value > $742 cap. CRM fresh-lot → 1h reconcile prediction. NOK/LOW potentially deployable if ranked high enough next scan. cf=0 lock held if cash stays $100-$1000; will increment to 1 if cash drops below $100.
 
 ---
+
+## ⏰ 2026-08-19 03:30 BJT
+
+### Result: 0 trades fired — **Hybrid A+B saturation with held-cap-block + non-held cash-block** (5-evaluated sub-pattern)
+
+- **Cash: $207.40** | 持倉 32 只 | 帳戶總值 (Notes): **$99,625.00**
+- **FIFO Total (recompute): $99,635.31** | **Notes ↔ FIFO drift: $-10.31** → **TRUST per P-MR-230** (0-trade, drift <$30)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match across all positions
+- **Stale-quote drift: $-3,155.25** (P-MR-183 — scan-printed MV $96,271.87 vs Σ(api qty × api price) $99,427.12; 32 positions × ~$100 avg)
+- **Inter-scan cash drift: $-0.54** (P-MR-179 trivial, 03:00→03:30 no intervening trades, well below $10 watch threshold)
+
+### 0 BUY fired — Stage 2 all blocked
+
+7 ⭐5 candidates total, top 5 evaluated (per scan.py L716 `qualified[:5]`):
+
+| Rank | Symbol | Price | RR | Result | Type |
+|------|--------|-------|-----|--------|------|
+| 1 | NBIS | $247.67 | 2.62 | skipped | **Type A** (cash-block: $247 > $207 cash, 非持倉) |
+| 2 | PATH | $15.85  | 2.26 | skipped | **Type B** (cap-floor: $1,062 > 10% cap, held qty 67, `倉位已達10%上限($1062/$207)，跳過`) |
+| 3 | SNDK | $1,627.01 | 1.73 | skipped | **Type B** (cap-floor: $1,627 > 10% cap, held qty 1, `倉位已達10%上限($1627/$207)，跳過`) |
+| 4 | TSLA | $337.14 | 1.25 | skipped | **Type B** (cap-floor: $674 > 10% cap, held qty 2, `倉位已達10%上限($674/$207)，跳過`) |
+| 5 | CRM  | $198.56 | 1.20 | skipped | **Type A** (cash-block: $198 ≈ $207 cash, qty would be 1 but cash-pool-split blocks micro-deploy, 非持倉) |
+
+**Ranks 6-7** (NBIS, PATH likely duplicates from top-5 truncation; per scan.py L716 only top 5 printed): 2 candidates omitted by top-5 truncation.
+
+**Hybrid A+B classification**: 3 held-symbol cap-block (Type B) + 2 non-held cash-block (Type A) → 0 BUY fires. This is a textbook deep-saturation block pattern. Distinct from P-MR-205 (multi-cap collapse with cash-pool-split), P-MR-211 (cash-pool-split hybrid), P-MR-224 (degenerate pure-cap), P-MR-229 (pure Type A) — this is **hybrid held-cap + non-held-cash** where held-symbol cap-block is trivial (3 HELD symbols all > 10% of total_value $99,635 → cap-floor $9,963 trivially exceeded) AND non-held unit prices exceed $207 cash floor.
+
+### Stage 2 RR list (per scan.py stdout)
+
+⭐5 NBIS $247.67 RSI=69.8 RR=2.62 MA20=$211.62 止蝕=$235.29
+⭐5 PATH $15.85 RSI=73.8 RR=2.26 MA20=$13.72 止蝕=$15.05
+⭐5 SNDK $1627.01 RSI=70.5 RR=1.73 MA20=$1375.22 止蝕=$1545.66
+⭐5 TSLA $337.14 RSI=75.8 RR=1.25 MA20=$325.54 止蝕=$320.28
+⭐5 CRM $198.56 RSI=57.6 RR=1.2 MA20=$185.83 止蝕=$188.63
+
+### Counter Arithmetic (P-MR-155 same-BJT-day check + P-MR-110/125/182 arithmetic)
+
+- **Pre-cron counters** (from 2026-08-19 03:00 BJT): **zt=0, cf=0**
+- **Day-boundary check**: last cron (03:00 BJT) BJT date = 2026-08-19 == this cron (03:30 BJT) BJT date = 2026-08-19 → **NO day-boundary reset** (P-MR-155)
+- **Trade effects**: 0 BUY fired → zt+1 (P-MR-110) → **zt=1**
+- **Cash check**: post-cash $207.40 > $100 → cf NOT incremented (P-MR-125) → **cf=0**
+- **Final**: **zt=1, cf=0**
+
+### Drift Decomposition (P-MR-200 0-trade variant)
+
+1. **API sum**: Σ(qty × price) from per-line stdout = $99,427.12
+2. **Scan-printed MV**: $96,271.87
+3. **MV drift**: -$3,155.25 = **PURE stale-quote** (P-MR-183, no buy-lag since 0 BUY)
+4. **FIFO MV**: $99,427.91 = Σ(qty_fifo × stdout_price); **identity EXACT** vs API sum (P-MR-214, +$0.79 rounding)
+5. **FIFO Total**: $99,635.31 = cash $207.40 + FIFO MV $99,427.91
+6. **Notes Total**: $99,625.00
+7. **Notes ↔ FIFO drift**: -$10.31 → **TRUST per P-MR-230** (0-trade, drift <$30)
+
+### Cash Trajectory (last 5 crons)
+
+```
+2026-08-18 22:00: pre=$3.28 → post=$19,891.34 (5 SL: OKLO/ALAB/ARM/ANET/SYM, P-MR-255 5-SL realization flush)
+2026-08-18 23:02: pre=$19,870.11 → post=$460.98 (2 BUY: MRVL/RKLB)
+2026-08-19 01:00: pre=$455.94 → post=$742.53 (1 SL: CRWV)
+2026-08-19 03:00: pre=$742.24 → post=$207.94 (2 BUY: TSLA/CRM)
+2026-08-19 03:30: cash=$207.40 (0 trades, sat)
+```
+
+Cash trajectory shows post-22:00 collapse from $19.9k → $200s range. cf counter stays at 0 because cash oscillates in $200-$750 band (above $100 floor but below $1k threshold for BUY deploys). Account is in **healthy deploy-but-no-deployable-cash** steady state.
+
+### Diagnostics
+
+- **Account status**: 32 positions, $99,635 FIFO total, P&L all-time +$7,033
+- **P&L breakdown** (session + all-time):
+  - **All-time realized**: **+$1,212.94** (61 closed trades)
+  - **Today's session realized (10 trades since 22:00 BJT)**: **+$133.79**
+    - 6 SL closes: OKLO 6@$41.83 + ALAB 24@$296.50 + ARM 18@$253.26 + ANET 40@$196.03 + SYM 3@$40.40 + CRWV 3@$95.53
+    - ANET was the big winner: +$1,240 realized (40@$165.03 → 40@$196.03)
+    - ALAB was the big loser: -$757 realized (21@$332.56 → 21@$296.50)
+    - Net of 6 SL: ALAB -$757 + ARM -$229 + ANET +$1,240 + SYM -$6 + CRWV +$46 + OKLO portion ≈ +$294
+  - **Live unrealized**: **+$5,820.42** (32 positions, current API prices)
+    - Top winners: BABA +$1,419 (16.3%), COP +$1,292 (18.4%), XOM +$878 (16.8%), FUTU +$586 (8.7%), WFC +$388 (14.1%)
+    - Top losers: HOOD -$202 (-2.9%), AVGO -$91 (-1.4%), CSCO -$82 (-2.5%), VRT -$40 (-3.5%)
+  - **Total P&L (all-time realized + live unrealized)**: **+$7,033.36**
+- **TP1 / TP2 state**: 18 symbols tracked in TP1 (14 True/dict-ACTIVE), 3 in TP2 (CRWV True only)
+- **Watch items**:
+  - Cash < $1k for 4 consecutive crons since 22:00 → if cash drops below $100, cf will increment
+  - HOOD at -2.9% PnL (close to 5% stop) — monitor
+  - AVGO at -1.4% (deep position $6,432), CSCO at -2.5% (29 shares $3,240)
+  - PATH at +32.8% (massive gain, watch for TP1 +20% / TP2 +50% triggers next cron)
+  - COP at +18.4% (close to TP1 +20% trigger, monitor)
+  - SNDK at +18.5% (1 share, big position $1,626, watch for TP1)
+
+### Daily Summary (2026-08-19 BJT, since 22:00 2026-08-18)
+
+- **Buy signals fired**: 4 (MRVL +45, RKLB +126, TSLA +1, CRM +1)
+- **SL fires**: 6 (OKLO 6@$41.83, ALAB 24@$296.50, ARM 18@$253.26, ANET 40@$196.03, SYM 3@$40.40, CRWV 3@$95.53)
+- **TP1 fires**: 0
+- **TP2 fires**: 0
+- **Today's realized P&L**: **+$133.79** (10 trades)
+- **Account delta** (22:00→03:30, ~5.5h): total $99,635.31 vs prior evening $98k+ → **stable** ($200k sat, no major moves)
+- **All-time P&L (realized + unrealized)**: **+$7,033.36**
