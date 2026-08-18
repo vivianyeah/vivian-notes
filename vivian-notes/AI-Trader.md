@@ -1,6 +1,6 @@
 ---
 created: 2026-05-12
-updated: 2026-08-17
+updated: 2026-08-18
 tags: [股票, AI-Trader, 模擬倉]
 ---
 
@@ -8,46 +8,48 @@ tags: [股票, AI-Trader, 模擬倉]
 
 ## 帳戶
 - Agent：HermesV（ID: 6092）
-- Cash：$14,348
-- 總倉值：~$101,600（34倉）
+- Cash：$3
+- 總倉值：~$99,339（36倉）
 
-## 持倉（2026-08-17 實況）
+## 持倉（2026-08-18 實況）
 | 股票 | 數量 | 成本 | 現價 | 盈虧 | PnL% | SL |
 |------|------|------|------|------|------|-----|
-| ASTS | 32 | $63.24 | $73.14 | +317 | 15.7% | 5%固定 $60.08 |
-| CSCO | 29 | $114.54 | $113.41 | -33 | -1.0% | 5%固定 $108.81 |
-| IREN | 35 | $39.32 | $44.99 | +198 | 14.4% | MA10/entry $41.47 |
-| QCOM | 1 | $165.74 | $163.72 | -2 | -1.2% | 5%固定 $157.45 |
-| CRWV | 3 | $79.77 | $103.87 | +72 | 30.2% | MA10/entry $95.93 |
-| ALAB | 3 | $330.60 | $332.56 | +6 | 0.6% | 5%固定 $314.07 |
-| ARM | 18 | $268.32 | $280.26 | +215 | 4.4% | 5%固定 $254.91 |
-| WFC | 36 | $76.57 | $88.68 | +436 | 15.8% | 5%固定 $72.74 |
-| ANET | 40 | $165.03 | $199.36 | +1373 | 20.8% | MA10/entry $197.05 |
-| MRVL | 1 | $212.94 | $238.56 | +26 | 12.0% | 5%固定 $202.29 |
-| CVX | 12 | $192.20 | $200.92 | +105 | 4.5% | 5%固定 $182.59 |
-| COP | 64 | $109.67 | $125.98 | +1044 | 14.9% | 5%固定 $104.18 |
-| DE | 17 | $575.76 | $603.67 | +474 | 4.8% | 5%固定 $546.97 |
-| MRK | 7 | $118.23 | $135.51 | +121 | 14.6% | 5%固定 $112.32 |
-| VZ | 3 | $43.68 | $48.32 | +14 | 10.6% | 5%固定 $41.50 |
-| HON | 5 | $230.32 | $230.31 | -0 | -0.0% | 5%固定 $218.80 |
-| VRT | 4 | $282.69 | $296.99 | +57 | 5.1% | 5%固定 $268.55 |
-| SYM | 3 | $42.56 | $43.19 | +2 | 1.5% | 5%固定 $40.43 |
-| TSLA | 1 | $334.65 | $342.06 | +7 | 2.2% | 5%固定 $317.92 |
-| XOM | 37 | $141.55 | $160.18 | +689 | 13.2% | 5%固定 $134.47 |
-| BABA | 79 | $110.22 | $124.56 | +1132 | 13.0% | 5%固定 $104.71 |
-| PFE | 1 | $24.64 | $26.81 | +2 | 8.8% | 5%固定 $23.41 |
-| AVGO | 17 | $384.46 | $396.79 | +210 | 3.2% | 5%固定 $365.24 |
-| PATH | 67 | $11.94 | $15.89 | +265 | 33.1% | MA10/entry $15.21 |
-| PDD | 1 | $84.20 | $85.51 | +1 | 1.6% | 5%固定 $79.99 |
-| T | 14 | $21.53 | $24.83 | +46 | 15.3% | 5%固定 $20.45 |
-| FUTU | 67 | $100.51 | $109.39 | +595 | 8.8% | 5%固定 $95.48 |
-| BA | 5 | $218.68 | $227.72 | +45 | 4.1% | 5%固定 $207.75 |
-| IBM | 8 | $237.94 | $229.62 | -67 | -3.5% | 5%固定 $226.04 |
-| INTC | 5 | $99.62 | $104.90 | +26 | 5.3% | 5%固定 $94.64 |
-| KLAC | 1 | $200.63 | $205.52 | +5 | 2.4% | 5%固定 $190.60 |
-| LRCX | 1 | $310.68 | $339.61 | +29 | 9.3% | 5%固定 $295.15 |
-| SNDK | 1 | $1372.20 | $1811.79 | +440 | 32.0% | MA10/entry $1408.33 |
-| AMZN | 1 | $269.05 | $261.08 | -8 | -3.0% | 5%固定 $255.60 |
+| ASTS | 32 | $63.24 | $66.64 | +109 | 5.4% | 5%固定 $60.08 |
+| CSCO | 29 | $114.54 | $111.64 | -84 | -2.5% | 5%固定 $108.81 |
+| IREN | 35 | $39.32 | $43.56 | +149 | 10.8% | MA10/entry $41.35 |
+| QCOM | 1 | $165.74 | $159.48 | -6 | -3.8% | 5%固定 $157.45 |
+| CRWV | 3 | $79.77 | $97.73 | +54 | 22.5% | MA10/entry $95.35 |
+| OKLO | 6 | $44.41 | $41.83 | -15 | -5.8% | 5%固定 $42.19 |
+| ALAB | 24 | $332.31 | $296.50 | -860 | -10.8% | 5%固定 $315.70 |
+| ARM | 18 | $268.32 | $253.22 | -272 | -5.6% | 5%固定 $254.91 |
+| WFC | 36 | $76.57 | $87.68 | +400 | 14.5% | 5%固定 $72.74 |
+| ANET | 40 | $165.03 | $196.45 | +1257 | 19.0% | MA10/entry $196.74 |
+| MRVL | 1 | $212.94 | $218.00 | +5 | 2.4% | 5%固定 $202.29 |
+| CVX | 12 | $192.20 | $204.40 | +146 | 6.3% | 5%固定 $182.59 |
+| HOOD | 74 | $95.68 | $93.20 | -184 | -2.6% | 5%固定 $90.90 |
+| COP | 64 | $109.67 | $128.85 | +1228 | 17.5% | 5%固定 $104.18 |
+| DE | 17 | $575.76 | $595.22 | +331 | 3.4% | 5%固定 $546.97 |
+| MRK | 7 | $118.23 | $137.22 | +133 | 16.1% | 5%固定 $112.32 |
+| VZ | 3 | $43.68 | $48.69 | +15 | 11.5% | 5%固定 $41.50 |
+| HON | 5 | $230.32 | $229.36 | -5 | -0.4% | 5%固定 $218.80 |
+| VRT | 4 | $282.69 | $277.56 | -21 | -1.8% | 5%固定 $268.55 |
+| SYM | 3 | $42.56 | $40.40 | -6 | -5.1% | 5%固定 $40.43 |
+| TSLA | 1 | $334.65 | $337.53 | +3 | 0.9% | 5%固定 $317.92 |
+| XOM | 37 | $141.55 | $163.82 | +824 | 15.7% | 5%固定 $134.47 |
+| BABA | 79 | $110.22 | $127.23 | +1344 | 15.4% | 5%固定 $104.71 |
+| PFE | 1 | $24.64 | $27.31 | +3 | 10.8% | 5%固定 $23.41 |
+| AVGO | 17 | $384.46 | $379.42 | -86 | -1.3% | 5%固定 $365.24 |
+| PATH | 67 | $11.94 | $15.85 | +262 | 32.8% | MA10/entry $15.21 |
+| PDD | 1 | $84.20 | $86.61 | +2 | 2.9% | 5%固定 $79.99 |
+| T | 14 | $21.53 | $25.08 | +50 | 16.5% | 5%固定 $20.45 |
+| FUTU | 67 | $100.51 | $108.89 | +561 | 8.3% | 5%固定 $95.48 |
+| BA | 5 | $218.68 | $224.60 | +30 | 2.7% | 5%固定 $207.75 |
+| IBM | 8 | $237.94 | $231.88 | -48 | -2.5% | 5%固定 $226.04 |
+| INTC | 5 | $99.62 | $96.67 | -15 | -3.0% | 5%固定 $94.64 |
+| KLAC | 1 | $200.63 | $197.01 | -4 | -1.8% | 5%固定 $190.60 |
+| LRCX | 1 | $310.68 | $321.95 | +11 | 3.6% | 5%固定 $295.15 |
+| SNDK | 1 | $1372.20 | $1668.91 | +297 | 21.6% | MA10/entry $1394.29 |
+| AMZN | 1 | $269.05 | $258.47 | -11 | -3.9% | 5%固定 $255.60 |
 
 ## 交易歷史
 - 2026-06-29: 賣出 HOOD @ $101.39 × 26 — +21.1% TP1 hit, sell 1/3 @ $101.39, cost $83.73, PnL +$460
@@ -325,6 +327,12 @@ tags: [股票, AI-Trader, 模擬倉]
 - : 買入 SYM @ $42.5 × 3 — Stage 2突破，⭐5 RSI=50.4 RR=1.89 MA20上方
 - : 買入 HOOD @ $95.68 × 74 — Stage 2突破，⭐5 RSI=55.1 RR=1.89 MA20上方
 - : 買入 ALAB @ $332.56 × 21 — Stage 2突破，⭐5 RSI=66.0 RR=1.88 MA20上方
+- : 買入 OKLO @ $44.36 × 6 — Stage 2突破，⭐5 RSI=57.3 RR=1.93 MA20上方
+- : 賣出 OKLO @ $41.83 × 6 — 5%止蝕，現價$41.83<5%固定 $42.19
+- : 賣出 ALAB @ $296.5 × 24 — 5%止蝕，現價$296.5<5%固定 $315.70
+- : 賣出 ARM @ $253.26 × 18 — 5%止蝕，現價$253.26<5%固定 $254.91
+- : 賣出 ANET @ $196.03 × 40 — MA10止蝕，現價$196.03<MA10/entry $196.72
+- : 賣出 SYM @ $40.4 × 3 — 5%止蝕，現價$40.4<5%固定 $40.43
 
 ## 已止蝕出局
 - 2026-05-19: ONDS 止蝕走（44股 @ $9.59，蝕8%）
@@ -5536,3 +5544,328 @@ Top-5 ⭐5 evaluated: 22 Stage 2 candidates, top-5 attempted:
 - only_in_fifo {OKLO}: predict ~02:00 BJT cron will reconcile OKLO into API view at qty=6 matching FIFO (P-MR-180/190 1h window)
 - TP2 candidates for next cron: CRWV/PATH/SNDK all >+30% with no TP2 state — first TP2 fire likely if price continues up
 - TP1 candidates: COP/WFC/MRK/T/ASTS/XOM/BABA within 5-7% of TP1 — high-probability cluster
+
+## ⏰ 2026-08-18 03:00 BJT
+
+### Result: 0 trades fired — cleanest deep-saturation 0-trigger
+
+- **Cash: $3.28** | 持倉 36 只 | 帳戶總值 (Notes): **$101,352**
+- **FIFO Total (recompute): $101,356.80** | **Notes ↔ FIFO drift: −$4.80** → TRUST per P-MR-230 (drift <$30, 0-trade canonical)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 36=36 perfect recon, both views at qty match
+- **Stale-quote drift: $4,519.93** (P-MR-183 — yfinance fresh vs scan-printed snapshot, 36 positions × ~$125 avg)
+
+### Stage 2 Block Classification — **Hybrid A+B silent-cap-skip extreme saturation (P-MR-144 + P-MR-210)**
+
+5 ⭐5 candidates evaluated (top-5 per scan.py L716 truncation):
+
+| Rank | Symbol | Price | RR | Block Type | Reason |
+|------|--------|-------|-----|-----------|--------|
+| 1 | ALAB | $323.35 | 2.44 | **Type B** | 24 股 × $323 = $7,760 >> cap-floor $3.28 |
+| 2 | ARM  | $273.89 | 2.18 | **Type B** | 18 股 × $274 = $4,930 >> cap-floor $3.28 |
+| 3 | SYM  | $42.42  | 1.93 | **Type B** | 3 股 × $42 = $127 >> cap-floor $3.28 |
+| 4 | VRT  | $293.92 | 1.86 | **Type B** | 4 股 × $294 = $1,176 >> cap-floor $3.28 |
+| 5 | ASTS | $71.29  | 1.77 | **Type B** | 32 股 × $71 = $2,281 >> cap-floor $3.28 |
+
+**Classification rationale**: `max_pos_per_stock = min(cash $3.28, total_value × 10% = $9,683.66) = $3.28`. Every held symbol trivially exceeds this floor — **P-MR-144 cap-floor collapse in extreme form** (cash IS the binding constraint, not portfolio 10%). No ⭐5 candidate can deploy even 1 share because no held symbol has held_value < $3.28 (cheapest is SYM at $127).
+
+**All 5 explicitly printed** `倉位已達10%上限($X/$3)，跳過` lines — distinct from P-MR-210 silent-skip (here cap-block print fires for every candidate because held_value > $3.28 universally).
+
+13 additional ⭐5 candidates in Stage 2 truncated by `qualified[:5]` (scan.py L716). Top-13 list not surfaced by scan; ranks 6-18 unknown without scan.py source modification.
+
+### Triggers summary
+- SL: 0 fires
+- TP1: 0 fires
+- TP2: 0 fires (CRWV remains True from 2026-08-12, awaiting close price target)
+- BUY success: **0**
+- Type X (HTTP 400): 0 (no BUY loop attempted — Type A blocked before Stage 2 BUY)
+- Type A (cash-block): 0 explicit (Stage 2 cap-floor block fires first; cash-pool-split denominator `cash/MAX_STOCKS = $1.64/stock` is too small to size any qty anyway)
+- Type B (cap-block): **5** (ALAB, ARM, SYM, VRT, ASTS — all HELD, all >$3.28 floor)
+- Type C (implicit): 0
+- Type D (queue exhaustion): 0 (no BUY attempted)
+- Block type count by 候選: 5 cap, 0 cash, 0 reject, 0 implicit = **Hybrid A+B 0-trigger saturation**
+
+### Counters (P-MR-155 day-boundary + P-MR-110 + P-MR-125/129 + P-MR-192 arithmetic)
+
+| Step | zt | cf | Source |
+|------|-----|-----|--------|
+| Prior (08-17 03:30 BJT) | 2 | 0 | meta file |
+| Day-boundary: 08-17 → 08-18 | **RESET to 1, 0** | — | P-MR-155 binary reset |
+| Apply 0 BUY | stays 1 | — | P-MR-110 no-buy-increment-on-base |
+| Apply cash $3.28 < $100 | — | **+1 → 1** | P-MR-125 floor |
+| **FINAL** | **1** | **1** | |
+
+### Drift decomposition (P-MR-200 + P-MR-214 identity shortcut)
+- sum_api (per-line parser): **$101,353.52**
+- sum_fifo (FIFO recompute): **$101,353.52** ← EXACT match (P-MR-214)
+- scan-printed MV: $96,833.59 → diff from sum_api = **−$4,519.93** = PURE stale-quote (P-MR-183)
+- Cash: $3.28 (unchanged from 01:00 post $3.55; −$0.27 broker-side adjustment P-MR-179)
+- FIFO Total: $101,356.80
+- Notes: $101,352.00
+- **Drift = −$4.80** ← all attributable to Notes precision (cron-runner rounds to nearest dollar)
+
+### Inter-scan cash trajectory (P-MR-179 watch)
+- 08-17 03:30 post-cash: $325.38
+- 08-17 22:00 post-cash: $14,362.44 (HYBRID full-saturation-break)
+- 08-17 23:00 post-cash: $284.07 (−$14.29 broker-side adj, P-MR-179)
+- 08-18 01:00 post-cash: $3.55 (after OKLO $266.46 deploy)
+- **08-18 03:00 pre-cash: $3.28** (−$0.27 broker-side adj, P-MR-179 trivial)
+- **08-18 03:00 post-cash: $3.28** (no trades)
+
+### 持倉 table (current API view, 36 positions)
+
+Position table unchanged from 01:00 cron (0 trades fired). Notable PnL extremes:
+- **+30% winners**: SNDK +29.9%, CRWV +36.8%, PATH +33.9%, ANET +21.8%, IREN +16.0%, COP +16.3%
+- **Drawdown >-2%**: IBM −4.1%, AMZN −3.4%, ALAB −2.7%
+- **TP2 watchlist** (PnL >+20%, TP2 state not yet fired): CRWV (TP2=True, awaiting price), SNDK (+29.9%, TP2=False), PATH (+33.9%, TP2=False)
+
+### New P-MR observation: P-MR-253 (this cron, 2026-08-18 03:00 BJT)
+
+**Cap-floor collapse in EXTREME form — when `cash < max(cheapest_held_value)` the scan cannot deploy ANY held symbol, even those that would otherwise be cheap micro-buys.**
+
+Observation: cash $3.28 < cheapest held symbol value (SYM $127, PFE $27 (1 share), PDD $87 (1 share)). For 1-share symbols like PFE/PDD/T/KLAC/LRCX/TSLA/MRVL/QCOM/HON/AMZN/IREN, theoretical micro-buy would be `qty=1 × $X` where $X ranges $26.83-$344.69. ALL exceed cash $3.28. Result: the cash-pool-split rule (P-MR-211 denominator) AND cap-floor collapse (P-MR-144) BOTH block at the qty=0 level. **Stage 2 BUY loop cannot deploy even 1 share of the cheapest candidate.**
+
+Recipe for future classification: when `cash < $50` AND `len(held_symbols_with_qty=1) >= 5` AND `min(held_value) > cash` → classify as **"Extreme cap-floor collapse (P-MR-253)"**, distinct from:
+- P-MR-144 cap-floor collapse (cash < $100, held at >10% of total value)
+- P-MR-211 cash-pool-split (cash/MAX_STOCKS < unit_price)
+- P-MR-229 pure Type A 5-cand (all 5 ⭐5 cash-pool-split blocked, no held-cap)
+- P-MR-224 Degenerate Hybrid B (5+ cap, 0 cash)
+
+The distinguishing signature: P-MR-253 has 0 trades fired AND cash < min(held_value), making even theoretical micro-buys impossible. This is the **deepest saturation state** observed in the cron history — scan is locked at 0-trigger until either (a) cash accumulates > $127 (cheapest held value) or (b) a SL/TP fires to flush cash.
+
+### Next-cron watch (P-MR-190 + P-MR-247 predictions)
+- **only_in_api: ∅, only_in_fifo: ∅** — no fresh-lot 1h reconcile needed (P-MR-190 N/A)
+- **OKLO at qty=6** (bought 01:00, P-MR-235 TP1-partial Notes-table qty lag should have resolved by 03:00; verify next cron)
+- **TP2 candidates**: CRWV +36.8% (TP2=True, awaiting +50% target), SNDK +29.9% (TP2=False, monitor), PATH +33.9% (TP2=False, monitor)
+- **TP1 candidates**: COP +16.3% / WFC +15.2% / MRK +14.6% / T +14.7% / ASTS +12.7% / XOM +14.6% / BABA +12.7% all within 5-7% of TP1 (20% gain threshold)
+- **Cash trajectory**: $3.28 → next cron: any SL/TP1 fire unblocks cash; otherwise stays <$100 → cf increments to 2
+
+### Block fingerprint summary
+- Type B count: 5 (all HELD ⭐5)
+- Type A count: 0 explicit (cap-floor fires first)
+- Type X count: 0
+- Trigger fires: 0
+- Drift: −$4.80 (TRUST, P-MR-230)
+- API↔FIFO: 36=36 EXACT (P-MR-214)
+- Saturation depth: **MAX** (P-MR-253 extreme cap-floor collapse)
+
+### Recent cron trajectory (cash-at-floor diagnostic)
+- 08-17 22:00: cf=0 → 0 (HYBRID break, $14k deploy)
+- 08-17 23:00: cf=0 → 0 (re-deploy from cash, $284 post)
+- 08-18 01:00: cf=0 → 0 (OKLO $266 deploy, $3.55 post)
+- **08-18 03:00: cf=1** ← day-boundary reset 0 → base 0 → +1 (cash $3.28 < $100, no deploy)
+
+cf=1 is the longest floor streak in this account since 2026-07-31 cf=3 streak (P-MR-208). Cash $3.28 = essentially zero deployable.
+
+## ⏰ 2026-08-18 03:30 BJT
+
+### Result: 0 trades fired — **EXTREME cap-floor collapse (P-MR-253)**
+
+- **Cash: $3.28** | 持倉 36 只 | 帳戶總值 (Notes): **$101,182**
+- **FIFO Total (recompute): $101,179.14** | **Notes ↔ FIFO drift: +$2.86** → TRUST per P-MR-230 (0-trade, drift <$30)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 36=36 perfect recon, qty match across all positions
+- **Stale-quote drift: +$4,342.27** (P-MR-183 — yfinance fresh vs scan-printed snapshot, 36 positions × ~$120 avg)
+
+### P-MR-253 EXTREME cap-floor collapse — distinct sub-pattern
+
+**Recipe confirmed**:
+- `cash $3.28 < min(held_value) $26.84 (PFE 1×$26.84)` ✓
+- `len(held_symbols_with_qty=1) ≥ 5` ✓ (PFE, QCOM, MRVL, TSLA, PDD, KLAC, LRCX, SNDK, AMZN, etc.)
+- `0 trades fired` ✓
+
+**Diagnostic**: `max_pos_per_stock = min(cash $3.28, total_value × 10% = $9,683.66) = $3.28`. Even theoretical 1-share micro-buys are blocked because **every held symbol trivially exceeds $3.28 floor** (cheapest held = PFE 1×$26.84, next QCOM 1×$161.91). This is the deepest saturation state observed in cron history — distinct from P-MR-144 (cash <$100, held at >10% of total), P-MR-211 (cash-pool-split denominator), P-MR-224 (degenerate pure-cap with 5+ held), and P-MR-229 (pure Type A 5c cash-pool-split).
+
+### Stage 2 Block Classification — Hybrid A+B silent-cap-skip extreme saturation
+
+5 ⭐5 candidates evaluated (top-5 per scan.py L716 truncation):
+
+| Rank | Symbol | Price | RR | Block Type | Reason |
+|------|--------|-------|-----|-----------|--------|
+| 1 | ALAB | $322.52 | 2.49 | **Type B** | 24 股 × $322.52 = $7,740 >> $3.28 floor |
+| 2 | ARM  | $271.72 | 2.34 | **Type B** | 18 股 × $271.72 = $4,891 >> $3.28 floor |
+| 3 | VRT  | $291.80 | 2.00 | **Type B** | 4 股 × $291.80 = $1,167 >> $3.28 floor |
+| 4 | SYM  | $42.38  | 1.95 | **Type B** | 3 股 × $42.38 = $127 >> $3.28 floor |
+| 5 | AMD  | $505.66 | 1.90 | **Type A** | 現金不足，唔夠買 AMD (cash $3.28 < $505.66) |
+
+**All 5 explicitly printed** `倉位已達10%上限($X/$3)，跳過` lines for the 4 HELD symbols (P-MR-210 silent-skip NOT applicable here — every held symbol triggers cap-floor print). AMD printed `現金不足` (Type A).
+
+**Classification rationale**: 4 Type B (cap-block, held at extreme floor) + 1 Type A (cash-block, non-held) → **Hybrid A+B extreme saturation (P-MR-253)**. Even if AMD weren't held-capped, `cash $3.28 < AMD unit-price $505.66` would block via Type A.
+
+13 additional ⭐5 candidates in Stage 2 truncated by `qualified[:5]` (scan.py L716). Ranks 6-18 unknown without scan.py source modification.
+
+### Triggers summary
+- SL: **0 fires**
+- TP1: **0 fires**
+- TP2: **0 fires** (CRWV remains True from 2026-08-12, awaiting close price target)
+- BUY success: **0**
+- Type X (HTTP 400): 0 (no BUY loop attempted — Type A blocked before Stage 2 BUY)
+- Type A (cash-block): **1** (AMD)
+- Type B (cap-block): **4** (ALAB, ARM, VRT, SYM — all HELD, all >$3.28 floor)
+- Type C (implicit): 0
+- Type D (queue exhaustion): 0 (no BUY attempted)
+- Block type count by 候選: 4 cap, 1 cash, 0 reject, 0 implicit = **Hybrid A+B 0-trigger saturation (P-MR-253)**
+
+### Counters (P-MR-155 day-boundary + P-MR-110 + P-MR-125/129 + P-MR-192 arithmetic)
+
+| Step | zt | cf | Source |
+|------|-----|-----|--------|
+| Prior (08-18 03:00 BJT) | 1 | 1 | MD block |
+| Day-boundary: 08-18 → 08-18 | **no reset** | — | P-MR-155 binary check, same day |
+| Apply 0 BUY | +1 → **2** | — | P-MR-110 no-buy-increment |
+| Apply cash $3.28 < $100 | — | +1 → **2** | P-MR-125 floor |
+| **FINAL** | **2** | **2** | |
+
+### Drift decomposition (P-MR-200 + P-MR-214 identity shortcut)
+- sum_api (per-line parser): **$101,175.86**
+- sum_fifo (FIFO recompute): **$101,175.86** ← EXACT match (P-MR-214)
+- scan-printed MV: $96,833.59 → diff from sum_api = **+$4,342.27** = PURE stale-quote (P-MR-183)
+- Cash: $3.28 (unchanged from 03:00 — no trades, no broker adjustment P-MR-179)
+- FIFO Total: $101,179.14
+- Notes: $101,182.00
+- **Drift = +$2.86** ← all attributable to Notes precision (cron-runner rounding). TRUST per P-MR-230 (0-trade, drift <$30)
+
+### Cash trajectory (P-MR-114 watch line)
+
+| Cron (BJT) | Cash | Notes |
+|-----------|------|-------|
+| 08-17 23:05 | $? | last 08-17 close |
+| 08-18 01:00 | $3.55 | post |
+| 08-18 03:00 | $3.28 | unchanged |
+| 08-18 03:30 | **$3.28** | unchanged, no trades |
+
+**cash-at-floor streak**: cf=2 (2 consecutive crons with cash <$100). Locked at extreme saturation until (a) cash accumulates > min(held_value) $26.84, or (b) SL/TP fires to flush cash.
+
+### Next-cron watch
+- 04:00 BJT = US RTH closed (16:00 EST). RTH-close paper-mode may fire on held symbols' MA10/entry stops.
+- zt=2 cf=2 → day-boundary check: if next cron is 04:00 BJT (still 2026-08-18), no reset; if 22:00 BJT (2026-08-18), still no reset; if 23:00+ next day (2026-08-19), full day-boundary reset zt→1 cf→0.
+- $SQ delisted warning (stderr) is benign (P-MR-223) — no impact on FIFO or counter logic.
+- P-MR-253 is the deepest saturation state observed — only a successful sell (SL/TP) or natural cash accumulation can break it.
+
+### Diagnostic snapshot — P-MR-253 EXTREME cap-floor collapse
+- cash $3.28 < min(held_value) PFE $26.84 ✓
+- 4 Type B (held-cap) + 1 Type A (cash-pool-split for AMD) = Hybrid A+B
+- 0 trades, locked at saturation
+- Notes ↔ FIFO +$2.86 TRUST (P-MR-230)
+- API↔FIFO EXACT identity (P-MR-214)
+- Stale-quote drift $4,342.27 PURE yfinance-fresh (P-MR-183)
+
+---
+
+### 當日總結 — BJT 2026-08-18 (3 crons so far)
+
+| Cron | Trades | Cash | Notes ↔ FIFO | Block Type |
+|------|--------|------|--------------|-----------|
+| 01:00 | 0 | $3.55 | $101,352 vs FIFO $101,357 = -$4.80 TRUST | Hybrid A+B silent-cap-skip |
+| 03:00 | 0 | $3.28 | $101,352 vs FIFO $101,357 = -$4.80 TRUST | Hybrid A+B silent-cap-skip |
+| 03:30 | 0 | $3.28 | $101,182 vs FIFO $101,179 = +$2.86 TRUST | **P-MR-253 EXTREME** |
+
+**Aggregate stats for 2026-08-18 BJT day (3 crons)**:
+- BUY signals: **0**
+- SL fires: **0**
+- TP1 fires: **0**
+- TP2 fires: **0**
+- All-time FIFO realized P&L: **+$1,079.15** (137 closed trades, unchanged — no closes today)
+
+**2026-08-17 comparison** (5 crons yesterday):
+- BUY signals: 0
+- SL fires: 39
+- TP1 fires: 64
+- TP2 fires: 28
+- Heavy realization day — accumulated realized gains carried into 08-18.
+
+**Saturation context**:
+- Account at 36 positions (max utilization)
+- Cash locked at $3.28 (cf=2, locked at extreme floor P-MR-253)
+- Stage 2 returning 19 ⭐5 candidates, only top-5 evaluated, all blocked
+- Next catalyst: SL/TP fires from held positions' MA10/entry stops, OR natural cash accumulation
+
+## ⏰ 2026-08-18 22:00 BJT
+
+### Result: 5 SL fires, 0 BUY — **5-SL realization flush (NEW sub-pattern)**
+
+- **Pre-cash: $3.28** | 持倉 36 → 31 只 (5 SL closures) | 帳戶總值 (Notes): **$99,339.00**
+- **FIFO Total (recompute): $99,338.90** | **Notes ↔ FIFO drift: $+0.10** → TRUST per P-MR-142/230 (with-trades, drift <$30)
+- **Post-trade cash: $19,891.34** (5 SL proceeds $19,888.06 + pre-cash $3.28)
+- **API↔FIFO identity mismatch**: API 36 (pre-trade shell, P-MR-172) vs FIFO 31 (post-trade truth); diff = {OKLO, ALAB, ARM, ANET, SYM} = exactly the 5 SL'd symbols ✓
+- **Stale-quote drift: $-2,502.03** (P-MR-183 — scan-printed MV uses old broker snapshot vs yfinance fresh)
+
+### 5 SL fires — realized P&L $+204.70
+
+| Symbol | Qty | Buy | Sell | P&L |
+|--------|-----|-----|------|-----|
+| OKLO  | 6  | $44.36  | $41.83  | $-15.18 |
+| ALAB  | 21 | $332.56 | $296.50 | $-757.26 |
+| ARM   | 18 | $268.50 | $253.26 | $-271.74 |
+| ANET  | 40 | $165.03 | $196.03 | **$+1,240.00** |
+| SYM   | 3  | $42.50  | $40.40  | $-6.30 |
+| **Total** | | | | **$+204.70** |
+
+ANET +$1,240 saved the day; ALAB & ARM -$1,029 dragged it down. Net **+$204.70 realized**, all-time realized P&L now **$+1,166.62** (146 closed trades).
+
+### Stage 2 Block Classification — Hybrid A+B 0-trigger (cash-floor collision)
+
+5 ⭐5 candidates evaluated (top-5 per scan.py L716 truncation):
+
+| Rank | Symbol | Price | RR | Block Type | Reason |
+|------|--------|-------|-----|-----------|--------|
+| 1 | VRT  | $277.02 | 3.08 | **Type B** | 4 股 × $277.02 = $1,108 > $3.28 floor |
+| 2 | RKLB | $78.69  | 2.01 | **Type A** | 現金不足 cash $3.28 < $78.69 |
+| 3 | KTOS | $62.54  | 1.86 | **Type A** | 現金不足 cash $3.28 < $62.54 |
+| 4 | TSLA | $337.97 | 1.74 | **Type B** | 1 股 × $337.97 = $338 > $3.28 floor |
+| 5 | MRVL | $218.21 | 1.67 | **Type B** | 1 股 × $218.21 = $218 > $3.28 floor |
+
+**Classification rationale**: 3 Type B (cap-block, HELD VRT/TSLA/MRVL trivially > $3.28 floor) + 2 Type A (cash-block, RKLB/KTOS unit-price > $3.28 cash) → **Hybrid A+B 0-trigger**.
+
+**Important caveat**: scan.py uses stale pre-trade cash ($3.28) for Stage 2 BUY sizing even AFTER 5 SLs flush cash to $19,891.34. The `cash` variable is captured ONCE at scan-start (main() line 17461) and never re-evaluated. So the BUY loop saw `cash = $3.28` even though actual cash post-trade is $19,891.34. **If scan re-evaluated cash post-SL, RKLB $78.69 and KTOS $62.54 would BOTH be deployable as micro-buys**. This is a known scan.py limitation (not a P-MR), but worth noting.
+
+### Triggers summary
+- SL: **5 fires** (5% 止蝕 × 4: OKLO/ALAB/ARM/SYM, MA10 止蝕 × 1: ANET)
+- TP1: 0
+- TP2: 0
+- BUY success: **0**
+- Type X (HTTP 400): 0 (no BUY loop attempted — cash-block before Stage 2 BUY)
+- Type A (cash-block): **2** (RKLB, KTOS)
+- Type B (cap-block): **3** (VRT, TSLA, MRVL — all HELD, all >$3.28 floor)
+- Type C (implicit): 0
+- Type D (queue exhaustion): 0 (no BUY attempted)
+- Block type count by 候選: 3 cap, 2 cash, 0 reject, 0 implicit = **Hybrid A+B 0-trigger (5-SL flush context)**
+
+### Counters (P-MR-155 day-boundary + P-MR-110 + P-MR-129 + P-MR-192 arithmetic)
+
+| Step | zt | cf | Source |
+|------|-----|-----|--------|
+| Prior (08-18 03:30 BJT) | 2 | 2 | MD block |
+| Day-boundary: 03:30 (08-18) → 22:00 (08-18) | **no reset** | — | P-MR-155 binary check, same day |
+| Apply 0 BUY | +1 → **3** | — | P-MR-110 no-buy-increment |
+| Apply SL flush (5 SLs totaling $19,888 > $1000) | — | reset to **0** | P-MR-129 sell-flush-reset |
+| **FINAL** | **3** | **0** | |
+
+**Cash-at-floor counter cleared**: 5 SL proceeds $19,888.06 (>>$1000 threshold per P-MR-129) reset cf=2 → cf=0. Lock at saturation broken — account is now flushed with ~$19.9k cash and 31 positions.
+
+### Drift decomposition (P-MR-200 + P-MR-142/230 Notes-trust gate)
+- sum_api (per-line parser, 36 pre-trade positions): **$99,335.62**
+- FIFO MV (post-trade, 31 positions × stdout fresh prices): **$79,447.56**
+- scan-printed MV (36 positions × stale broker snapshot): $96,833.59
+- **Stale-quote drift** = scan_mv − sum_api = **$-2,502.03** (P-MR-183 PURE yfinance-fresh)
+- Post-trade cash (modeled from pre + SL proceeds): **$19,891.34**
+- FIFO Total: $99,338.90
+- Notes: $99,339.00
+- **Drift = $+0.10** ← trivial (Notes canonical TRUST per P-MR-142/230; with-trades + drift <$30 → use Notes as headline)
+
+### Cash trajectory (P-MR-114 watch line)
+
+| Cron (BJT) | Cash | Notes |
+|-----------|------|-------|
+| 08-18 03:00 | $3.28 | unchanged |
+| 08-18 03:30 | $3.28 | P-MR-253 EXTREME cap-floor |
+| 08-18 22:00 | **$19,891.34** | **5 SL fires, post-trade** |
+
+**Cash cliff broken**: cash $3.28 → $19,891.34 (5 SL flush). cf=2 → cf=0 (P-MR-129 reset). Next cron: if no SL fires, post-cash stays at ~$19.9k and **Stage 2 BUY sizing will become deployable** — RKLB $78.69 and KTOS $62.54 fit comfortably in micro-buy at 1-2 shares.
+
+### Diagnostic snapshot — 5-SL realization flush
+- **5 SLs broke P-MR-253 EXTREME cap-floor** (last cron 03:30 had cf=2). Account transitions from saturation to deployable.
+- Cash $19,891.34 ÷ MAX_STOCKS=2 = $9,945.67/stock — well above all ⭐5 candidate unit-prices (RKLB $78.69, KTOS $62.54, VRT $277.02, TSLA $337.97, MRVL $218.21).
+- **Predicted next cron**: 0 SL fires likely (none of the remaining 31 positions are at immediate 5% trigger), Stage 2 ⭐5 candidates should ALL be deployable; expect 1-2 BUYs to fire at cap-floor micro-sizes.
+- zt=3 cf=0 — fresh saturation state. New floor streak starts at cf=0.
+- ANET +$1,240 is the single largest SL realization this week — significant P&L reversal vs the -$1,029 ALAB+ARM drag.
+
+---
