@@ -6244,3 +6244,105 @@ Cash trajectory shows post-22:00 collapse from $19.9k → $200s range. cf counte
 - **Today's realized P&L**: **+$133.79** (10 trades)
 - **Account delta** (22:00→03:30, ~5.5h): total $99,635.31 vs prior evening $98k+ → **stable** ($200k sat, no major moves)
 - **All-time P&L (realized + unrealized)**: **+$7,033.36**
+
+## ⏰ 2026-08-19 22:00 BJT
+
+### Result: 0 trades fired — **Pre-RTH-30min zero-Stage-2 scan (scan pool returned 0 candidates)**
+
+- **Cash: $207.40** | 持倉 32 只 | 帳戶總值 (Notes): **$99,625.00** (stale from 03:30 BJT cron)
+- **FIFO Total (recompute): $99,425.31** | **Notes ↔ FIFO drift: $+199.69** (Notes 表未更新，trust FIFO as audit truth)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match all positions, no lag shells
+- **Stale-quote drift: $0.00** — scan-printed MV not emitted this run; sum_api $99,217.91 = FIFO MV $99,217.91 (identity hit)
+- **Inter-scan cash drift: $-0.54** (P-MR-179 trivial, 03:30→22:00 no intervening trades, well below $10 watch threshold)
+
+### 0 BUY fired — Stage 2 pool empty
+
+**`掃描股票池: 成功分析: 0 只`** — scan pool returned **ZERO successful analyses**. Stage 2 evaluation was therefore skipped entirely: `Stage 2 候選: 0 只`. This is distinct from prior Hybrid A+B saturation patterns (P-MR-205/211/224/229) where 3-5 ⭐5 candidates appeared but were all blocked. Here the upstream **yfinance pool fetch** failed to return any data.
+
+**Possible causes**:
+1. **Pre-RTH 30-min timing** — scan ran at 22:00 BJT = 10:00 EST, BEFORE US RTH open at 09:30 EST + 30min. At 09:30 EST, US market had just opened; yfinance likely returned the most recent CLOSE prices from 2026-08-18 RTH, but the daily-bars download may not have completed yet for the 22:00 cron window.
+2. **yfinance rate-limit / API transient** — the "$SQ: possibly delisted" warning (benign per P-MR-223) appeared, suggesting the Yahoo Finance endpoint was reachable but returned `No data found` for the delisted symbol. The other ~90+ scan pool symbols may have hit a similar transient.
+3. **scan.py pool filter exhaustion** — pool symbols with `price_data.empty == True` are silently dropped before Stage 2 qualification. With 0 successful analyses, the qualification step had nothing to evaluate.
+
+**Block Classification: N/A** — no Stage 2 candidates means no Type A/B/C/D/X block classification possible. The scan was healthy in execution (no exceptions, no aborts) but had no qualifying data to act on.
+
+**Counter Arithmetic (P-MR-155 same-BJT-day check + P-MR-110/125/182)**:
+- **Pre-cron counters** (from 2026-08-19 03:00 BJT, carried through 03:30 same-day): **zt=1, cf=0**
+- **Day-boundary check**: last cron (03:30 BJT) BJT date = 2026-08-19 == this cron (22:00 BJT) BJT date = 2026-08-19 → **NO day-boundary reset** (P-MR-155). Counters carry forward.
+- **Trade effects**: 0 BUY fired → zt+1 (P-MR-110) → **zt=2**
+- **Cash check**: post-cash $207.40 > $100 → cf NOT incremented (P-MR-125) → **cf=0**
+- **Final**: **zt=2, cf=0**
+
+### Drift Decomposition (P-MR-200 0-trade variant + P-MR-214 identity shortcut)
+
+1. **API sum**: Σ(qty × stdout price) from per-line P-MR-168 parser = **$99,217.91** (32 positions captured, all qty match FIFO)
+2. **Scan-printed MV**: not emitted this run (no `持倉市值:` line); implicit from sum_api
+3. **FIFO MV**: $99,217.91 = Σ(qty_fifo × stdout_price) → **IDENTITY HIT EXACTLY** (P-MR-214)
+4. **FIFO Total**: $99,425.31 = cash $207.40 + FIFO MV $99,217.91
+5. **Notes Total** (stale from 03:30 cron): $99,625.00
+6. **Notes ↔ FIFO drift**: $99,625.00 − $99,425.31 = **$+199.69** → **NEUTRAL** (Notes-table lag, expected ~$200 from 18.5h drift without re-update)
+
+### Cash Trajectory (last 6 crons)
+
+```
+2026-08-18 22:00: pre=$3.28   → post=$19,891.34 (5 SL: OKLO/ALAB/ARM/ANET/SYM, P-MR-255 5-SL realization flush)
+2026-08-18 23:02: pre=$19,870.11 → post=$460.98 (2 BUY: MRVL/RKLB)
+2026-08-19 01:00: pre=$455.94 → post=$742.53 (1 SL: CRWV)
+2026-08-19 03:00: pre=$742.24 → post=$207.94 (2 BUY: TSLA/CRM)
+2026-08-19 03:30: pre=$207.40 (no change, 0 trades)
+2026-08-19 22:00: pre=$207.40 (no change, 0 trades, scan pool returned 0)
+```
+
+Cash trajectory: post-22:00 collapse from $19.9k → $200s range. **18.5h gap** between 03:30 and 22:00 with zero broker activity; cash holds at $207.40 unchanged. **cf=0** because cash oscillates in $200-$750 band (above $100 floor but below $1k threshold for BUY deploys).
+
+### P&L Breakdown
+
+- **All-time realized**: **+$1,212.94** (61 closed trades total)
+- **Today's session realized** (since 22:00 BJT 2026-08-18, 10 trades): **+$133.79**
+  - 6 SL closes: OKLO + ALAB + ARM + ANET + SYM + CRWV
+  - ANET was the big winner: +$1,240 realized (40@$165.03 → 40@$196.03)
+  - ALAB was the big loser: -$757 realized (24@$296.50 vs avg cost $329.04)
+  - Net session: +$133.79
+- **Live unrealized**: **+$5,611.21** (32 positions, current API prices)
+  - **Top winners**: BABA +$1,399 (+16.05%), COP +$1,374 (+19.58%), XOM +$963 (+18.39%), MRVL +$888 (+9.08%), FUTU +$561 (+8.34%)
+  - **Top losers**: RKLB -$413 (-4.20%), AVGO -$383 (-5.87%), HOOD -$201 (-2.84%), CSCO -$103 (-3.11%), VRT -$89 (-7.90%)
+- **Total P&L (all-time realized + live unrealized)**: **+$6,824.15**
+
+### TP1 / TP2 State
+
+- **TP1** (18 symbols tracked): 14 active (True or dict-ACTIVE), 4 inactive (False)
+- **TP2** (3 symbols tracked): CRWV True (partial already fired), 2 inactive
+- **TP1 territory candidates** (held symbols within $1 of +20% TP1 threshold):
+  - **COP** qty=64 cost=$109.67, current $131.14 = **+19.58%** (0.42% from TP1) — **CLOSE-WATCH**
+  - **WFC** qty=36 cost=$76.57, current $87.12 = **+13.78%** (6.22% from TP1)
+  - **T** qty=14 cost=$21.53, current $25.32 = **+17.60%** (2.40% from TP1)
+  - **ASTS** qty=32 cost=$63.17, current $64.41 = **+1.96%** (18.04% from TP1)
+- **TP2 territory** (+40% gain): CRWV at +32.0% (approaching); others below
+
+### Held-symbol PnL Matrix (near MA10 trailing-stop)
+
+- **None within $1 of MA10 trail** — all MA10-trail symbols (DHR, ANET, MSFT, PATH, ADBE) have cushion >$2
+- **5% fixed stop symbols near floor** (within 3%):
+  - **HOOD** qty=74 cost=$95.68, current $92.96 = **-2.84%** (2.16% from 5% stop at $90.93) — **CLOSE-WATCH**
+  - **VRT** qty=4 cost=$279.30, current $260.36 = **-7.90%** (already crossed 5% stop at $265.34!) — **⚠️ SL SHOULD FIRE NEXT CRON**
+  - **INTC** qty=5 cost=$99.09, current $92.18 = **-7.42%** (crossed 5% stop at $94.13) — **⚠️ SL SHOULD FIRE NEXT CRON**
+  - **KLAC** qty=1 cost=$200.62, current $188.85 = **-5.87%** (crossed 5% stop at $190.59) — **⚠️ SL SHOULD FIRE NEXT CRON**
+
+### Diagnostics
+
+- **Account status**: 32 positions, FIFO total $99,425.31, all-time P&L +$6,824.15
+- **Cap-floor collapse status** (P-MR-144): INACTIVE — cash $207.40 is too small to size any meaningful new position, but max_pos_per_stock = min($207.40, $9,942.53) = $207.40 means held symbols above $207.40 trivially block. With 32 held symbols, all with MV > $207, **all held ⭐5 candidates would be Type B cap-block**.
+- **Cash-pool-split rule** (P-MR-211): cash $207.40 / MAX_STOCKS 2 = $103.70/stock. Non-held ⭐5 candidates with unit-price × 1 > $103.70 → qty=0 micro-deploy. This is moot this cron since Stage 2 pool was empty.
+- **Watch items for next cron (22:30 BJT or 23:00 BJT)**:
+  - **3 SL candidates**: VRT -7.90%, INTC -7.42%, KLAC -5.87% — all already crossed 5% stop; scan should fire `🔴 5% 止蝕` next cron unless prices recover
+  - **COP +19.58%**: 0.42% from TP1 +20% trigger; very close watch
+  - **T +17.60%**: 2.40% from TP1 trigger
+  - **MSFT, DHR near MA10 trail**: no immediate trigger but volatile
+
+### Summary
+
+**Clean 0-trade scan with empty Stage 2 pool** — no BUY, no SL, no TP, no rejects. The "0 trades fired" is healthy in execution semantics but represents a **scan pool data fetch issue** rather than the typical saturation block pattern. Next cron should re-test whether the pool fetch recovers; if not, escalate as yfinance/connectivity issue.
+
+**Key risk going into next cron**: 3 symbols (VRT/INTC/KLAC) appear to have ALREADY crossed their 5% stop thresholds at 22:00 BJT prices. If scan's SL evaluation runs on these prices, all 3 SL should fire in next cron (~$518 total cash credit). Notes-table lag of $199.69 will be reconciled when next cron updates positions table.
+
+**P-MR-244/P-MR-190 fresh-lot reconcile prediction**: TSLA (bought 03:00) and CRM (bought 03:00) are NOW visible in API view at qty=2 and qty=1 respectively — confirms 1h+ reconcile window. No outstanding fresh-lot lag.
