@@ -7364,3 +7364,96 @@ No Stage 2 candidates means no Type A/B/C/D/X block classification possible. The
 - **Cash**: $207.40 (held for 10 consecutive crons since 2026-08-19 03:30 BJT)
 - **Counters**: zt=2 cf=0 (same-BJT-day carry from 01:00; no day-boundary reset; 0 BUY → zt+1)
 - **Today net**: 0 trades, −$248.91 paper-MV move (PURE price movement during US RTH 12:00→14:00 EST afternoon), scan pool empty 9th consecutive — **CRITICAL ESCALATION** if not addressed
+
+## ⏰ 2026-08-21 03:30 BJT cron (HermesV ID 6092)
+
+### Result: 0 trades fired — yfinance pool empty 10th-consecutive cron, RTH pre-close (16:00 EST = 04:00 BJT closed) last scan of US session
+
+- **Cash: $207.40** (unchanged from 03:00 cron, P-MR-179 trivial $0.00 inter-scan drift, no fills intervening)
+- **持倉: 32 只** (unchanged from 03:00 — no TP/SL fires)
+- **帳戶總值 (FIFO recompute, headline):** **$100,992.65** (sum_api $100,785.25 + Cash $207.40)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match all positions, no lag shells, `only_in_api: ∅`, `only_in_fifo: ∅`
+- **Inter-scan FIFO drift (03:00→03:30, PURE price movement)**: $100,689.65 → $100,992.65 = **+$303.00** — Net +$303.00 across 32 positions during 03:00→03:30 BJT = 14:00→15:30 EST (1.5h US RTH afternoon session rebound, recovering from the 23:00→03:00 pullback sequence)
+- **Inter-scan cash drift**: **$0.00** (P-MR-179 trivial; well below $10 watch threshold)
+- **Notes (stale from 2026-08-19 front-matter)**: $99,625.00 (Cash $207, total ~$99,625/32 positions)
+- **Notes ↔ FIFO drift**: $99,625.00 − $100,992.65 = **−$1,367.65** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute $100,992.65 (Notes front-matter is stale from 2026-08-19, FIFO recompute uses fresh per-line stdout prices for all 32 positions)
+
+### Counter state (NO day-boundary reset — same BJT day as 03:00 cron)
+
+- **Pre-cron counters** (from 2026-08-21 03:00 BJT cron section): **zt=2, cf=0**
+- **Day-boundary check**: last cron (03:00 BJT 2026-08-21) BJT date = 2026-08-21 == this cron (03:30 BJT 2026-08-21) BJT date = 2026-08-21 → **SAME → NO RESET** (P-MR-155/192/201 rules)
+- **Trade effects** (reset FIRST then trade effects SECOND per P-MR-192):
+  - 0 BUY fired → zt+1 per P-MR-110
+  - Cash $207.40 > $100 floor → cf stays at base 0 (P-MR-125 requires post-cash <$100)
+- **Final counters**: **zt=3, cf=0**
+
+### 0 BUY fired — Stage 2 pool empty (10th consecutive cron with `成功分析: 0 只`)
+
+**`掃描股票池: 成功分析: 0 只`** — scan pool returned **ZERO successful analyses** identical to 03:30 / 22:00 / 23:00 / 01:00 / 03:00 / 22:00 / 23:00 / 01:00 / 03:00 / **03:30** prior crons. Stage 2 evaluation was therefore skipped entirely: `Stage 2 候選: 0 只` and `買入信號: 0 只`. Trailing `$SQ: possibly delisted; no price data found` warning (benign per P-MR-223) confirms yfinance API is reachable but returns `No data found` for the broader universe. **This is the 10th consecutive cron with yfinance pool fetch failure** spanning 2026-08-19 / 2026-08-20 / 2026-08-21 (3 distinct BJT days, ~28h elapsed).
+
+**Note on per-line position evaluation**: the `持倉狀況:` block succeeded for ALL 32 HELD symbols (full price refresh shown for CRM $206.78, TSLA $343.56, RKLB $72.64, MRVL $248.49, HOOD $94.64, etc.) — this confirms `yf.Ticker(SYM).history()` works fine for individual symbols. The issue is the broader universe `evaluate_stage2_candidates()` (line 150 of scan.py) returning empty results.
+
+**Likely cause** (refined across 10 consecutive crons): Most likely a **scan.py pool-symbol-list or schema issue**, NOT transient timing. Possible candidates:
+1. **scan.py pool_symbols list exhausted** — if `pool_symbols` was trimmed/filtered to ONLY held symbols, the broader universe is empty AND `evaluate_stage2_candidates()` filters out held symbols.
+2. **yfinance schema change** — Yahoo may have altered a JSON field that scan.py's pool-level fetch reads.
+3. **Outer try/except swallowing the real error** — pool fetch may be raising an exception caught silently.
+
+**ESCALATION PRIORITY CRITICAL**: 10 consecutive same-pattern failures across 3 distinct BJT days (~28h elapsed) warrant **IMMEDIATE operator attention**. Diagnostic step: add `print()` statements to scan.py around the pool-fetch loop (line 150) to verify `pool_symbols` length and any caught exception.
+
+### Block Classification: N/A
+
+No Stage 2 candidates means no Type A/B/C/D/X block classification possible. The scan was healthy in execution (no exceptions, no aborts, no Stage 2 evaluations crashed). The "0 trades" is a **persistent data fetch issue**, not a Hybrid A+B saturation block pattern.
+
+**Note on Hybrid A+B context** (per 22:00 / 23:00 / 01:00 / 03:00 prior crons): Even IF scan pool recovered, the account is in deep saturation:
+- **Cash $207.40** → after P-MR-211 cash-pool-split (`$207.40 / MAX_STOCKS 2 = $103.70/stock`), only candidates with unit-price ≤ $103.70 could deploy at any meaningful size.
+- **32 HELD positions** → 10% cap = $10,099 cap each. Many held symbols already at or near cap (AVGO $6,196 / cap $10,099 = 61%; IREN $1,477; PATH $1,066; etc.). Cap-block would dominate for any held add-on Stage 2 candidate.
+- **Combined effect**: even with full pool recovery, BUY count would be ≤1 micro-deploy at best (cash-pool-split blocks most cheap candidates). Cap-floor collapse (P-MR-144) is FULL ACTIVE.
+
+### Drift decomposition (P-MR-200 0-trade variant + P-MR-214 identity)
+
+1. `sum_api = $100,785.25` (Σ qty × stdout price from per-line API parser, P-MR-168)
+2. `fifo_mv = $100,785.25` (Σ qty × stdout price for 32 FIFO open positions)
+3. **Identity check**: `sum_api == fifo_mv` → **EXACT** (P-MR-214) — NO qty drift, NO lag shells
+4. `fifo_total = cash_pre + fifo_mv = $207.40 + $100,785.25 = $100,992.65`
+5. **Notes ↔ FIFO**: $99,625 − $100,992.65 = **−$1,367.65** (> $100 → IGNORE per P-MR-230, headline = FIFO)
+6. **Total drift decomposition**: $0 PURE stale-quote (P-MR-214 shortcut applies — by definition FIFO uses stdout prices). Notes headline stale from 2026-08-19; FIFO is authoritative.
+
+### Diagnostics
+
+- **TP2 state.json**: CRWV = True (1 TP2 fire on record); AVAV / SMCI = False
+- **TP1 state.json**: 14 fired (True), 3 unfired (False), 1 fully-closed (HOOD: status=FULLY_CLOSED)
+- **Cap-floor collapse status** (P-MR-144): **FULL ACTIVE** — cash $207.40 vs every held symbol MV = trivially blocked for any held add-on
+- **Cash-pool-split rule** (P-MR-211/229): cash $207.40 / MAX_STOCKS 2 = $103.70/stock unit-cap. Most non-held Stage 2 candidates would qty=0 anyway.
+- **Inter-scan cash drift**: $0.00 (P-MR-179 trivial; well below $10 watch threshold)
+- **yfinance pool fetch issue**: **10th consecutive cron** (`成功分析: 0 只` at 2026-08-19 03:30 / 22:00 / 23:00 / 2026-08-20 01:00 / 03:00 / 03:30 / 22:00 / 23:00 / 2026-08-21 01:00 / 03:00 / **03:30**). Per-line position evaluation still works for all 32 held symbols. **ESCALATION CRITICAL**: persistent scan.py pool-fetch issue — needs IMMEDIATE operator attention (add diagnostic print to scan.py pool loop NOW).
+- **Same-day carry validation**: P-MR-201 validated for 03:30 BJT (same-BJT-day as 03:00 cron, no day-boundary reset). Per P-MR-192: reset FIRST (n/a here) → trade effects SECOND (0 BUY → zt+1, no cf trigger) → zt=3 cf=0.
+- **Session realized P&L (last 50 events)**: $4,880.58 (per `session_realized_pnl` from fifo_pnl.py) — unchanged from 03:00 cron (no fills intervening)
+- **All-time realized P&L**: $1,212.94 (147 closed trades cumulative) — unchanged from 03:00 cron
+- **Breadth snapshot**: 19 green / 13 red (avg PnL +6.16%). Top gainers: PATH +33.2%, MRK +26.8%, COP +22.8%, XOM +17.7%, BABA +17.5%, T +16.8%, MRVL +17.0%, SNDK +16.0%. Defensive/tech mix holding afternoon gains.
+- **Macro**: market in afternoon rebound (+$303.00 across 32 positions in 1.5h after the −$248.91 midday pullback), recovering most of the morning dip. TP2 line approaches for PATH (+33.2%, +6.8% to +40% TP2 trigger at $16.71, currently $15.90), MRK (+26.8%, +13.2% to TP2 at $169.74, currently $149.93).
+
+### Notes for next cron
+
+- **Watch (CRITICAL PRIORITY)**: scan.py pool fetch recovery — **10 consecutive cron failures across 3 BJT days and ~28h elapsed**. **Add diagnostic print to scan.py pool loop NOW** if operator can patch. Without this fix, all future crons will continue to return `成功分析: 0 只` indefinitely.
+- **Watch**: PATH at +33.2% — closing on TP2 territory (+40% = $16.71, currently $15.90 = $0.81 short, narrowed from 03:00's $0.74 gap then briefly widened). If PATH crosses +40% before next cron (post-RTH paper-mode), manual TP2 decision required.
+- **Watch**: MRK at +26.8% — past TP1, watch TP2 (would need +40% = $169.74 to trigger, currently $149.93 = $19.81 short, widened from 03:00's $14.93 gap).
+- **Watch**: COP at +22.8% — past TP1 territory (+20%). Manual TP1 trigger if scan pool recovers.
+- **Watch**: XOM/T/BABA/SNDK/MRVL all within 2-5% of TP1 territory. Manual TP1 decision possible if any cross +20%.
+- **Watch**: VRT/INTC/KLAC/RKLB/AVGO all below their 5% fixed-stop (PnL from −5.2% to −7.5%) — scan.py MA20-only logic gap means these stops do NOT auto-fire. Manual stop decision required if positions continue to deteriorate.
+- **Watch**: HON at −4.9% PnL ($219.03 vs stop $208.08 = $10.95 above stop) — last defensible level. Manual stop decision imminent if HON closes below $208.08.
+- **Watch**: HELD approaching 10% cap threshold: AVGO 17@$364.45 = $6,196 (6.1%); KLAC 1@$185.87 = $186 (0.2%); SNDK 1@$1592.38 = $1,592 (1.6%); **DE 17@$625.02 = $10,625 (10.5% — ABOVE 10% CAP, was 10.5% at 03:00 too)**. Manual cap-management needed for DE if further additions planned.
+
+### 當日總結 (BJT 2026-08-21)
+
+- **Buy signals fired today (BJT 2026-08-21)**: 0 (3rd cron of day; 01:00 = 0, 03:00 = 0, **03:30 = 0**)
+- **SL stop-loss fires today**: 0
+- **TP1 +20% partial sells today**: 0
+- **TP2 +40% partial sells today**: 0
+- **Total realized P&L (all-time cumulative)**: **$1,212.94** (unchanged from 03:00 — no fills intervening)
+- **TP1 cumulative fires**: 14 (True); 3 unfired (False); 1 fully-closed (HOOD)
+- **TP2 cumulative fires**: 1 (True — CRWV)
+- **Active positions**: 32
+- **Account Total (FIFO recompute)**: **$100,992.65** (+$303.00 vs 03:00 = pure price movement, 03:00→03:30 BJT = 14:00→15:30 EST afternoon rebound)
+- **Cash**: $207.40 (held for 11 consecutive crons since 2026-08-19 03:30 BJT)
+- **Counters**: zt=3 cf=0 (same-BJT-day carry from 03:00; no day-boundary reset; 0 BUY → zt+1)
+- **Today net**: 0 trades, +$303.00 paper-MV move (PURE price movement during US RTH 14:00→15:30 EST afternoon rebound), scan pool empty 10th consecutive — **CRITICAL ESCALATION** if not addressed
