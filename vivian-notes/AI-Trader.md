@@ -7457,3 +7457,62 @@ No Stage 2 candidates means no Type A/B/C/D/X block classification possible. The
 - **Cash**: $207.40 (held for 11 consecutive crons since 2026-08-19 03:30 BJT)
 - **Counters**: zt=3 cf=0 (same-BJT-day carry from 03:00; no day-boundary reset; 0 BUY → zt+1)
 - **Today net**: 0 trades, +$303.00 paper-MV move (PURE price movement during US RTH 14:00→15:30 EST afternoon rebound), scan pool empty 10th consecutive — **CRITICAL ESCALATION** if not addressed
+## ⏰ 2026-08-21 22:01 BJT
+
+2026-08-21 22:00 BJT cron (HermesV ID 6092) — RTH-open+30min stable window, first scan after US market open
+
+### Result: 0 trades fired — yfinance pool empty (consecutive 0-fill cron)
+
+- **Cash: $207.40** (unchanged from 03:30 prior cron, P-MR-179 trivial $0.00 inter-scan drift, no fills intervening across 18.5h US-RTH-closed window)
+- **持倉: 32 只** (unchanged from 03:30 prior cron — no TP/SL fires)
+- **帳戶總值 (FIFO recompute, headline):** **$102,414.02** (sum_api $102,206.62 + Cash $207.40)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match all positions, no lag shells, `only_in_api: ∅`, `only_in_fifo: ∅`
+- **Inter-scan FIFO drift (03:30→22:01, PURE price movement + RTH reopen)**: $100,992.65 → $102,414.02 = **+$1,421.37** — Net +$1,421.37 across 32 positions during 03:30→22:01 BJT = 14:30 EST → 10:01 EST (RTH-closed 18.5h window with pre-market rebound)
+- **Inter-scan cash drift**: **$0.00** (P-MR-179 trivial; well below $10 watch threshold)
+- **Notes (stale from 2026-08-19 front-matter)**: $99,625.00 (Cash $207, total ~$99,625 / 32 positions)
+- **Notes ↔ FIFO drift**: $99,625.00 − $102,414.02 = **−$2,789.02** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute $102,414.02 (Notes front-matter is stale from 2026-08-19, FIFO recompute uses fresh per-line stdout prices for all 32 positions)
+
+### Stage 2 Block Classification
+
+- **Stage 2 候選: 0 只** (yfinance scan returned 0 analysis-success symbols — `成功分析: 0 只`)
+- **買入信號: 0 只** (no BUY fires)
+- **Block Classification**: yfinance scan_pool is empty (data feed returned 0 candidates) — no Type A/B/C/D/X blocks evaluated since Stage 2 evaluation cannot proceed without candidate pool
+
+### Counter state (NO day-boundary reset — same BJT day as 03:30 cron)
+
+- **Pre-cron counters** (from 2026-08-21 03:30 BJT cron section): **zt=3, cf=0**
+- **Day-boundary check**: last cron (03:30 BJT 2026-08-21) BJT date = 2026-08-21 == this cron (22:01 BJT 2026-08-21) BJT date = 2026-08-21 → **SAME → NO RESET** (P-MR-155/192/201 rules)
+- **Trade effects** (reset FIRST then trade effects SECOND per P-MR-192):
+  - 0 BUY fired → zt+1 per P-MR-110 (zt: 3 → 4)
+  - Cash $207.40 > $100 floor → cf stays at base 0 (P-MR-125 requires post-cash <$100)
+- **Final counters**: **zt=4, cf=0**
+
+### Diagnostics
+
+- **Cash trajectory** (last 3 crons, P-MR-114):
+  - 2026-08-21 03:00 → Cash $207.40
+  - 2026-08-21 03:30 → Cash $207.40 (P-MR-179 trivial $0.00 drift)
+  - 2026-08-21 22:01 → Cash $207.40 (P-MR-179 trivial $0.00 drift, 18.5h RTH-closed window)
+- **Zero-trigger counter streak**: zt=4 (P-MR-110 increment, 4th consecutive 0-trigger cron)
+- **Cash-at-floor counter**: cf=0 (cash $207.40 > $100 floor, P-MR-125 NOT triggered)
+- **FIFO recompute identity**: API source MV $102,206.62 == FIFO MV $102,206.62 (P-MR-214 EXACT hit)
+- **Stale-quote drift** (P-MR-183): $0 between scan-printed and FIFO recompute (perfect identity); all drift is real US-RTH price movement between scans
+- **Notes front-matter staleness**: Notes $99,625.00 is from 2026-08-19 (3 days stale), FIFO recompute uses fresh per-line stdout prices for 32 positions
+
+### Watch / Next Cron
+
+- 22:00 BJT is the FIRST scan after US RTH open (21:30 BJT = 09:30 EST). Next US RTH cron slot is 23:00 BJT (1h later).
+- yfinance scan_pool returned 0 successful analyses — this is the 10th-consecutive cron with empty pool (per prior 03:30 cron section note). Likely yfinance rate-limiting or data feed issue. No action available from cron-side; pool is empty so no BUY decision can be made.
+- zt=4 is approaching the P-MR-127 "saturation cliff" territory but cash $207.40 > $100 means cf stays at base — not a saturation crisis yet.
+- Notes front-matter refresh is overdue (3 days stale). Next scan with a successful BUY should refresh both FIFO recompute AND Notes table simultaneously.
+
+### P-MR references
+
+- P-MR-110 (zero-trigger counter +1 on 0 BUY scan)
+- P-MR-125 (cash-at-floor +1 only when post-cash <$100)
+- P-MR-155/192/201 (day-boundary reset semantics — same BJT date = no reset)
+- P-MR-168 (per-line API parser pattern, caught all 32 positions cleanly)
+- P-MR-179 (inter-scan cash drift trivial $0.00 = watch footnote)
+- P-MR-183 (stale-quote drift decomposition)
+- P-MR-214 (API↔FIFO identity shortcut — exact hit)
+- P-MR-230 (Notes↔FIFO drift >$100 → IGNORE, headline = FIFO recompute)
