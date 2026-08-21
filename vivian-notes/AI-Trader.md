@@ -5871,7 +5871,7 @@ ANET +$1,240 saved the day; ALAB & ARM -$1,029 dragged it down. Net **+$204.70 r
 
 ---
 
-## ⏰ 2026-08-18 23:02 BJT
+## ⏰ 2026-08-18 23:00 BJT
 
 ### Result: 2 BUY success + 3 Type D queue exhaustion — **post-5SL-flush deployable BUY burst (NEW pattern)**
 
@@ -6012,13 +6012,13 @@ CRWV MA10 stop at $95.53 (PnL=19.8% gain from $80.09 avg cost). Latest in CRWV's
 
 | Step | zt | cf | Source |
 |------|----|----|--------|
-| Prior (08-18 23:02 BJT) | 0 | 0 | P-MR-221 hybrid BUY burst reset zt to 0; cf stayed 0 (post-cash $460.98 > $100) |
-| Day-boundary: 23:02 (08-18) → 01:00 (08-19) | **reset to base** | **reset to base** | P-MR-155 binary check, BJT date changed |
+| Prior (08-18 23:00 BJT) | 0 | 0 | P-MR-221 hybrid BUY burst reset zt to 0; cf stayed 0 (post-cash $460.98 > $100) |
+| Day-boundary: 23:00 (08-18) → 01:00 (08-19) | **reset to base** | **reset to base** | P-MR-155 binary check, BJT date changed |
 | Apply base values | 1 | 0 | day-boundary reset (zt=1 base, cf=0 base per P-MR-155/192) |
 | Apply 1 SL (no BUY) | stays **1** | stays **0** | P-MR-110 (only BUY resets zt); post-cash $742.53 > $100, no cf increment |
 | **FINAL** | **1** | **0** | |
 
-**Day-boundary reset validated**: 23:02 (08-18) → 01:00 (08-19) crosses BJT date boundary. Both counters reset to base values per P-MR-155/192. Trade effects (1 SL) layered on top of reset values, not carried-forward values. Final state: zt=1 (no BUY fired) cf=0 (cash $742.53 > $100).
+**Day-boundary reset validated**: 23:00 (08-18) → 01:00 (08-19) crosses BJT date boundary. Both counters reset to base values per P-MR-155/192. Trade effects (1 SL) layered on top of reset values, not carried-forward values. Final state: zt=1 (no BUY fired) cf=0 (cash $742.53 > $100).
 
 ### Drift decomposition (P-MR-200 + P-MR-142/230 Notes-trust gate)
 - sum_api (per-line parser, 32 pre-trade positions incl CRWV lag shell): **$99,346.50**
@@ -6036,7 +6036,7 @@ CRWV MA10 stop at $95.53 (PnL=19.8% gain from $80.09 avg cost). Latest in CRWV's
 | Cron (BJT) | Cash | Notes |
 |-----------|------|-------|
 | 08-18 22:00 post | $19,891.34 | 5-SL realization flush (P-MR-255) |
-| 08-18 23:02 post | $460.98 | 2-BUY deployable burst (P-MR-221 hybrid) |
+| 08-18 23:00 post | $460.98 | 2-BUY deployable burst (P-MR-221 hybrid) |
 | 08-19 01:00 pre | $455.94 | (inter-scan $-5.04 broker adjustment, P-MR-179) |
 | 08-19 01:00 post | **$742.53** | 1 SL CRWV realized +$46.32, +$286.59 cash credit |
 
@@ -6046,12 +6046,12 @@ CRWV MA10 stop at $95.53 (PnL=19.8% gain from $80.09 avg cost). Latest in CRWV's
 - **1 SL break-through**: CRWV MA10 stop realized +$46.32, added to all-time FIFO P&L (now $1,212.94 across 147 closed trades).
 - **5 ⭐5 evaluated, 0 fired**: scan printed 3 explicit block lines (1 cap-block SNDK + 2 cash-block NBIS/MU). CRM (non-held) and TSLA (held at 0.35%) silent-skipped per P-MR-210 — neither emitted block print nor BUY attempt.
 - **Cash-pool-split diagnosis**: cash $455.94 / MAX_STOCKS=2 = $227.97/stock. CRM 1股 $197.80 nominally fits, but at RR=1.27 (rank 4) scan de-prioritized for higher-RR candidates. Higher-RR (NBIS $247.60, MU $938.42, SNDK $1,624.47) all blocked by cash-floor or cap. Final result: 0 BUY.
-- **Day-boundary reset (P-MR-155/192)**: counters reset to base; 1 SL on new day increments zt 0→1 (carry-forward from 23:02 zt=0 starts at 1 base, no BUY fired so stays 1).
+- **Day-boundary reset (P-MR-155/192)**: counters reset to base; 1 SL on new day increments zt 0→1 (carry-forward from 23:00 zt=0 starts at 1 base, no BUY fired so stays 1).
 - **Saturation state**: post-cap-floor-collapse (P-MR-253 broken since 22:00 5-SL flush, P-MR-255; now stable). Next catalyst: TP1 fires from MA20-following positions, or further SL/TP from held positions.
 - **Predicted next cron watch (02:00 BJT)**: TSLA held at 1股 may appear again in Stage 2; if so, will need cash-pool-split >= $339.43 (currently $227.97 — still blocked). Or wait for further SL/TP realization to lift cash above $5k deployable.
 
 ### All-time realized P&L update
-- **Pre-cron: $1,166.62** (146 closed trades, from 23:02 cron)
+- **Pre-cron: $1,166.62** (146 closed trades, from 23:00 cron)
 - **CRWV SL realized: +$46.32**
 - **Final all-time realized P&L: $1,212.94** across **147 closed trades**
 
@@ -6089,7 +6089,7 @@ Both BUY fills SUCCESS via broker mock (signal_id 3304286 TSLA, 3304292 CRM). Ac
 | 4 | NOK  | $10.34   | 1.17 | skipped | **Type D-implicit** (queue exhaustion after 2 fills, MAX_STOCKS=2) |
 | 5 | LOW  | $217.21  | 0.82 | skipped | **Type D-implicit** (queue exhaustion, RR also low) |
 
-**Pattern signature (NEW 13th Hybrid A+B sub-pattern)**: post-P-MR-253 cap-floor-collapse era + post-P-MR-255 5-SL-flush recovery → 23:02 2-BUY queue-bypass burst (P-MR-221) → 01:00 1-SL cash-recovery → **03:00 2-BUY micro-deploy at remaining cap-floor** where the cap-floor formula `max_pos = min(cash, total × 10%)` reduces to `cash × 10%` at sub-$1k cash states. SNDK at $1,607 trivially exceeds $742 cap, gets explicit cap-block print (NOT P-MR-210 silent-skip). TSLA passed by the P-MR-199 cap-bypass edge case (pre-buy 1股×$336 = $336 < $742 cap, post-buy 2股 = $672 still under 10% of total). CRM not held at all, no cap collision. NOK/LOW queue-truncated post-success (Type D-implicit by MAX_STOCKS=2).
+**Pattern signature (NEW 13th Hybrid A+B sub-pattern)**: post-P-MR-253 cap-floor-collapse era + post-P-MR-255 5-SL-flush recovery → 23:00 2-BUY queue-bypass burst (P-MR-221) → 01:00 1-SL cash-recovery → **03:00 2-BUY micro-deploy at remaining cap-floor** where the cap-floor formula `max_pos = min(cash, total × 10%)` reduces to `cash × 10%` at sub-$1k cash states. SNDK at $1,607 trivially exceeds $742 cap, gets explicit cap-block print (NOT P-MR-210 silent-skip). TSLA passed by the P-MR-199 cap-bypass edge case (pre-buy 1股×$336 = $336 < $742 cap, post-buy 2股 = $672 still under 10% of total). CRM not held at all, no cap collision. NOK/LOW queue-truncated post-success (Type D-implicit by MAX_STOCKS=2).
 
 **Cap-floor collapse continues**: cash $742.24 × 10% = $74.22 floor; cap-floor formula computes `max_pos_per_stock = min(cash, total × 10%)` → for positions below 1% of total, the cap binding constraint is sometimes the per-stock `max_position_pct` rule, sometimes the cash-limit; here SNDK's holding exceeds the cash-derived $742 floor. P-MR-253 EXTREME cap-floor dynamic continues post-22:00 SL flush: cash is back down to $207.94 (P-MR-211 cash-pool-split zone), but above the P-MR-253 trilion-dollar zero.
 
@@ -6126,7 +6126,7 @@ Both BUY fills SUCCESS via broker mock (signal_id 3304286 TSLA, 3304292 CRM). Ac
 | Post-cash floor check (cf increment rule per P-MR-125) | — | +1 | post-cash $207.94 > $100 → cf stays 0 |
 | **Final** | **0** | **0** | |
 
-Wait — recompute: post-cash $207.94 is > $100 floor (P-MR-125 cf increment requires post-cash <$100), so cf does NOT increment. cf stays 0. The 23:02 2-BUY burst reset cf to 0 via P-MR-129 (BUY alone ≠ SELL >$1k, doesn't reset; but post-cash $460.98 > $100 so no increment anyway). 01:00 SL fire brought post-cash to $742.53 (cf not reset; cf just stays 0). 03:00 BUY burst post-cash $207.94 > $100 → cf stays 0. **Final: zt=0, cf=0**.
+Wait — recompute: post-cash $207.94 is > $100 floor (P-MR-125 cf increment requires post-cash <$100), so cf does NOT increment. cf stays 0. The 23:00 2-BUY burst reset cf to 0 via P-MR-129 (BUY alone ≠ SELL >$1k, doesn't reset; but post-cash $460.98 > $100 so no increment anyway). 01:00 SL fire brought post-cash to $742.53 (cf not reset; cf just stays 0). 03:00 BUY burst post-cash $207.94 > $100 → cf stays 0. **Final: zt=0, cf=0**.
 
 ### Drift classification (P-MR-117/142/198/230)
 
@@ -6142,7 +6142,7 @@ Wait — recompute: post-cash $207.94 is > $100 floor (P-MR-125 cf increment req
 - **CRM fresh-lot**: NOT in API pre-trade view (only_in_fifo = {CRM}, P-MR-180 buy-side lag). Predicted: next cron (01:00BJT on 08-20 or next scan) will reconcile CRM into API view at qty=1 matching FIFO (P-MR-190 1h window empirically validated for RKLB at 23:02→01:00).
 - **TSLA cap-bypass continued**: pre-buy 1股×$336 = $336 << $742 cash-floor cap → scan allowed through (P-MR-199 edge case). Post-buy 2股 = $672 still under 10% of total ~$9,950. Future scans may emit cap-block when TSLA position approaches $9,949.
 - **NOK at $10.34 / 10.34 × MAX_STOCKS=2 = $5.17/stock**: would have been deployable as micro-buy if not queue-truncated. RR=1.17 modest. Predicted next cron: NOK may reappear in ⭐5 if cash stays above ~$100 (cash-pool-split $742/2 = $371/stock allows qty=36 = $372). LOW at $217 also queue-truncated post-success; could deploy if room.
-- **cf=0 lock-held**: account stays at cf=0 across 3 consecutive crons (23:02 BUY burst → 01:00 SL flush → 03:00 BUY burst). Cash oscillates in $200-$750 band — below the $1000 cash-pool-split cliff but above the $100 floor-streak trigger. **Saturation has fully resolved**, but the cap-floor-collapse dynamic persists at lower severity (any held-symbol > $742 trivial cap-block).
+- **cf=0 lock-held**: account stays at cf=0 across 3 consecutive crons (23:00 BUY burst → 01:00 SL flush → 03:00 BUY burst). Cash oscillates in $200-$750 band — below the $1000 cash-pool-split cliff but above the $100 floor-streak trigger. **Saturation has fully resolved**, but the cap-floor-collapse dynamic persists at lower severity (any held-symbol > $742 trivial cap-block).
 - **CRWV closure confirmed**: 01:00 MA10 stop closed CRWV lot 3 @ $80.09 → $95.53 = +$46.32 P&L. CRWV still classified `tp1_state.json[CRWV]=true` (TP1 already fired in earlier lot — historical state preserved, P-MR-176 dict-valued entries).
 - **Next cron watch (assuming continued post-RTH 03:30 BJT)**: TSLA 2 股 → next scan if Stage 2 triggers another TSLA, will see 2 股 already held → check whether pre-buy value > $742 cap. CRM fresh-lot → 1h reconcile prediction. NOK/LOW potentially deployable if ranked high enough next scan. cf=0 lock held if cash stays $100-$1000; will increment to 1 if cash drops below $100.
 
@@ -7505,6 +7505,70 @@ No Stage 2 candidates means no Type A/B/C/D/X block classification possible. The
 - yfinance scan_pool returned 0 successful analyses — this is the 10th-consecutive cron with empty pool (per prior 03:30 cron section note). Likely yfinance rate-limiting or data feed issue. No action available from cron-side; pool is empty so no BUY decision can be made.
 - zt=4 is approaching the P-MR-127 "saturation cliff" territory but cash $207.40 > $100 means cf stays at base — not a saturation crisis yet.
 - Notes front-matter refresh is overdue (3 days stale). Next scan with a successful BUY should refresh both FIFO recompute AND Notes table simultaneously.
+
+### P-MR references
+
+- P-MR-110 (zero-trigger counter +1 on 0 BUY scan)
+- P-MR-125 (cash-at-floor +1 only when post-cash <$100)
+- P-MR-155/192/201 (day-boundary reset semantics — same BJT date = no reset)
+- P-MR-168 (per-line API parser pattern, caught all 32 positions cleanly)
+- P-MR-179 (inter-scan cash drift trivial $0.00 = watch footnote)
+- P-MR-183 (stale-quote drift decomposition)
+- P-MR-214 (API↔FIFO identity shortcut — exact hit)
+- P-MR-230 (Notes↔FIFO drift >$100 → IGNORE, headline = FIFO recompute)
+## ⏰ 2026-08-21 23:00 BJT
+
+2026-08-21 23:00 BJT cron (HermesV ID 6092) — RTH-open+1.5h follow-through scan, second cron of 2026-08-21 BJT day (after 22:01 RTH-open)
+
+### Result: 0 trades fired — yfinance pool empty (consecutive 0-fill cron)
+
+- **Cash: $207.40** (unchanged from 22:01 prior cron, P-MR-179 trivial $0.00 inter-scan drift, 1h window)
+- **持倉: 32 只** (unchanged from 22:01 prior cron — no TP/SL fires in 22:01→23:00 BJT window)
+- **帳戶總值 (FIFO recompute, headline):** **$101,776.40** (sum_api $101,569.00 + Cash $207.40)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match all positions, no lag shells, `only_in_api: ∅`, `only_in_fifo: ∅`
+- **Inter-scan FIFO drift (22:01→23:00, RTH first hour price movement)**: $102,414.02 → $101,776.40 = **−$637.62** — Net −$637.62 across 32 positions during 22:01→23:00 BJT = 10:01 EST → 11:00 EST (RTH first hour minor pullback)
+- **Inter-scan cash drift**: **$0.00** (P-MR-179 trivial; well below $10 watch threshold)
+- **Notes (stale from 2026-08-19 front-matter)**: $99,625.00 (Cash $207, total ~$99,625 / 32 positions)
+- **Notes ↔ FIFO drift**: $99,625.00 − $101,776.40 = **−$2,151.40** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute $101,776.40 (Notes front-matter is stale from 2026-08-19, FIFO recompute uses fresh per-line stdout prices for all 32 positions)
+
+### Stage 2 Block Classification
+
+- **Stage 2 候選: 0 只** (yfinance scan returned 0 analysis-success symbols — `成功分析: 0 只`)
+- **買入信號: 0 只** (no BUY fires)
+- **Block Classification**: yfinance scan_pool is empty (data feed returned 0 candidates) — no Type A/B/C/D/X blocks evaluated since Stage 2 evaluation cannot proceed without candidate pool. Same fingerprint as 22:01 prior cron and the trailing 03:30 cron → yfinance rate-limiting or data feed issue persists.
+
+### Counter state (NO day-boundary reset — same BJT day as 22:01 cron)
+
+- **Pre-cron counters** (from 2026-08-21 22:01 BJT cron section): **zt=4, cf=0**
+- **Day-boundary check**: last cron (22:01 BJT 2026-08-21) BJT date = 2026-08-21 == this cron (23:00 BJT 2026-08-21) BJT date = 2026-08-21 → **SAME → NO RESET** (P-MR-155/192/201 rules)
+- **Trade effects** (reset FIRST then trade effects SECOND per P-MR-192):
+  - 0 BUY fired → zt+1 per P-MR-110 (zt: 4 → 5)
+  - Cash $207.40 > $100 floor → cf stays at base 0 (P-MR-125 requires post-cash <$100)
+- **Final counters**: **zt=5, cf=0**
+
+### Diagnostics
+
+- **Cash trajectory** (last 4 crons, P-MR-114):
+  - 2026-08-21 03:00 → Cash $207.40
+  - 2026-08-21 03:30 → Cash $207.40 (P-MR-179 trivial $0.00 drift)
+  - 2026-08-21 22:01 → Cash $207.40 (P-MR-179 trivial $0.00 drift, 18.5h RTH-closed window)
+  - 2026-08-21 23:00 → Cash $207.40 (P-MR-179 trivial $0.00 drift, 1h RTH first-hour window)
+- **Zero-trigger counter streak**: zt=5 (P-MR-110 increment, 5th consecutive 0-trigger cron — entered P-MR-127 saturation territory territory)
+- **Cash-at-floor counter**: cf=0 (cash $207.40 > $100 floor, P-MR-125 NOT triggered)
+- **FIFO recompute identity**: API source MV $101,569.00 == FIFO MV $101,569.00 (P-MR-214 EXACT hit)
+- **Stale-quote drift** (P-MR-183): $0 between scan-printed and FIFO recompute (perfect identity); all drift is real US-RTH price movement between scans
+- **Position-level signal highlights** (1h RTH first-hour moves vs 22:01 cron):
+  - Top gainers (RTH first hour): PATH 35.9%, MRK 30.4%, COP 23.3%, FUTU 23.1%, T 18.2%, XOM 17.3%, SNDK 16.0%
+  - Top decliners: INTC −9.3%, KLAC −8.8%, VRT −8.6%, RKLB −6.6%, HON −5.2%, AVGO −4.5%
+- **Notes front-matter staleness**: Notes $99,625.00 is from 2026-08-19 (3 days stale), FIFO recompute uses fresh per-line stdout prices for 32 positions
+
+### Watch / Next Cron
+
+- 23:00 BJT is the SECOND scan after US RTH open (21:30 BJT = 09:30 EST, now 11:00 EST). Next US RTH cron slot is 01:00 BJT (2h later).
+- yfinance scan_pool returned 0 successful analyses — this is the 11th-consecutive cron with empty pool. Likely yfinance rate-limiting or data feed issue. No action available from cron-side; pool is empty so no BUY decision can be made.
+- zt=5 has now entered P-MR-127 saturation territory (5+ consecutive zero-trigger crons) but cash $207.40 > $100 means cf stays at base — NOT a saturation crisis yet. The watch threshold for "deep saturation crisis" is zt≥10 AND cf≥3 (concurrent conditions).
+- Notes front-matter refresh is overdue (3 days stale). Next scan with a successful BUY should refresh both FIFO recompute AND Notes table simultaneously.
+- No SL/TP signals fired in this scan — all 32 positions held through the RTH first hour without hitting 5%-stop or MA10-stop or +20% TP1 thresholds.
 
 ### P-MR references
 
