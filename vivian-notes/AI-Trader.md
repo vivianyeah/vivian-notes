@@ -7580,3 +7580,88 @@ No Stage 2 candidates means no Type A/B/C/D/X block classification possible. The
 - P-MR-183 (stale-quote drift decomposition)
 - P-MR-214 (API↔FIFO identity shortcut — exact hit)
 - P-MR-230 (Notes↔FIFO drift >$100 → IGNORE, headline = FIFO recompute)
+## ⏰ 2026-08-24 01:00 BJT
+
+2026-08-24 01:00 BJT cron (HermesV ID 6092) — RTH-mid-session scan, ~4h post US RTH open. **50-hour gap from prior cron (2026-08-21 23:00 BJT)** — long gap spanning 3 BJT dates triggers day-boundary reset (P-MR-247/215).
+
+### Result: 0 trades fired — yfinance pool empty (12th consecutive cron with `成功分析: 0 只`)
+
+- **Cash: $207.40** (unchanged across 50h gap, P-MR-179 trivial inter-scan drift)
+- **持倉: 32 只** (unchanged across 50h gap — no TP/SL fires over the 3 calendar days)
+- **帳戶總值 (FIFO recompute, headline):** **$102,111.32** (FIFO MV $101,903.92 + Cash $207.40)
+- **API↔FIFO identity: EXACT** (P-MR-214) — 32=32 perfect recon, qty match all positions, no lag shells, `only_in_api: ∅`, `only_in_fifo: ∅`
+- **Inter-scan FIFO drift (2026-08-21 23:00 BJT → 2026-08-24 01:00 BJT, ~50h including 3 calendar days of RTH)**: $101,776.40 → $102,111.32 = **+$334.92** — minor net positive across 2.5 RTH sessions (Friday afternoon close → Monday morning RTH, ~2.5 days x 32 positions)
+- **Inter-scan cash drift**: **$0.00** (P-MR-179 trivial; well below $10 watch threshold despite 50h gap)
+- **Notes (stale from 2026-08-19 front-matter)**: $99,625.00
+- **Notes ↔ FIFO drift**: $99,625.00 − $102,111.32 = **−$2,486.32** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute
+
+### Stage 2 Block Classification
+
+- **Stage 2 候選: 0 只** (yfinance scan returned 0 analysis-success symbols — `成功分析: 0 只`)
+- **買入信號: 0 只** (no BUY fires)
+- **Block Classification**: yfinance scan_pool empty (data feed returned 0 candidates) — no Type A/B/C/D/X blocks evaluated since Stage 2 evaluation cannot proceed without candidate pool. **12th consecutive cron** with this fingerprint across 3 distinct BJT days (08-21 / 08-23 / 08-24). **ESCALATION CRITICAL PRIORITY**: persistent scan.py pool-fetch issue — needs IMMEDIATE operator attention (add diagnostic `print()` to scan.py pool loop).
+
+### TP1 Trigger Watch (重點 — paper-mode noted but scan.py has NO TP1 logic)
+
+scan.py `main()` (185 lines) has **MA20 exit logic only** (line 134-147) but **NO TP1 +20% logic**. The TP1 state file is checked here but NOT updated by scan. The 3 fresh candidates below are +20%+ PnL but not yet TP1-d:
+
+| Symbol | Cost | Now | PnL% | Qty | Status |
+|---|---|---|---|---|---|
+| MRK | $118.23 | $152.55 | **+29.0%** | 7 | 🚨 PAST TP1, unfired |
+| FUTU | $100.51 | $123.64 | **+23.0%** | 67 | 🚨 PAST TP1, unfired |
+| COP | $109.67 | $134.87 | **+23.0%** | 64 | 🚨 PAST TP1, unfired |
+
+**TP1 status JSON** (`/tmp/ai_trader_tp1_state.json`): 14 True (AMD/NBIS/ONDS/PYPL/SMCI/DHR/ADBE/MSFT/JD/ANET/PATH/CRWV/IREN/SNDK), 0 fresh fires this scan (scan has no TP1 trigger), 1 fully-closed (HOOD dict-valued closure audit per P-MR-176).
+
+**TP2 status JSON**: 1 True (CRWV). MRK currently +29.0% — closest to TP2 territory (+40% = $165.60 trigger, now $152.55 = $13.05 short).
+
+**Operator note**: the broker/agent cannot fire TP1 without explicit signal; if scan pool recovers, MRK/FUTU/COP are immediate TP1 candidates at +20%/+23%/+23% PnL.
+
+### Counter state (DAY-BOUNDARY RESET — 50h gap, 3 BJT dates crossed)
+
+- **Pre-cron counters** (from 2026-08-21 23:00 BJT cron section): **zt=5, cf=0**
+- **Day-boundary check**: last cron (23:00 BJT 2026-08-21) BJT date = 2026-08-21 ≠ this cron (01:00 BJT 2026-08-24) BJT date = 2026-08-24 → **DIFFERENT → RESET** (P-MR-247/215/192 — binary BJT-date detection, NOT time-dependent; gap = 50h > 24h does NOT scale the reset)
+- **RESET FIRST per P-MR-192**: day-boundary → zt=1 (base), cf=0 (cash $207.40 > $100 floor, also base)
+- **Trade effects SECOND per P-MR-192**:
+  - 0 BUY fired → zt+1 per P-MR-110 (zt: 1 → 2)
+  - Cash $207.40 > $100 floor → cf stays at base 0 (P-MR-125 requires post-cash <$100)
+- **Final counters**: **zt=2, cf=0**
+
+### Diagnostics
+
+- **Cash trajectory** (last 5 crons, P-MR-114):
+  - 2026-08-21 03:00 → Cash $207.40
+  - 2026-08-21 03:30 → Cash $207.40
+  - 2026-08-21 22:01 → Cash $207.40
+  - 2026-08-21 23:00 → Cash $207.40 (P-MR-179 trivial $0.00 drift across 18.5h gap)
+  - 2026-08-24 01:00 → Cash $207.40 (P-MR-179 trivial $0.00 drift across **50h gap** including 3 calendar dates)
+- **Zero-trigger counter streak**: zt=2 (DAY-BOUNDARY RESET to 1 → +1 for 0 BUY → 2)
+- **Cash-at-floor counter**: cf=0 (cash $207.40 > $100 floor)
+- **FIFO recompute identity**: API source MV $101,903.92 == FIFO MV $101,903.92 (P-MR-214 EXACT hit)
+- **Stale-quote drift** (P-MR-183): $0 between scan-printed and FIFO recompute (perfect identity)
+- **Breadth snapshot** (using Notes-front-matter cost basis): 21 green / 11 red (avg PnL +7.79%). Top gainers vs cost: PATH +37.3%, MRK +29.0%, FUTU +23.0%, COP +23.0%, BABA +8.3%, XOM +16.6%, WFC +9.5%. Defensive mix leading.
+- **RTH price fresh data** (from scan stdout MA20=now signals prices are intra-day current):
+  - Notes front-matter cost basis from 2026-08-19 is 3+ days stale (Notes qty column matches but price column is stale)
+  - Current scan stdout prices ARE 2026-08-24 RTH-mid-session prices (used for FIFO recompute)
+  - **Notes front-matter should be refreshed** but no BUY fires → no cron trigger to update the table
+
+### Watch / Next Cron
+
+- 01:00 BJT = ~13:00 EST (RTH mid-session, post-lunch EST). Next US RTH cron slot is 03:00 BJT (2h later, then 03:30 RTH pre-close).
+- **CRITICAL ESCALATION PRIORITY**: 12 consecutive crons with yfinance pool empty across 3 distinct BJT dates and ~50h elapsed. **Operator action needed**: add diagnostic `print()` to scan.py `evaluate_stage2_candidates()` / pool loop (line ~150) to surface the empty pool cause.
+- **TP1 trigger watch**: MRK, FUTU, COP all past +20% PnL but unfired. If scan pool recovers and these symbols remain above +20% at next cron, manual TP1 decision required.
+- **TP2 watch**: MRK at +29.0% — closing on TP2 territory (+40% = $165.60, now $152.55 = $13.05 short). Manual TP2 decision if MRK crosses +40% before next cron.
+- **SL watch**: INTC (−9.6%), KLAC (−8.3%), VRT (−7.3%), RKLB (−7.0%), HON (−6.3%), AVGO (−4.2%) all below their 5% fixed-stop levels — scan.py MA20-only logic gap means these stops do NOT auto-fire. Manual stop decision required if positions continue to deteriorate.
+
+### P-MR references
+
+- P-MR-110 (zero-trigger counter +1 on 0 BUY scan)
+- P-MR-125 (cash-at-floor +1 only when post-cash <$100)
+- P-MR-155/192/201/247/215 (day-boundary reset semantics — BJT date change = reset to base values, NOT time-dependent)
+- P-MR-168 (per-line API parser pattern, caught all 32 positions cleanly)
+- P-MR-176 (TP1 dict-valued closure audit, defensive `isinstance` check)
+- P-MR-179 (inter-scan cash drift trivial $0.00 across 50h gap = watch footnote)
+- P-MR-183 (stale-quote drift decomposition)
+- P-MR-186 (fresh-each-cron clean commit, slot-reuse causes corruption)
+- P-MR-214 (API↔FIFO identity shortcut — exact hit)
+- P-MR-230 (Notes↔FIFO drift >$100 → IGNORE, headline = FIFO recompute)
