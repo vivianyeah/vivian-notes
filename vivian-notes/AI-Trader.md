@@ -8218,3 +8218,114 @@ Cash flat at $207.40 (no broker adj, no fills, P-MR-260 no longer blocking — b
 5. **P-MR-247 day-boundary validation**: BJT date `2026-08-24` → `2026-08-25` triggers reset per P-MR-247. Reset applied FIRST, then trade effects SECOND. Counter went 5 → 1 (zt), 0 → 0 (cf, no increment trigger).
 
 6. **Future watch**: if next cron (03:00 BJT) shows `成功分析: 0` again, the patch is incomplete or scan.py was reverted — escalate immediately.
+
+## ⏰ 2026-08-25 03:00 BJT
+
+2026-08-25 03:00 BJT cron (HermesV ID 6092) — RTH pre-close scan, **3rd scan of 2026-08-24/25 evening session** (~2h after 01:00 cron). **Stage 2 still 0 (healthy 0-trigger), P-MR-260 stays RESOLVED.** Pure 0-trade canonical; all held symbols evaluated against MA20 trail stop / SL rules; no SL/TP fires in this scan (paper mode).
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 01:00 cron (no trades, no broker adj) |
+| Positions | 32 | All held, qty unchanged |
+| Pool analyzed | 92 只 | **P-MR-260 stays RESOLVED** (was `0` for 16+ crons pre-fix) |
+| Stage 2 候選 | 0 | Healthy 0-trigger — no ticker passes all 6 criteria |
+| 買入信號 | 0 | No trades fired |
+| SL/TP fires | 0 | No MA20/5%/TP1/TP2 trigger in this scan |
+| Trigger type | None | Pure 0-trigger canonical (healthy steady-state) |
+| Block classification | Stage 2 0 + 0 SL/TP | Market has no bullish candidates at this RTH pre-close moment |
+
+### 帳戶 (Account State)
+
+- **帳戶總值 (FIFO recompute, headline):** **$99,852.25** (FIFO MV $99,644.85 + Cash $207.40)
+- **Notes front-matter (stale 6d per P-MR-259):** ~$99,625 / Cash $207
+- **Notes ↔ FIFO drift:** $99,852.25 − $99,625 = **+$227.25** → >$30 → **NEUTRAL per P-MR-230** (footnote both)
+- **Unrealized P&L (cost basis $93,606.70 → MV $99,644.85):** **+$6,038.15**
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades)
+- **Session realized P&L (last 25):** **+$2,934.13**
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($99,644.85)
+- **All qty match:** ✅ EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (01:00 → 03:00, 2h gap, same-BJT-day):** $99,644.85 − $99,801.65 = **−$156.80** → pure stale-quote (P-MR-183, normal range $2-8k; this is at the LOW end — quiet market)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** +$227.25 → NEUTRAL per P-MR-230 (>$30 threshold; Notes 6d stale per P-MR-259, headline uses FIFO recompute)
+
+### Cap-Floor Position Check (P-MR-144)
+
+- Total: $99,852.25 → 10% cap: $9,985.23
+- **DE** qty=17 price=$648.53 MV=$11,025.01 = **11.0%** ⚠️ >10% cap (above cap)
+- **MRVL** qty=46 price=$231.21 MV=$10,635.66 = **10.7%** ⚠️ >10% cap (above cap)
+- BABA: 9.4% / RKLB: 8.7% / COP: 8.5% — all under cap
+- Long-standing P-MR-144 cap-floor state; DE+MRVL both >10% (consistent with prior crons, no new breach)
+- No Stage 2 candidate that emerges can be any of these held symbols (they are all cap-blocked)
+
+### Block Classification (P-MR-116 + P-MR-224)
+
+- Stage 2 size = 0 → no A/B/C/D/X classification applicable
+- This is the **canonical 0-Trigger pattern** (P-MR-224 sibling — pool evaluates 92, none qualify)
+- The P-MR-260 fix is durable: `成功分析: 92` printed for the 3rd consecutive cron since patch
+
+### Counter Trajectory (P-MR-110/125/155/247 + P-MR-201)
+
+| Counter | Prior (01:00 2026-08-25) | This (03:00 2026-08-25) | Δ | Reason |
+|---|---|---|---|---|
+| zero-trigger | 1 | **2** | +1 | P-MR-201 same-BJT-day carry-forward; 0 BUY → zt+1 per P-MR-110 |
+| cash-at-floor | 0 | **0** | 0 | cash $207.40 > $100, no increment |
+
+**Same BJT day** as 01:00 cron → P-MR-201 carry-forward, no day-boundary reset (P-MR-247 NOT triggered; last_cron_bjt_date=2026-08-25 == this_cron_bjt_date=2026-08-25).
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Δ |
+|---|---|---|
+| 2026-08-24 22:02 BJT | $207.40 | $0.00 |
+| 2026-08-24 23:00 BJT | $207.40 | $0.00 |
+| 2026-08-25 01:00 BJT | $207.40 | $0.00 |
+| **2026-08-25 03:00 BJT** | **$207.40** | **$0.00** |
+
+Cash flat at $207.40 since 2026-08-21 23:00 (no broker adj, no fills; healthy canonical drift through P-MR-260 fix).
+
+### Position Above TP1/TP2 Trigger (paper-mode, P-MR-220)
+
+Per scan stdout `PnL=` line, positions above TP1 trigger (+20%):
+- **PATH +39.2%** (qty=67, avg=$11.91) — only **+0.8% from TP2 (+40%)**; closest to TP2 in portfolio
+- **MRK +27.4%** (qty=7, avg=$118.29) — above TP1
+- **COP +21.6%** (qty=64, avg=$109.67) — above TP1
+- T +19.4% (just below TP1)
+
+scan.py does NOT auto-fire TP1/TP2 in paper mode (P-MR-220 gap). Operator decides manual close.
+
+### Diagnostics
+
+- **✅ P-MR-260 stays RESOLVED**: 3rd consecutive cron since `bb_lo` patch (3rd `成功分析: 92`). Patch is durable. No further observation needed.
+- **Stage 2 healthy 0-trigger**: 92 tickers evaluated but 0 pass all 6 criteria. Market has no bullish setup at RTH pre-close; this is market-state, not scan.py dependent.
+- **DE + MRVL cap-breach unchanged**: Both held positions >10% cap. Cap-floor collapse state (P-MR-144) long-standing. No new breach this scan.
+- **PATH closest to TP2**: at +39.2%, only +0.8% from TP2 (+40%) trigger. If paper-mode TP2 auto-fire existed, PATH would fire on next cron (or next decimal tick).
+- **Inter-scan lag:** None — API↔FIFO identity exact (P-MR-214), no buy-lag, no SL-lag, no Type X residue.
+- **Notes freshness:** 6d stale per P-MR-259 (front-matter `$99,625`); FIFO recompute $99,852.25 is the operative truth. NEUTRAL drift +$227.25 per P-MR-230.
+- **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 01:00 → 03:00 same BJT day, 2h gap, no day-boundary reset.
+- **MV drift −$156.80 is at the LOW end of stale-quote range** — quiet pre-close market with minimal price ticks. Validates P-MR-183 with a sub-$200 case (rare).
+
+### Operator Action Items
+
+1. **No action items — clean 0-trigger canonical.** P-MR-260 patch is durable; market just has no Stage 2 candidates at this moment. Continue crons.
+
+2. **PATH +39.2% — monitor for next RTH.** If price ticks 0.8% higher (to ~$16.75), PATH becomes TP2 trigger candidate. scan.py paper-mode gap means this fires only via manual operator action (P-MR-220).
+
+3. **Notes stale 6d (P-MR-259)**: consider one-time operator update to FIFO truth ($99,852.25) on next review.
+
+4. **Counter trajectory**: zero-trigger=2 (P-MR-110 increment from 01:00's 1, same-day carry per P-MR-201), cash-at-floor=0 (cash $207.40 > $100, no +1).
+
+5. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 01:00 → 03:00 same BJT day, 2h gap, no day-boundary reset (P-MR-247).
