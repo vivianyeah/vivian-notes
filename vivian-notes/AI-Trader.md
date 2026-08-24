@@ -7963,3 +7963,127 @@ All within paper-mode tolerance.
 - US RTH status: pre-open (opens 22:30 BJT)
 
 ---
+
+## ⏰ 2026-08-24 23:00 BJT
+
+2026-08-24 23:00 BJT cron (HermesV ID 6092) — RTH-open+90min stable window scan, **2nd scan of 2026-08-24 evening session** (~1h after 22:02 cron). **🚨 P-MR-260 16th consecutive pool-empty** — but **ROOT CAUSE IDENTIFIED**: scan.py L78 `NameError: name 'bb_lo' is not defined`. This is a single-line scan.py bug, NOT a yfinance outage (manual `yf.Ticker(AAPL).history()` returns 126 rows cleanly). See Operator Action #1 for the one-line fix.
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 22:02 cron (no trades, no broker adj) |
+| Positions | 32 | All held, qty unchanged |
+| Stage 2 候選 | 0 | P-MR-260 pool-empty (16th consecutive) — **scan.py bug** |
+| 買入信號 | 0 | No trades fired |
+| Trigger type | None | Pure 0-trigger saturation |
+| Block classification | P-MR-260 pool-empty | scan.py `bb_lo` NameError swallows every ticker |
+
+### 帳戶 (Account State)
+
+- **帳戶總值 (FIFO recompute, headline):** **$100,187.47** (FIFO MV $99,980.07 + Cash $207.40)
+- **Notes front-matter (stale 5d per P-MR-259):** $99,625.00
+- **Notes ↔ FIFO drift:** $99,625.00 − $100,187.47 = **−$562.47** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute
+- **Unrealized P&L (cost basis $93,606.70 → MV $99,980.07):** **+$6,373.37**
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades)
+- **Session realized P&L (last 25):** **+$2,934.13**
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($99,980.07)
+- **All qty match:** ✅ EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (22:02 → 23:00, 1h gap):** $99,980.07 − $99,684.71 = **+$295.36** → pure stale-quote (P-MR-183, $2-8k normal range on 30-position account; this scan is at the low end)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** −$562.47 → IGNORE per P-MR-230 (>$100 threshold; Notes 5d stale per P-MR-259)
+
+### 🚨 Root Cause: scan.py P-MR-260 Bug Identified
+
+The "16 consecutive pool-empty" pattern is **NOT a yfinance API failure** — it's a **single-line Python bug in scan.py**:
+
+```python
+# /tmp/ai_trader_scan.py L68-L78
+bb_mid = ma20                                                          # L68
+bb_std = math.sqrt(sum((c-bb_mid)**2 for c in closes[-20:])/20)       # L69
+bb_up = bb_mid + 2*bb_std                                              # L70
+# ...
+if bb_lo < last < bb_up: score += 1                                    # L78 ← NameError!
+```
+
+`bb_lo` is **referenced but never defined**. The bare `except:` at the end of `get_price()` swallows the `NameError` and returns `None` for **every ticker**. The pool loop then collects `[None, None, None, ...]` → `成功分析: 0 只`.
+
+**Empirical verification** (this cron):
+- Manual `yf.Ticker('AAPL').history(period='6mo')` → 126 rows ✓ (yfinance works)
+- Same call inside `get_price('AAPL')` → `None` (NameError on `bb_lo`)
+- Standalone debug replica of `get_price` body → `NameError: name 'bb_lo' is not defined`
+
+**One-line fix** (for next operator review):
+```python
+# Insert after L70:
+bb_lo = bb_mid - 2*bb_std
+```
+
+This single-line patch should restore Stage 2 evaluation immediately on the next scan.
+
+### Block Classification (P-MR-116 + P-MR-213 + P-MR-260)
+
+- **P-MR-260 pool-empty (16th consecutive):** scan.py main pool loop returns `成功分析: 0 只` because `get_price()` returns None for every ticker due to L78 `NameError`.
+- This is NOT a Type A/B/C/D/X block — those all require Stage 2 candidates to evaluate. The failure is at the pool-fetch layer, caused by an internal scan.py bug.
+- **16th consecutive observation** of this pattern: 2026-08-21 23:00, 2026-08-22 (multiple), 2026-08-23 (multiple), 2026-08-24 01:00/03:00/03:30/22:02/23:00 — the bug has been present continuously since 2026-08-21 evening.
+
+### Counter Trajectory (P-MR-110/125/155/201)
+
+| Counter | Prior (22:02) | This (23:00) | Δ | Reason |
+|---|---|---|---|---|
+| zero-trigger | 4 | **5** | +1 | P-MR-110 (0 BUY in scan, P-MR-260 pool-empty) |
+| cash-at-floor | 0 | **0** | 0 | cash $207.40 > $100, no increment |
+
+**Same BJT day** as 22:02 cron → P-MR-201 carry-forward, no day-boundary reset (P-MR-247 not triggered).
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Δ |
+|---|---|---|
+| 2026-08-21 23:00 BJT | $207.40 | — |
+| 2026-08-24 01:00 BJT | $207.40 | $0.00 (50h gap, P-MR-179 trivial) |
+| 2026-08-24 03:00 BJT | $207.40 | $0.00 |
+| 2026-08-24 03:30 BJT | $207.40 | $0.00 |
+| 2026-08-24 22:02 BJT | $207.40 | $0.00 |
+| **2026-08-24 23:00 BJT** | **$207.40** | **$0.00** |
+
+Cash has been flat at $207.40 since 2026-08-21 23:00 (no broker adj, no fills, P-MR-260 blocking).
+
+### Diagnostics
+
+- **Pool-empty escalation level:** P-MR-260 16th consecutive observation. Root cause now identified (scan.py L78 `bb_lo` NameError); single-line fix available.
+- **Position concentration check:** Top-3 positions = DE (17.3% MV), PATH (11.2% MV), FUTU (7.9% MV) — DE at 17.3% exceeds 10% per-position cap-floor threshold. Long-standing cap-floor collapse state per P-MR-144.
+- **TP1/TP2 status:** PATH +39.6% (above TP1 trigger, paper-mode no auto-fire); MRK +27.4%; COP +22.0%; T +19.1%; XOM +15.4% — 5 held positions above TP1 trigger per scan.py but not auto-firing in paper mode (P-MR-220 gap).
+- **Inter-scan lag:** None — API↔FIFO identity exact (P-MR-214), no buy-lag, no SL-lag, no Type X residue.
+- **Notes freshness:** 5d stale per P-MR-259 (front-matter `$99,625`); FIFO recompute is the operative truth.
+
+### Operator Action Items
+
+1. **🚨 CRITICAL: scan.py L78 `bb_lo` NameError — single-line patch restores all Stage 2 evaluation.** The 16-consecutive pool-empty pattern is now confirmed as a one-line Python bug, NOT a yfinance outage. Apply this fix:
+   ```python
+   # /tmp/ai_trader_scan.py after line 70 (after `bb_up = bb_mid + 2*bb_std`):
+   bb_lo = bb_mid - 2*bb_std
+   ```
+   With this patch, the next scan should evaluate all ~80 POOL tickers, return `成功分析: N>0`, and resume Stage 2 + BUY loop. **Without this fix, no trades will ever fire** (P-MR-260 escalation: 16th consecutive → 17th inevitable without intervention).
+
+2. **TP1/TP2 paper-mode gap** — scan.py has MA20 exit only; TP1+20% and TP2+40% triggers are checked here but never auto-fired. PATH at +39.6% from TP2 trigger (operator should track for manual close); MRK +27.4%, COP +22.0%, T +19.1% above TP1 trigger (per P-MR-220).
+
+3. **Notes stale from 2026-08-19** — front-matter `$99,625` is 5d stale. Drift −$562 vs FIFO recompute → IGNORE per P-MR-230 (>$100). Consider updating Notes to FIFO truth on next operator review (P-MR-259).
+
+4. **Counter trajectory**: zero-trigger=5 (P-MR-110 increment from 22:02's 4, no BUY to reset), cash-at-floor=0 (cash $207.40 > $100, no +1).
+
+5. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 22:02 → 23:00 same BJT day, 1h gap, no day-boundary reset (P-MR-247).
+
+6. **P-MR-260 escalation classification**: with root cause now identified, this is the LAST "blind" P-MR-260 observation. Next cron after scan.py patch should be classified as "P-MR-260 resolved — Stage 2 evaluation restored" if `成功分析: N>0`. If patch NOT applied, P-MR-260 continues to 17th consecutive.
