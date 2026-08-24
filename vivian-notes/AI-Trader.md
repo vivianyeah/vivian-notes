@@ -8329,3 +8329,125 @@ scan.py does NOT auto-fire TP1/TP2 in paper mode (P-MR-220 gap). Operator decide
 4. **Counter trajectory**: zero-trigger=2 (P-MR-110 increment from 01:00's 1, same-day carry per P-MR-201), cash-at-floor=0 (cash $207.40 > $100, no +1).
 
 5. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 01:00 → 03:00 same BJT day, 2h gap, no day-boundary reset (P-MR-247).
+
+
+## ⏰ 2026-08-25 03:30 BJT
+
+2026-08-25 03:30 BJT cron (HermesV ID 6092) — RTH pre-close final scan, **4th scan of 2026-08-24/25 evening session** (~30min after 03:00 cron). **Stage 2 still 0 (healthy 0-trigger), P-MR-260 stays RESOLVED (4th consecutive `成功分析: 92`).** Pure 0-trade canonical; all held symbols evaluated against MA20 trail stop / SL rules; no SL/TP fires in this scan (paper mode).
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 03:00 cron (no trades, no broker adj) |
+| Positions | 32 | All held, qty unchanged |
+| Pool analyzed | 92 only | **P-MR-260 stays RESOLVED** (4th consecutive `成功分析: 92`) |
+| Stage 2 候選 | 0 | Healthy 0-trigger — no ticker passes all 6 criteria |
+| 買入信號 | 0 | No trades fired |
+| SL/TP fires | 0 | No MA20/5%/TP1/TP2 trigger in this scan |
+| Trigger type | None | Pure 0-trigger canonical (healthy steady-state, RTH pre-close) |
+| Block classification | Stage 2 0 + 0 SL/TP | Market has no bullish candidates at this RTH pre-close moment |
+
+### Account (Account State)
+
+- **Account Total (FIFO recompute, headline):** **$99,863.47** (FIFO MV $99,656.07 + Cash $207.40)
+- **Notes front-matter (stale 6d per P-MR-259):** ~$99,625 / Cash $207
+- **Notes ↔ FIFO drift:** $99,863.47 − $99,625 = **+$238.47** → NEUTRAL per P-MR-230 (>$30 threshold; Notes 6d stale, headline uses FIFO recompute)
+- **Unrealized P&L (cost basis $93,606.70 → MV $99,656.07):** **+$6,049.37**
+- **Session realized P&L (last 25):** **+$2,934.13** (per `session_realized_pnl(log, 50)`)
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades)
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** empty set
+- **only_in_fifo:** empty set
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($99,656.07)
+- **All qty match:** OK EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (03:00 → 03:30, 30min gap, same-BJT-day):** $99,656.07 − $99,644.85 = **$+11.22** → pure stale-quote (P-MR-183)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** +$238.47 → NEUTRAL per P-MR-230 (>$30 threshold)
+
+### Cap-Floor Position Check (P-MR-144)
+
+- Total: $99,863.47 → 10% cap: $9,986.35
+- **DE** qty=17 price=$647.38 MV=$11,005.46 = **11.0%** OVER cap
+- **MRVL** qty=46 price=$231.13 MV=$10,631.98 = **10.6%** OVER cap
+- Long-standing P-MR-144 cap-floor state; no Stage 2 candidate can be any of these held symbols
+- No new breach (same set as 03:00 cron)
+
+### Block Classification (P-MR-116 + P-MR-224)
+
+- Stage 2 size: 0 candidates
+- All 32 held symbols evaluated; MA20 trail stop and 5% SL rules computed for each
+- **0 SL fires**, **0 TP1 fires**, **0 TP2 fires**, **0 Type X rejects**, **0 implicit Type D**
+- Block pattern: **No Stage 2 = no candidates to block** (P-MR-224 degenerate state — but with 0 candidates, this is healthier than 5-cap saturation)
+- No trades attempted or blocked — pure market quiescence at RTH pre-close
+
+### Counter Trajectory (P-MR-110/125/155/247 + P-MR-201)
+
+| Counter | Prior (03:00 2026-08-25) | This (03:30 2026-08-25) | Delta | Reason |
+|---|---|---|---|---|
+| zero-trigger | 2 | **3** | +1 | P-MR-201 same-BJT-day carry-forward; 0 BUY → zt+1 per P-MR-110 |
+| cash-at-floor | 0 | **0** | 0 | cash $207.40 > $100, no increment |
+
+**Same BJT day** as 03:00 cron → P-MR-201 carry-forward, no day-boundary reset (P-MR-247 NOT triggered; last_cron_bjt_date=2026-08-25 == this_cron_bjt_date=2026-08-25).
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Delta |
+|---|---|---|
+| 2026-08-24 22:02 BJT | $207.40 | $0.00 |
+| 2026-08-24 23:00 BJT | $207.40 | $0.00 |
+| 2026-08-25 01:00 BJT | $207.40 | $0.00 |
+| 2026-08-25 03:00 BJT | $207.40 | $0.00 |
+| **2026-08-25 03:30 BJT** | **$207.40** | **$0.00** |
+
+Cash flat at $207.40 since 2026-08-21 23:00 (no broker adj, no fills; healthy canonical drift through P-MR-260 fix).
+
+### Position Above TP1/TP2 Trigger (paper-mode, P-MR-220)
+
+Per scan stdout `PnL=` line, positions above TP1 trigger (+20%):
+- **PATH +39.9%** (qty=67, avg=$11.91) — **ONLY 0.1% FROM TP2 (+40%)!** Critical watch for next RTH open
+- **MRK +27.3%** (qty=7, avg=$118.29) — above TP1
+- **COP +21.6%** (qty=64, avg=$109.67) — above TP1
+- T +19.4% (just below TP1)
+
+scan.py does NOT auto-fire TP1/TP2 in paper mode (P-MR-220 gap). Operator decides manual close.
+
+### Diagnostics
+
+- **OK P-MR-260 stays RESOLVED**: 4th consecutive cron since `bb_lo` patch (4th `成功分析: 92`). Patch is durable. No further observation needed.
+- **Stage 2 healthy 0-trigger**: No bullish candidates; this is structurally clean (not a saturation block, just no candidates meet all 6 criteria)
+- **No held-symbol SL/TP fires**: MA20 trail stops all clear; 5% SL rule all clear; TP1/TP2 rule all clear
+- **PATH at +39.9%**: Almost at TP2 trigger (+40%); if PATH closes >= $16.666 on Monday open, TP2 partial 2/3 sell would fire
+- **Cap-floor state unchanged**: DE (11.0%) + MRVL (10.7%) both >10% cap from prior crons; no new breach
+- **Inter-scan cash drift**: $0.00 (P-MR-179 trivial, no broker adj)
+- **Stale-quote drift $+11.22**: At the LOW end of P-MR-183 normal range ($2-8k); quiet market at RTH pre-close
+
+### P-MR Compliance Audit
+
+- **P-MR-168**: Per-line API parser used (caught all 32 positions, no prefix regex drops)
+- **P-MR-186**: Comma-formatted regex used (`${\d,.]+}` + `replace(',','')`)
+- **P-MR-187**: Scan stdout tee'd to `/tmp/_scan_stdout_1724546400.log` (timestamp-fresh)
+- **P-MR-201**: Same-BJT-day counter carry-forward (zt 2→3, cf 0→0)
+- **P-MR-214**: API↔FIFO identity exact (32=32, qty match, no drift decomposition needed)
+- **P-MR-230**: Notes ↔ FIFO drift +$238.47 → NEUTRAL (>$30 threshold)
+- **P-MR-260**: Patched (4th consecutive `成功分析: 92`, no regression)
+
+### Next Cron Watch
+
+- **PATH TP2 watch**: If PATH closes >= $16.666 on Monday 2026-08-25 RTH open, TP2 partial 2/3 sell fires
+- **Counter state to carry**: zt=3, cf=0 (same-BJT-day; will reset on 2026-08-26 first cron per P-MR-155)
+- **Saturation state**: Cash $207.40 above $100 floor; no cap breach; P-MR-144 cap-floor collapse NOT in effect (DE+MRVL at >10% but cash adequate)
+- **Pool health**: `bb_lo` patch durable (P-MR-260 4th validation)
+
+---
+
+*Generated by AI-Trader cron (HermesV ID 6092) at 2026-08-25 03:30 BJT. Pure 0-trigger canonical, paper mode.*
