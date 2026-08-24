@@ -7842,3 +7842,124 @@ Pre-close (US RTH closes 04:00 BJT = 16:00 EST) trail-stop audit: all 32 positio
 - US RTH status: pre-close (closes 04:00 BJT), final cron of 2026-08-23 US session
 
 ---
+
+## ⏰ 2026-08-24 22:02 BJT
+
+2026-08-24 22:02 BJT cron (HermesV ID 6092) — RTH-open+30min stable window scan, first scan of 2026-08-24 evening session (18.5h after 03:30 pre-close cron). **15th consecutive yfinance pool-fetch failure** (P-MR-260 escalation — see Operator Action #1).
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 03:30 cron (no trades, no broker adj) |
+| Positions | 32 | All held |
+| Stage 2 候選 | 0 | P-MR-260 pool-empty (15th consecutive) |
+| 買入信號 | 0 | No trades fired |
+| Trigger type | None | Pure 0-trigger saturation |
+| Block classification | P-MR-260 pool-empty | scan.py pool loop returns 0 candidates before evaluation |
+
+### 帳戶 (Account State)
+
+- **帳戶總值 (FIFO recompute, headline):** **$99,892.11** (FIFO MV $99,684.71 + Cash $207.40)
+- **Notes front-matter (stale 5d per P-MR-259):** $99,625.00
+- **Notes ↔ FIFO drift:** $99,625.00 − $99,892.11 = **−$267.11** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute
+- **Unrealized P&L (cost basis $93,606.70 → MV $99,684.71):** **+$6,078.01**
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades)
+- **Session realized P&L (last 25):** **+$2,934.13**
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($99,684.71)
+- **All qty match:** ✅ EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (03:30 → 22:02, 18.5h gap):** $99,684.71 − $101,903.92 = **−$2,219.21** → pure stale-quote (P-MR-183, $2-8k normal range on 30-position account)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** −$267.11 → IGNORE per P-MR-230 (>$100 threshold)
+
+### Block Classification (P-MR-116 + P-MR-213 + P-MR-260)
+
+- **P-MR-260 pool-empty (15th consecutive):** scan.py main pool loop returns `成功分析: 0 只` BEFORE Stage 2 evaluation. **No candidates reach the buy loop at all.**
+- This is NOT a Type A/B/C/D/X block — those all require Stage 2 candidates to evaluate. The failure is at the pool-fetch layer.
+
+### Counter Trajectory (P-MR-110/125/155/201)
+
+| Counter | Prior (03:30) | This (22:02) | Δ | Reason |
+|---|---|---|---|---|
+| zero-trigger | 3 | **4** | +1 | P-MR-110 (0 BUY in scan) |
+| cash-at-floor | 0 | **0** | 0 | cash $207.40 > $100, no increment |
+
+**Same BJT day** as 03:30 cron → P-MR-201 carry-forward, no day-boundary reset (P-MR-155 not triggered).
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Δ |
+|---|---|---|
+| 2026-08-21 23:00 BJT | $207.40 | — |
+| 2026-08-24 01:00 BJT | $207.40 | $0.00 (50h gap, P-MR-179 trivial) |
+| 2026-08-24 03:00 BJT | $207.40 | $0.00 (2h RTH, no trades) |
+| 2026-08-24 03:30 BJT | $207.40 | $0.00 (30min RTH pre-close, no trades) |
+| **2026-08-24 22:02 BJT** | **$207.40** | **$0.00** (18.5h gap, no trades) |
+
+**cash-at-floor counter: 0** (cash $207.40 > $100, NOT at floor).
+**zero-trigger counter: 4** (P-MR-110 increment, no BUY to reset).
+
+### RTH Pre-Open Stage 2 Check
+
+Scan ran at 22:02 BJT = 10:02 EST. US RTH opens 09:30 EST (22:30 BJT). Pre-open window — early stable scan per spec ("21:30-22:00 高波動後穩定期"). No actionable signals.
+
+### TP1/TP2 Paper-Mode Watch
+
+| Symbol | TP1 Trigger | Current | Gap | Status |
+|---|---|---|---|---|
+| **PATH** | TP1 done (partial) | $16.52 | TP2 $16.67 → gap +$0.15 | 🚨 **TP2 IMMINENT** |
+| COP | $131.60 (+20%) | $134.53 | +$2.93 | Watch (TP1 not fired) |
+| MRK | $141.88 (+20%) | $150.60 | +$8.72 | Watch |
+| FUTU | $140.71 (+20%) | $117.51 | −$23.20 | Not near TP1 |
+| T | $30.65 (+20%) | $25.54 | −$5.11 | Not near TP1 |
+| VZ | $59.80 (+20%) | $49.83 | −$9.97 | Not near TP1 |
+| PFE | $33.56 (+20%) | $27.97 | −$5.59 | Not near TP1 |
+| XOM | $196.93 (+20%) | $164.11 | −$32.82 | Not near TP1 |
+| HOOD | $114.79 (+20%) | $106.50 | −$8.29 | Not near TP1 |
+| WFC | $102.27 (+20%) | $85.24 | −$17.03 | Not near TP1 |
+| BABA | $140.66 (+20%) | $117.22 | −$23.44 | Not near TP1 |
+| DE | $786.34 (+20%) | $654.44 | −$131.90 | Not near TP1 |
+
+**PATH is the most critical TP2 watch** — TP1 already partial-fired (P-MR-235), qty 67 held, current $16.52 vs TP2 trigger $16.67 = +$0.15 gap (under trigger but close). MRK and COP are next-closest untriggered TP1 candidates.
+
+### MA10 Trail Stop Status
+
+All 32 positions checked against MA10 trail stop at 22:02 BJT scan. **No MA10 stop fires** this scan. Closest-to-stop positions:
+- KLAC: −8.3% from entry (5% fixed SL = $169.29, current $178.20)
+- VRT: −7.3% (5% fixed SL = $239.70, current $252.31)
+- INTC: −9.6% (5% fixed SL = $81.12, current $85.39)
+- HON: −6.9% (5% fixed SL = $203.66, current $214.38)
+
+All within paper-mode tolerance.
+
+### Diagnostics & Operator Action Items
+
+1. **🚨 CRITICAL: yfinance pool-fetch failure (15th consecutive cron)** — scan.py main pool loop returns `成功分析: 0 只` every run since 2026-08-21 22:01 BJT. **Persistent structural failure** blocking all Stage 2 evaluation. Operator action: add diagnostic `print()` to scan.py pool fetch loop to identify whether it's a yfinance API rate-limit, network issue, or symbol-pool exhaustion. **Without this fix, no trades will ever fire.** (escalation from P-MR-260 14th → 15th observation).
+2. **TP1/TP2 paper-mode gap** — scan.py has MA20 exit only; TP1+20% and TP2+40% triggers checked here but never auto-fired. PATH at +$0.15 from TP2 trigger (above trigger means sell — operator should track for manual close).
+3. **Notes stale from 2026-08-19** — front-matter $99,625 is 5 days stale. Drift −$267 vs FIFO recompute → IGNORE per P-MR-230 (>$100). Consider updating Notes to FIFO truth on next operator review (P-MR-259).
+4. **Counter trajectory**: zero-trigger=4 (P-MR-110 increment from 03:30, no BUY to reset), cash-at-floor=0 (cash > $100, no +1).
+5. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 03:30 → 22:02 same day, 18.5h gap, no day-boundary reset (P-MR-247).
+
+### Reference
+
+- Previous cron: 2026-08-24 03:30 BJT (~18.5h prior — same BJT day, no day-boundary reset)
+- Inter-scan elapsed: ~18.5h RTH pre-open window
+- API↔FIFO identity: EXACT (P-MR-214 0-fill shortcut)
+- Drift decomposition: $0.00 inter-scan cash, $0.00 buy-lag, $0.00 SL-lag, $2,219.21 pure stale-quote (P-MR-183)
+- FIFO recompute: $99,684.71 MV + $207.40 cash = **$99,892.11 total**
+- Cron report: stage2-empty-15th-consecutive, no trades, TP2 PATH watch active (+$0.15 from trigger)
+- US RTH status: pre-open (opens 22:30 BJT)
+
+---
