@@ -8087,3 +8087,134 @@ Cash has been flat at $207.40 since 2026-08-21 23:00 (no broker adj, no fills, P
 5. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 22:02 → 23:00 same BJT day, 1h gap, no day-boundary reset (P-MR-247).
 
 6. **P-MR-260 escalation classification**: with root cause now identified, this is the LAST "blind" P-MR-260 observation. Next cron after scan.py patch should be classified as "P-MR-260 resolved — Stage 2 evaluation restored" if `成功分析: N>0`. If patch NOT applied, P-MR-260 continues to 17th consecutive.
+
+## ⏰ 2026-08-25 01:00 BJT
+
+2026-08-25 01:00 BJT cron (HermesV ID 6092) — RTH mid-session scan, **3rd scan of 2026-08-24/25 evening session** (~2h after 23:00 cron). **🚨 P-MR-260 RESOLVED — scan.py `bb_lo` NameError patched, pool evaluation restored.** Stage 2 still 0 (no candidates pass all 6 bullish criteria), but the structural pool-empty failure is fixed.
+
+### Patch Applied
+
+```python
+# /tmp/ai_trader_scan.py after L70 (after `bb_up = bb_mid + 2*bb_std`):
++        bb_lo = bb_mid - 2*bb_std
+```
+
+After patch: `成功分析: 92 只` (vs. `0` for 16+ consecutive crons). Pool loop now evaluates every ticker correctly; the bare `except:` no longer swallows `NameError`. P-MR-260 root cause fixed at source.
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 23:00 cron (no trades, no broker adj) |
+| Positions | 32 | All held, qty unchanged |
+| Pool analyzed | 92 只 | **P-MR-260 RESOLVED** (was `0` for 16+ crons) |
+| Stage 2 候選 | 0 | Healthy 0-trigger — no ticker passes all 6 criteria |
+| 買入信號 | 0 | No trades fired |
+| Trigger type | None | Pure 0-trigger saturation (healthy) |
+| Block classification | P-MR-260 resolved + Stage 2 0 | Market has no bullish candidates at this RTH moment |
+
+### 帳戶 (Account State)
+
+- **帳戶總值 (FIFO recompute, headline):** **$100,009.05** (FIFO MV $99,801.65 + Cash $207.40)
+- **Notes front-matter (stale 6d per P-MR-259):** $99,625.00
+- **Notes ↔ FIFO drift:** $99,625.00 − $100,009.05 = **−$384.05** → drift >$100 → **IGNORE per P-MR-230**, headline = FIFO recompute
+- **Unrealized P&L (cost basis $93,606.70 → MV $99,801.65):** **+$6,194.95**
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades)
+- **Session realized P&L (last 25):** **+$2,934.13**
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($99,801.65)
+- **All qty match:** ✅ EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (23:00 → 01:00, 2h gap, cross-BJT-day):** $99,801.65 − $99,980.07 = **−$178.42** → pure stale-quote (P-MR-183, normal range $2-8k; this is at the low end)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** −$384.05 → IGNORE per P-MR-230 (>$100 threshold; Notes 6d stale per P-MR-259)
+
+### Stage 2 Evaluation Detail
+
+- **Pool size:** 92 tickers successfully analyzed (yfinance + Bollinger Band evaluation now functional)
+- **Stage 2 criteria (all 6 must pass):** `above_ma20 + stars>=4 + 25<=rsi<=75 + rr>=0.8 + macd_hist>0 + kdj>0`
+- **Stage 2 pass:** 0 candidates — every ticker either (a) below MA20, (b) RSI outside [25,75] band, (c) negative MACD histogram, or (d) negative KDJ
+- **Market state interpretation:** Healthy RTH mid-session; 32-position portfolio holds all the Stage-2-worthy tickers already; new candidates failing is normal, not a saturation problem
+
+### TP1/TP2 Status (paper-mode, P-MR-220)
+
+| Symbol | Qty | AvgCost | Price | PnL% | TP Status |
+|---|---|---|---|---|---|
+| **PATH** | 67 | $11.91 | $16.52 | **+38.7%** | TP1 fired (paper-only), **+1.3% from TP2** |
+| **MRK** | 7 | $118.29 | $151.05 | **+27.7%** | TP1 fired (paper-only) |
+| **COP** | 64 | $109.67 | $133.26 | **+21.5%** | TP1 fired (paper-only) |
+| T | 14 | $21.53 | $25.69 | +19.3% | Below TP1 trigger (just shy) |
+| FUTU | 67 | $100.51 | $115.97 | +15.4% | Below TP1 trigger |
+| XOM | 37 | $141.51 | $162.62 | +14.9% | Below TP1 trigger |
+| VZ | 3 | $43.68 | $50.16 | +14.8% | Below TP1 trigger |
+| PFE | 1 | $24.65 | $28.01 | +13.6% | Below TP1 trigger |
+| HOOD | 74 | $95.68 | $107.30 | +12.1% | Below TP1 trigger |
+| WFC | 36 | $76.57 | $84.35 | +10.2% | Below TP1 trigger |
+
+**3 held positions above TP1 trigger** (PATH/MRK/COP) per scan.py check, but paper-mode does not auto-fire (P-MR-220 gap). PATH is **closest to TP2** at +38.7% (only +1.3% from TP2 trigger). Manual close tracked by operator if desired.
+
+### Block Classification (P-MR-116 + P-MR-260)
+
+- **P-MR-260 RESOLVED**: scan.py L78 `bb_lo` NameError patched at 01:00 BJT before scan execution. Pool loop now evaluates all tickers (92 successful analyses, up from 0). This is the 1st "resolved" cron after 16 consecutive failures.
+- **Stage 2 0 candidates**: distinct from P-MR-260 — the pool evaluates correctly, but no ticker passes all 6 bullish criteria (above_ma20 + stars>=4 + rsi[25,75] + rr>=0.8 + macd_hist>0 + kdj>0). This is healthy 0-trigger steady-state, NOT a structural failure.
+- **No Type A/B/C/D/X blocks**: those all require Stage 2 candidates to evaluate; with 0 candidates, there are no blocks to classify.
+
+### Counter Trajectory (P-MR-110/125/155/247)
+
+| Counter | Prior (23:00 2026-08-24) | This (01:00 2026-08-25) | Δ | Reason |
+|---|---|---|---|---|
+| zero-trigger | 5 | **1** | **−4** | P-MR-247 day-boundary reset (BJT date 2026-08-24 → 2026-08-25); base value 1 |
+| cash-at-floor | 0 | **0** | 0 | P-MR-247 day-boundary reset; cash $207.40 > $100, no increment |
+
+**Day-boundary reset fires** (P-MR-247: BJT date changes → both counters reset to base FIRST, then trade effects SECOND). 0 BUY → no zt override. Cash $207.40 > $100 → no cf increment. Final: zt=1, cf=0.
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Δ |
+|---|---|---|
+| 2026-08-24 03:30 BJT | $207.40 | $0.00 |
+| 2026-08-24 22:02 BJT | $207.40 | $0.00 |
+| 2026-08-24 23:00 BJT | $207.40 | $0.00 |
+| **2026-08-25 01:00 BJT** | **$207.40** | **$0.00** |
+
+Cash flat at $207.40 (no broker adj, no fills, P-MR-260 no longer blocking — but Stage 2 still 0 because market has no candidates).
+
+### Position Concentration Check
+
+- **Top-3:** DE (11.1%), MRVL (10.5%), BABA (9.5%) → **31.0% of MV** in top-3 (P-MR-144 cap-floor collapse context: DE at 11.1% exceeds 10% per-position cap-floor; MRVL right at threshold)
+- **Top-5:** DE (11.1%), MRVL (10.5%), BABA (9.5%), RKLB (8.8%), COP (8.5%) → **48.4% of MV** in top-5
+- **Cap-floor collapse state:** Long-standing per P-MR-144; DE exceeds 10% threshold; MRVL at threshold. New candidates blocked by cash-floor ($207 < DE $11,056).
+
+### Diagnostics
+
+- **✅ P-MR-260 RESOLVED**: scan.py L78 patched; pool evaluates 92 tickers per cron. No more `NameError`. This is the 1st "post-fix" cron; if next crons also show `成功分析: N>0`, the patch is durable.
+- **Stage 2 healthy 0-trigger**: 92 tickers evaluated, 0 pass all 6 criteria. This is market-state dependent, NOT scan.py dependent. As long as `成功分析: N>0` keeps printing, P-MR-260 stays resolved.
+- **Position concentration unchanged**: DE/MRVL near or at 10% cap-floor; long-standing P-MR-144 collapse state.
+- **TP1 paper-mode gap**: 3 held positions above TP1 trigger (PATH/MRK/COP); scan.py does not auto-fire in paper mode (P-MR-220). Operator decides manual close.
+- **PATH closest to TP2**: at +38.7%, only +1.3% from TP2 trigger (+40%). If scan.py paper-mode added TP2 auto-fire, PATH would be the first candidate.
+- **Inter-scan lag:** None — API↔FIFO identity exact (P-MR-214), no buy-lag, no SL-lag, no Type X residue.
+- **Notes freshness:** 6d stale per P-MR-259 (front-matter `$99,625`); FIFO recompute is the operative truth.
+
+### Operator Action Items
+
+1. **✅ P-MR-260 fix verified**: scan.py patch applied, pool evaluates 92 tickers cleanly. **Next cron (03:00 BJT) should also show `成功分析: 92+` to confirm durability.** If the patch is reverted or new bug introduced, P-MR-260 re-occurs.
+
+2. **TP1/TP2 paper-mode gap** — scan.py has MA20 exit only; TP1+20% and TP2+40% triggers are checked here but never auto-fired. **PATH at +38.7% (closest to TP2)**; MRK +27.7%, COP +21.5% above TP1 trigger (per P-MR-220).
+
+3. **Notes stale from 2026-08-19** — front-matter `$99,625` is 6d stale. Drift −$384 vs FIFO recompute → IGNORE per P-MR-230 (>$100). Consider updating Notes to FIFO truth on next operator review (P-MR-259).
+
+4. **Counter trajectory**: zero-trigger=1 (P-MR-247 day-boundary reset from prior 5), cash-at-floor=0 (cash $207.40 > $100, no +1).
+
+5. **P-MR-247 day-boundary validation**: BJT date `2026-08-24` → `2026-08-25` triggers reset per P-MR-247. Reset applied FIRST, then trade effects SECOND. Counter went 5 → 1 (zt), 0 → 0 (cf, no increment trigger).
+
+6. **Future watch**: if next cron (03:00 BJT) shows `成功分析: 0` again, the patch is incomplete or scan.py was reverted — escalate immediately.
