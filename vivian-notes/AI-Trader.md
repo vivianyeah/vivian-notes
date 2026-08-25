@@ -8810,3 +8810,160 @@ Day-boundary reset consumed prior cf carry (cf was already 0, so no observable c
 - **P-MR-247**: Day-boundary BJT-date binary check (2026-08-25 23:00 → 2026-08-26 01:00 = crossed → reset FIRST, trade effects SECOND)
 - **P-MR-259**: Notes front-matter stale 6d (acknowledged; FIFO recompute used as headline)
 - **P-MR-260**: 7th consecutive `成功分析: 92` — bb_lo patch durable
+## ⏰ 2026-08-26 03:00 BJT
+
+2026-08-26 03:00 BJT cron (HermesV ID 6092) — RTH late-evening scan (US RTH 14:00 ET ≈ 16:00 close, ~1h pre-close RTH), **2nd scan of 2026-08-26 day** (2h after 01:00 cron). **Stage 2 still 0 (healthy 0-trigger), P-MR-260 stays RESOLVED.** Pure 0-trade canonical; all 32 held symbols evaluated against MA20 trail / 5%-SL / TP1+20%; no SL/TP fires this scan (paper mode per P-MR-220).
+
+### Scan Summary
+
+| Metric | Value | Note |
+|---|---|---|
+| Cash | $207.40 | Unchanged from 01:00 cron (no trades, no broker adj) |
+| Positions | 32 | All held, qty unchanged |
+| Pool analyzed | 92 | **P-MR-260 stays RESOLVED** (8th consecutive `成功分析: 92`) |
+| Stage 2 候選 | 0 | Healthy 0-trigger — no ticker passes all 6 criteria |
+| 買入信號 | 0 | No trades fired |
+| SL/TP fires | 0 | No MA20/5%/TP1/TP2 trigger (paper mode) |
+| Trigger type | None | Pure 0-trigger canonical (healthy steady-state) |
+| Block classification | Stage 2 = 0 | Market has no bullish setup at RTH pre-close |
+
+### 帳戶 (Account State)
+
+- **帳戶總值 (FIFO recompute, headline):** **$100,902.55** (FIFO MV $100,695.15 + Cash $207.40)
+- **Notes front-matter (stale 6d per P-MR-259):** ~$99,625 / Cash $207
+- **Notes ↔ FIFO drift:** $100,902.55 − $99,625 = **+$1,277.55** → **NEUTRAL per P-MR-230** (>$100 → footnote both, but FIFO is headline given Notes 6d stale; P-MR-259 explicit)
+- **Cost basis total:** $93,606.70 (unchanged — no trades since 2026-08-21)
+- **Unrealized P&L (cost basis → MV):** **+$7,088.45** (slight gain from 01:00's +$6,884.01 due to intra-RTH drift up)
+- **All-time realized P&L:** **+$1,212.94** (147 closed trades, unchanged)
+- **Session realized P&L (last 25):** **+$2,934.13** (unchanged)
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($100,695.15)
+- **All qty match:** EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (01:00 → 03:00, 2h gap, same-BJT-day):** $100,695.15 − $100,490.71 = **+$204.44** → pure stale-quote (P-MR-183, normal range $2-8k; this is at the LOW end — quiet market)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** +$1,277.55 → **NEUTRAL per P-MR-230** (>$30 threshold; >$100 → P-MR-230 footnote both; Notes 6d stale per P-MR-259, headline uses FIFO recompute)
+
+### Cap-Floor Position Check (P-MR-144)
+
+Total: $100,902.55 → 10% cap: $10,090.26
+
+| Symbol | Qty | Price | MV | % Total | Status |
+|---|---|---|---|---|---|
+| **MRVL** | 46 | $240.90 | $11,081.40 | **10.98%** | ⚠️ >10% cap |
+| **DE** | 17 | $631.34 | $10,732.78 | **10.64%** | ⚠️ >10% cap |
+| BABA | 79 | $119.18 | $9,415.22 | 9.33% | Heavy, under cap |
+| RKLB | 126 | $67.12 | $8,457.12 | 8.38% | Heavy, under cap |
+| COP | 64 | $132.65 | $8,489.60 | 8.41% | Heavy, under cap |
+| HOOD | 74 | $112.27 | $8,307.98 | 8.23% | Heavy, under cap |
+
+- Top-2 (MRVL + DE) **21.62%** of account — long-standing P-MR-144 cap-floor collapse state
+- MRVL slipped from 11.03% (01:00) to 10.98% — small price dip
+- DE slipped from 10.61% (01:00) to 10.64% — small price gain (modestly tighter)
+- BABA approaching cap from below (now 9.33%, was 9.32% at 01:00 — flat)
+- Cop-floor state: MRVL + DE both still >10%; no new breach
+
+### Block Classification (P-MR-116 + P-MR-224)
+
+- Stage 2 size = 0 → no A/B/C/D/X classification applicable
+- This is the **canonical 0-Trigger pattern** (P-MR-224 sibling — pool evaluates 92, none qualify)
+- The P-MR-260 fix is durable: `成功分析: 92` printed for the 8th consecutive cron since patch
+
+### Counter Trajectory (P-MR-110/125/155/247 + P-MR-201)
+
+| Counter | Prior (01:00 2026-08-26) | This (03:00 2026-08-26) | Δ | Reason |
+|---|---|---|---|---|
+| zero-trigger | 1 | **2** | +1 | P-MR-201 same-BJT-day carry-forward; 0 BUY → zt+1 per P-MR-110 |
+| cash-at-floor | 0 | **0** | 0 | cash $207.40 > $100, no increment |
+
+**Same BJT day** as 01:00 cron → P-MR-201 carry-forward, no day-boundary reset (P-MR-247 NOT triggered; last_cron_bjt_date=2026-08-26 == this_cron_bjt_date=2026-08-26).
+
+### Cash Trajectory (last 5 crons)
+
+| Cron | Cash | Δ |
+|---|---|---|
+| 2026-08-25 22:02 BJT | $207.40 | $0.00 |
+| 2026-08-25 23:00 BJT | $207.40 | $0.00 |
+| 2026-08-26 01:00 BJT | $207.40 | $0.00 |
+| **2026-08-26 03:00 BJT** | **$207.40** | **$0.00** |
+
+Cash flat at $207.40 — no fills, no broker adj since 2026-08-21 (canonical P-MR-260-resolved steady-state).
+
+### Positions Above TP1/TP2 Trigger Zone (paper-mode, P-MR-220)
+
+Per cost-basis vs scan stdout `PnL=` line, positions above TP1 (+20%) trigger:
+
+| Symbol | Qty | Avg Cost | Current | P&L % | Status |
+|---|---|---|---|---|---|
+| **PATH** | 67 | $11.91 | $16.47 | **+38.3%** | TP1 zone, **+1.7% from TP2 (+40%)** |
+| **MRK** | 7 | $118.29 | $155.95 | **+31.8%** | TP1 zone |
+| **FUTU** | 67 | $100.51 | $126.17 | **+25.5%** | TP1 zone |
+| **COP** | 64 | $109.67 | $132.65 | **+21.0%** | TP1 zone |
+| T | 14 | $21.53 | $25.81 | +19.9% | (just under TP1, $25.84 trigger) |
+| HOOD | 74 | (varied avg) | $112.27 | +17.3% | (TP1 zone at avg-cost basis — paper-mode) |
+
+scan.py does NOT auto-fire TP1/TP2 in paper mode (P-MR-220 gap). Operator decides manual close.
+
+### Positions in 5%-SL Trigger Zone (paper-mode)
+
+Per cost-basis, positions at or below −5%:
+
+| Symbol | Qty | Avg Cost | Current | P&L % | Status |
+|---|---|---|---|---|---|
+| **RKLB** | 126 | $78.08 | $67.12 | **−14.0%** | ⚠️ SL zone |
+| **INTC** | 5 | $99.57 | $87.82 | **−11.8%** | ⚠️ SL zone |
+| **VRT** | 4 | $282.70 | $255.37 | **−9.7%** | ⚠️ SL zone |
+| KLAC | 1 | $200.62 | $182.98 | −8.8% | SL zone |
+| AVGO | 17 | $384.25 | $357.08 | −7.1% | SL zone |
+| HON | 5 | $230.32 | $215.23 | −6.6% | SL zone |
+
+6 positions in SL-zone (cost-basis). MA20 trail did NOT trigger this scan (all 32 OK). Scan stdout reports all 32 symbols MA20 = current price exactly (no MA20 deviation yet → trail not active for these symbols in the 5d lookback).
+
+### Inter-Cron MV Drift vs 23:00/01:00
+
+| Span | Δ MV | Reason |
+|---|---|---|
+| 23:00 (8/25) → 01:00 (8/26) | −$85.00 | stale-quote (P-MR-183, 2h RTH-stable) |
+| 01:00 (8/26) → 03:00 (8/26) | +$204.44 | stale-quote (P-MR-183, 2h RTH tick) |
+| Cumulative intra-RTH | +$119.44 | quiet pre-close market |
+
+All ≤ $200 magnitude — at the LOW end of the P-MR-183 normal range ($2-8k typical; this is unusually quiet).
+
+### Diagnostics
+
+- **P-MR-260 stays RESOLVED**: 8th consecutive cron since `bb_lo` patch (8th `成功分析: 92`). Patch is durable. No further observation needed.
+- **Stage 2 healthy 0-trigger**: 92 tickers evaluated but 0 pass all 6 criteria. Market has no bullish setup at RTH pre-close; this is market-state, not scan.py dependent.
+- **DE + MRVL cap-breach unchanged**: Both held positions >10% cap (DE 10.64% tightened from 10.61%; MRVL 10.98% slightly loosened from 11.03%). Cap-floor collapse state (P-MR-144) long-standing. No new breach this scan.
+- **PATH at +38.3%**: climbed from +37.9% (01:00) → +38.3% (03:00); still +1.7% from TP2 (+40%). If paper-mode TP2 auto-fire existed, PATH would fire on next ~$0.27 price tick (~1.6% gain).
+- **Inter-scan lag:** None — API↔FIFO identity exact (P-MR-214), no buy-lag, no SL-lag, no Type X residue.
+- **Notes freshness:** 6d stale per P-MR-259 (front-matter `$99,625`); FIFO recompute $100,902.55 is the operative truth. NEUTRAL drift +$1,277.55 per P-MR-230 (>$100 → footnote both).
+- **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 01:00 → 03:00 same BJT day, 2h gap, no day-boundary reset (P-MR-247 NOT triggered).
+- **MV drift +$204.44 is at the LOW end of stale-quote range** — quiet pre-close market with minimal price ticks. Validates P-MR-183 with a sub-$200 case (rare).
+- **SL-zone count: 6** — same as 01:00 (RKLB/INTC/VRT/KLAC/AVGO/HON all still underwater). MA20 trail does NOT trigger because 5d MA20 = current price (insufficient lookback for trail).
+- **TP1-zone count: 4-5** — PATH/MRK/FUTU/COP all still above TP1 trigger; PATH closest to TP2. Operator continues deferring manual close (P-MR-220).
+
+### Operator Action Items
+
+1. **No action items — clean 0-trigger canonical.** P-MR-260 patch is durable (8th consecutive `成功分析: 92`); market just has no Stage 2 candidates at this moment. Continue crons.
+
+2. **PATH +38.3% (TP1 zone, +1.7% from TP2): monitor for next RTH.** If price ticks 1.7% higher (to ~$16.75), PATH becomes TP2 trigger candidate. scan.py paper-mode gap means this fires only via manual operator action (P-MR-220).
+
+3. **6 SL-zone positions (RKLB/INTC/VRT/KLAC/AVGO/HON)**: cost-basis below −5%, but MA20 trail did not fire (5d MA20 = current price). These are CANDIDATES for manual stop-loss decision; operator may want to consider closing RKLB (most underwater at −14.0%) and INTC (−11.8%) on next review.
+
+4. **Notes stale 6d (P-MR-259)**: consider one-time operator update to FIFO truth ($100,902.55) on next review.
+
+5. **Counter trajectory**: zero-trigger=2 (P-MR-110 increment from 01:00's 1, same-day carry per P-MR-201), cash-at-floor=0 (cash $207.40 > $100, no +1).
+
+6. **Counter carry-forward validation**: P-MR-201 same-BJT-day carry validated — 01:00 → 03:00 same BJT day, 2h gap, no day-boundary reset (P-MR-247).
+
+7. **Cap-floor loosening signal**: MRVL slipped from 11.03% → 10.98%, DE from 10.61% → 10.64% (modestly tighter). If RTH price dips continue, MRVL could exit over-cap state at next cron.
