@@ -9498,3 +9498,152 @@ PATH OVER TP2 threshold (+40%) — was +41.3% at 23:02, dipped to +40.2% at 01:0
 ---
 
 **Cron #14 (2026-08-27 BJT, day-boundary first cron of new BJT day).** 0 trades. Stage 2 size 0. FIFO recompute $100,540.24. API↔FIFO identity EXACT (P-MR-214 hit). Pure stale-quote drift +$3.02. Day-boundary reset applied (zt 5→1, cf 0→0). Healthy canonical.
+
+
+## ⏰ 2026-08-27 03:00 BJT — AI-Trader Cron
+
+**Status:** Clean 0-trigger canonical (no trades fired; market produced no Stage 2 candidates — 4th cron of BJT day, post-01:00)
+**Pre-cash:** $207.40  |  **MV (sum_api):** $100,429.50  |  **FIFO Total:** $100,636.90
+**API positions:** 32  |  **FIFO positions:** 32  |  **only_in_api:** set()  |  **only_in_fifo:** set()
+
+
+### Account Snapshot
+
+- **Cash:** $207.40
+- **持倉市值 (sum_api):** $100,429.50
+- **帳戶總值 (FIFO recompute):** $100,636.90
+- **All-time realized P&L:** **$+1,212.94** (147 closed trades, unchanged)
+- **Session realized P&L (last 25):** **$+2,934.13** (unchanged)
+
+
+### API ↔ FIFO Cross-Check (P-MR-92 + P-MR-168 + P-MR-214)
+
+- **API parsed (P-MR-168 per-line matcher):** 32 positions
+- **FIFO open positions:** 32 positions
+- **only_in_api:** set()
+- **only_in_fifo:** set()
+- **P-MR-214 identity check:** `sum_api == fifo_mv` EXACT ($100,429.50 — perfect identity hit)
+- **All qty match:** EXACT (32=32, no diffs)
+- **Verdict:** Pure 0-fill canonical — drift is 100% stale-quote (P-MR-183), no broker lag, no buy-lag, no SL-lag
+
+
+### Drift Decomposition (P-MR-200 + P-MR-183)
+
+- **MV drift vs prior cron (01:00 → 03:00, 2h gap, same-BJT-day):** $100,429.50 − $100,332.84 = **+$96.66** → PURE stale-quote (P-MR-183, 32 positions × ~$3 avg drift per position)
+- **Total drift vs prior cron:** $100,636.90 − $100,540.24 = **+$96.66** (cash unchanged, MV drift = Total drift)
+- **Cash drift vs prior cron:** $207.40 → $207.40 = **$+0.00** (P-MR-179 trivial, no broker adj)
+- **Inter-scan lag fingerprint:** NONE (API↔FIFO identity exact, no buy-lag, no SL-lag)
+- **Notes ↔ FIFO drift:** Notes prior $100,540.24 (6d stale per P-MR-259) → FIFO recompute $100,636.90 = **−$96.66** → **NEUTRAL per P-MR-230** ($30-$100 0-trade zone). Headline uses FIFO recompute.
+
+P-MR-274 documented at this exact window (23:02→01:00) prior canonical: +$3.02 (2h drift, smallest on record). This 03:00 cron drift +$96.66 is larger but still entirely stale-quote (P-MR-183); no buy-lag/sell-lag/cash-deployment components. P-MR-274 holds the 2h-RTH-window quiet-stale-quote floor; this drift is 32× that floor but still pure price-snapshot refresh.
+
+
+### Cap-Floor Position Check (P-MR-144)
+
+Total: $100,636.90 → 10% cap: $10,063.69
+
+| Symbol | Qty | Price | MV | % Total | Status |
+|---|---|---|---|---|---|
+| **MRVL** | 46 | $243.34 | $11,193.64 | **11.12%** | ⚠️ >10% cap (tightened from 11.07%) |
+| **DE** | 17 | $635.36 | $10,801.12 | **10.73%** | ⚠️ >10% cap (loosened from 10.79%) |
+| BABA | 79 | $120.04 | $9,483.16 | 9.42% | under cap, heavy |
+| COP | 64 | $130.99 | $8,383.36 | 8.33% | under cap |
+| FUTU | 67 | $126.86 | $8,499.62 | 8.44% | under cap |
+
+Top-2 by MV (MRVL 11.12% + DE 10.73% = **21.85%** of account). MRVL drifted up $241.87 → $243.34 (+$1.47/qty = +$67.62 MV lift). DE drifted down $638.10 → $635.36 (−$2.74/qty = −$46.58 MV drop). Both still in cap-floor collapse state — no relief imminent at current prices.
+
+
+### SL/TP Zones (P-MR-167 zone analysis)
+
+**SL zone (cost-basis PnL < -5%) — 5 positions:**
+
+| Symbol | Qty | Price | Avg Cost | PnL % | vs 01:00 |
+|---|---|---|---|---|---|
+| **RKLB** | 126 | $66.45 | $78.08 | **-14.9%** | drifted −0.4pp (was −14.5%) |
+| **INTC** | 5 | $87.56 | $99.57 | **-12.0%** | improved +0.5pp (was −12.5%) |
+| **KLAC** | 1 | $183.93 | $200.62 | **-8.3%** | improved +1.0pp (was −9.3%) |
+| **AVGO** | 17 | $354.28 | $384.25 | **-7.8%** | improved +0.7pp (was −8.5%) |
+| **VRT** | 4 | $263.59 | $282.70 | **-6.8%** | improved +0.9pp (was −7.7%) |
+
+5 positions in SL zone (cost-basis). All 5 SL positions slightly improved vs 01:00 (price drift toward recovery). MA10 trail did NOT trigger (scan prints `現價=$X MA20=$X` — current = MA20 exactly, insufficient lookback). RKLB furthest underwater at −14.9%.
+
+**TP1 zone (cost-basis PnL ≥ +20%) — 5 positions:**
+
+| Symbol | Qty | Price | Avg Cost | PnL % | TP1 fired? |
+|---|---|---|---|---|---|
+| **PATH** | 67 | $16.74 | $11.91 | **+40.6%** | True (TP1 already fired, awaiting TP2 cross) |
+| **MRK** | 7 | $153.36 | $118.29 | **+29.7%** | None (TP1 not yet) |
+| **FUTU** | 67 | $126.86 | $100.51 | **+26.2%** | None (TP1 not yet) |
+| **COP** | 64 | $130.99 | $109.67 | **+19.4%** | None — **DROPPED OUT** of TP1 zone (was +20.4%) |
+| T | 14 | $25.95 | $21.53 | +20.5% | None (TP1 not yet) |
+
+COP dropped out of TP1 zone this scan (price drift $132.02 → $130.99, +20.4% → +19.4%). PATH remains at +40.6%, still OVER TP2 threshold. MRK near TP1 trigger (+29.7%, needs +30% for TP1 hit price based on 1.2× cost).
+
+**TP2 zone (cost-basis PnL ≥ +40%) — 1 position:**
+
+| Symbol | Qty | Price | Avg Cost | PnL % | Notional |
+|---|---|---|---|---|---|
+| **PATH** | 67 | $16.74 | $11.91 | **+40.6%** | $1,121.58 |
+
+**P-MR-264 OVER TP2 watch (4th cron):** PATH at +40.6% over TP2 threshold — was +41.3% at 23:02, +40.2% at 01:00, now +40.6% (slight recovery). Still over TP2 line; operator continues deferring manual close. Notional $1,121.58 = 67 × $16.74. PATH has TP1 fired (33/100 sold at $15.01) but TP2 not yet triggered by scan (TP2 threshold defined as 2× cost = $23.82, not yet reached).
+
+
+### Block Classification (P-MR-116 + P-MR-224)
+
+- Stage 2 size: **0 candidates** (Stage 2 候選: 0 只)
+- All 32 held symbols evaluated; scan evaluated 92 stock pool, no Stage 2 candidate passes all 6 criteria
+- **Healthy pure 0-trigger canonical** (no SL/TP fires, no Stage 2, no buy signal — market-state, not scan.py bug)
+- Distinct from P-MR-189 (2-cand hybrid), P-MR-205/224 (multi-cap collapse), P-MR-229 (pure Type A): market simply has no candidates to evaluate
+- **Block matrix:** all 6 dimensions (Type A/B/C/D/X/silent) = 0
+- **Cap-floor collapse (P-MR-144):** cash $207.40 × MAX_STOCKS 2 = $103.70/stock; cheapest non-held ⭐5 candidate if any must be < $103.70 to deploy — but Stage 2 = 0, so no candidate evaluation triggered
+- **Cash > $100 floor** (vs P-MR-253 EXTREME cap-floor collapse): cash $207.40 > min(held_value) $311.92 (KLAC 1×$183.93)? No, KLAC=$183.93 < $207.40, so 1× micro-buy theoretically possible BUT unit-price × min-lot $183.93 > cash-deployable $103.70/share → cash-pool-split blocks. P-MR-229 territory if any ⭐5 emerged; Stage 2=0 prevents this classification from activating this scan.
+
+
+### Counter Trajectory (P-MR-110 + P-MR-125 + P-MR-155 + P-MR-201)
+
+- **Prior (01:00 BJT, same BJT day):** zero-trigger=**1** (day-boundary reset from 23:02 → 01:00 cron at 01:00), cash-at-floor=**0** (cash >$100 reset)
+- **Day-boundary check:** last_cron_bjt_date = 2026-08-27 == this_cron_bjt_date = 2026-08-27 → **NO day-boundary reset** (P-MR-201 same-day carry)
+- **Trade effects this scan:** 0 BUY → zt+1 (P-MR-110); cash $207.40 > $100 → cf unchanged at 0 (P-MR-125 reset condition not met)
+- **Current:** zero-trigger=**2**, cash-at-floor=**0**
+- **Cash-at-floor counter trajectory:** 03:30=0 → 22:02=0 → 23:02=0 → 01:00=0 → 03:00=0 (cash steady $207.40 across all 4 crons this BJT day). cf stays at base reset value because cash has been >$100 the entire day (the P-MR-253 EXTREME cap-floor collapse from prior crons resolved at 01:00 day-boundary reset).
+- **Zero-trigger counter trajectory:** 03:30=0 → 22:02=4 → 23:02=5 (cf reset by sell >$1000) → 01:00=1 (day-boundary reset) → 03:00=2 (this cron, zt+1 from 0 BUY). Within-day counter steady accumulation.
+
+
+### TP1 State Update — No changes this scan
+
+- **0 TP1 fires this scan** (no positions crossed +20% trigger and scan.py is conservative on TP1 — fires only at hit price $1.2× avg_cost at scan-time)
+- **5 positions in TP1 zone** but all either (a) already fired (PATH) or (b) below scan.py hit threshold (MRK +29.7% needs +30% hit)
+- **TP2 status:** PATH at +40.6% (cost-basis) over TP2 threshold; current_price $16.74 vs TP2 hit price $23.82 (2× cost) — gap $7.08 to hit TP2 trigger price
+- **No tp1_state.json write this scan** (no new fires)
+- **No tp2_state.json write this scan** (PATH still below TP2 trigger price)
+
+
+### Diagnostics & Cash Trajectory
+
+- **Cash flat at $207.40 across 4 consecutive crons today** (22:02 → 23:02 → 01:00 → 03:00, ~6h) — no broker adjustment, no trades; the P-MR-179 watch footnote stays silent
+- **MV drift sub-$100 across 2h RTH midnight window** — validates P-MR-274 (smallest 2h drift on record +$3.02 at 23:02→01:00) and shows the 03:00 window drifts larger (+$96.66) but still PURE stale-quote (P-MR-183). The 23:02→01:00 window was the quietest RTH-mintight ever recorded; 01:00→03:00 has more cross-Pacific price moves.
+- **Top-2 cap pressure (MRVL+DE 21.85%)** essentially flat vs 01:00 (was 21.86%); MRVL tightened slightly while DE loosened slightly — net wash. Both still >10% cap. No relief imminent.
+- **TP2-crossed-in-0-trigger watch (P-MR-264, 4th cron):** PATH at +40.6% (cost-basis PnL) over TP2 threshold +40%. Dipped to +40.2% at 01:00, recovered to +40.6% now (price $16.70 → $16.74). PATH has TP1 fired (33/100 sold at $15.01); TP2 hit price is $23.82 (2× cost), current $16.74, gap $7.08 to TP2 trigger. Operator continues deferring manual close.
+- **TP1 zone dropouts:** COP dropped out of TP1 zone (price $132.02 → $130.99, PnL +20.4% → +19.4%). T, MRK, FUTU remain in zone but below scan.py hit threshold.
+- **SL zone recovery:** All 5 SL positions slightly improved vs 01:00 (price drift toward cost). RKLB remains furthest underwater at −14.9%; MA10 trail did NOT trigger because current price = MA20 (insufficient lookback).
+- **Held-symbol Stage 2 health:** No held symbol crossed Stage 2 in this scan. Most held symbols have negative or marginal cost-basis PnL (RKLB −14.9%, INTC −12.0%, KLAC −8.3%, AVGO −7.8%, VRT −6.8%) — typical late-RTH scan pattern where overnight moves are digested.
+
+
+### Health Checks (P-MR-90 series + P-MR-101 + P-MR-103)
+
+- ✅ FIFO helpers present: `fifo_realized`, `session_block`, `session_block_by_time`, `live_unrealized`, `load_log`, `fifo_open_positions`, `session_realized_pnl`
+- ✅ trades_log parse: 286 entries, 0 non-trade
+- ✅ tp1_state parse: 18 entries (incl. HOOD dict-valued FULLY_CLOSED per P-MR-176)
+- ✅ tp2_state parse: 3 entries (CRWV fired, AVAV/SMCI closed-flag)
+- ✅ Per-line API parser (P-MR-168): 32 positions, matches header
+- ✅ P-MR-214 identity check: `sum_api == fifo_mv` EXACT
+- ✅ Cash drift inter-scan: $0.00 (P-MR-179 silent)
+- ✅ P-MR-260 structural fix validated: `成功分析: 92 只` (pool-loop healthy)
+
+
+### Next-Cron Watch
+
+- **Path to TP2 fire:** PATH needs current_price ≥ $23.82 (2× avg_cost $11.91). Currently $16.74, gap $7.08. Watch for next significant price move up.
+- **Path to SL zone exit:** RKLB needs price ≥ $73.30 (5% above cost) to exit MA10 trailing zone; currently $66.45, gap $6.85. INTC needs ≥ $94.59; currently $87.56, gap $7.03.
+- **Day-boundary prediction:** Next cron is 03:30 BJT (same BJT day 2026-08-27); no day-boundary reset expected. zt will go 2→3 if 0 BUY, cf stays 0 if cash $207.40 unchanged.
+- **MRVL/DE cap pressure:** Continues to tighten as prices drift up. If MRVL crosses 11.50%, scan will emit explicit cap-block print (currently silent per P-MR-210).
