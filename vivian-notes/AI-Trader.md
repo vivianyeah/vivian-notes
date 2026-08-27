@@ -9883,3 +9883,104 @@ This cron is push candidate #7 — soft-reset to origin/main before commit if ne
 - Realized P&L today: **$0.00** (all-time stays $+1,212.94)
 - Unrealized P&L: **$+6,593.47** (per FIFO cost-basis); 帳戶總值 $100,162.88 (22:04) → $100,407.57 (23:00, +244.69 intra-window RTH-open gain)
 - Verdict: healthy full-invested steady-state; RTH 開市 1.5h 後變盤信號未成形，PATH 持續 OVER TP2 watch
+## ⏰ 2026-08-28 01:00 BJT
+
+**HermesV cron #6092 — 01:00 scan (RTH 中段，TP1 開始有機會觸發)**
+
+### Stage 2 / Trades
+- **Stage 2 候選: 0 只**
+- **買入信號: 0 只** — RTH 中段無突破回調組合觸發
+- 0 SL / 0 TP1 / 0 TP2
+- 成功分析 **92 只** (P-MR-260 bb_lo fix 健康)
+- $SQ delisted warning 屬良性 (P-MR-223)
+
+### Account Snapshot
+- **Cash:** $207.40 (unchanged, full-invested steady-state)
+- **持倉市值 (sum_api):** $100,234.59
+- **帳戶總值 (FIFO recompute):** $100,441.99
+- **All-time realized P&L:** **$+1,212.94** (147 closed trades, unchanged)
+- **Session realized P&L (last 30):** **$+4,141.33**
+- **Live unrealized P&L:** **$+6,627.89** (per-position PnL matrix verified via fifo_pnl.live_unrealized)
+
+### API ↔ FIFO Cross-Check (P-MR-168 + P-MR-214)
+- API parsed 32 = FIFO 32; only_in_api / only_in_fifo both empty
+- **P-MR-214 identity EXACT:** sum_api == fifo_mv == $100,234.59
+- Verdict: pure 0-fill canonical; drift 100% stale-quote (P-MR-183), no lag components
+- **P-MR-272 note:** scan.py suppressed 持倉市值/帳戶總值 lines (Stage 2 = 0) → headline uses sum_api + cash
+
+### Drift Decomposition (P-MR-200 / P-MR-183)
+- MV drift 23:00 → 01:00 (1h56m intra-window, RTH 中段): $100,234.59 − $100,200.17 = **+$34.42** (pure stale-quote, RTH mid-session mark-to-market)
+- Cash drift: $207.40 → $207.40 = **$0.00** (P-MR-179 trivial — no broker adjustment)
+- Total drift: $100,441.99 − $100,407.57 = **+$34.42** (pure stale-quote)
+- Notes ↔ FIFO: P-MR-272 applies (scan-suppressed lines) → use FIFO recompute as headline
+
+### Day-Boundary Reset (P-MR-155 / P-MR-185 / P-MR-215 / P-MR-247)
+- Last BJT date: **2026-08-27** (23:04 BJT)
+- This BJT date: **2026-08-28** (01:00 BJT) — **binary BJT-date detection** triggered
+- Per P-MR-247: "day-boundary reset at 23:00→01:00 cross-midnight (binary BJT-date detection, NOT time-dependent)"
+- Reset base: zt=1, cf=0
+- Trade effects: 0 BUY → zt+1 → zt=2; cash $207.40 > $100 → cf stays 0
+- **Current: zt=2, cf=0**
+- Cash trajectory: 22:04 (prev day) $207.40 → 23:00 (prev day) $207.40 → 01:00 (today) $207.40 (full-invested steady-state across day-boundary)
+
+### Block Classification
+- **Type: none** — Stage 2 候選 = 0 (RTH 中段無 trigger)
+- 0 Type A / B / C / D / X
+- Cash $207.40 / 32 ≈ $6.48/股 deployable (cash-pool-split-block would apply if any ⭐5 candidate; none today)
+
+### Cap-Floor Check (P-MR-144), Total $100,441.99 → 10% cap $10,044.20
+| Symbol | Qty | MV | % | Status |
+|---|---|---|---|---|
+| **MRVL** | 46 | $11,242.40 | 11.19% | ⚠️ >cap |
+| **DE** | 17 | $10,578.42 | 10.53% | ⚠️ >cap |
+
+### P-MR-282 PATH acceleration watch — 8th validation
+PATH 67 @ avg_cost $11.91, price $18.34, cost-basis **+53.99%**, notional $1,228.78.
+TP1 already fired (TP1 state True). TP2 trigger = 2×cost = **$23.82**, gap = **$5.48**.
+Trajectory: 22:02 +41.3% → 01:00 +40.2% → 03:00 +40.6% → 03:30 +41.0% → 22:04 +52.9% → 23:00 +53.5% → **01:00 +54.0%**.
+Inter-cron delta (23:00→01:00, 1h56m): **+0.51pp** intra-window RTH-mid acceleration (P-MR-284 pattern).
+Gap-to-TP2 trigger tightening from $5.63 (22:04) → $5.54 (23:00) → **$5.48 (01:00)** — ~$0.15 tighter in ~3h.
+⚠️ **P-MR-282 escalation continues:** PATH velocity sustained at ~0.25pp/hour. At current rate, ~22h to TP2 crossing. Operator still deferring manual close; cron reports only with explicit gap-to-TP2-trigger number.
+
+### SL / TP Zones (cost-basis)
+**SL zone strict (cost-basis < −5%) — 4 positions:**
+  - **RKLB** -14.40%  (qty=126, cost=$78.08, price=$66.84) — deepest underwater
+  - **INTC** -8.86%  (qty=5, cost=$99.57, price=$90.74)
+  - **KLAC** -8.49%  (qty=1, cost=$200.62, price=$183.59)
+  - **VRT** -6.04%  (qty=4, cost=$282.70, price=$265.63)
+
+**SL zone watch (cost-basis −5% to −2%, monitor next cron):**
+  - **AMZN** -4.82%  (qty=1, cost=$269.04, price=$256.06)
+  - **HON** -4.65%  (qty=5, cost=$230.32, price=$219.61)
+  - **AVGO** -3.71%  (qty=17, cost=$384.25, price=$370.00)
+  - **BA** -3.41%  (qty=5, cost=$218.68, price=$211.22)
+  - **ASTS** -3.21%  (qty=32, cost=$63.17, price=$61.14)
+  - **CSCO** -2.28%  (qty=29, cost=$114.57, price=$111.96)
+
+**TP zone (>+20%) — 4 positions:**
+  - **PATH** +53.99%  (qty=67, cost=$11.91, price=$18.34) — OVER TP2 watch, TP1 already fired
+  - **MRK** +27.62%  (qty=7, cost=$118.29, price=$150.96)
+  - **CRM** +25.43%  (qty=1, cost=$198.16, price=$248.55)
+  - **FUTU** +24.27%  (qty=67, cost=$100.51, price=$124.90)
+
+### Counter Trajectory (P-MR-110 / P-MR-125 / P-MR-201 / P-MR-247)
+- Prior (23:04 BJT 2026-08-27): zt=**5**, cf=**0**
+- Day-boundary: 2026-08-27 → 2026-08-28 (binary BJT-date change) → reset base zt=1, cf=0
+- Effects: 0 BUY → zt+1; cash $207.40 > $100 → cf stays 0
+- **Current: zt=2, cf=0**
+- Cash trajectory: 22:04 (prev day) $207.40 → 23:00 (prev day) $207.40 → 01:00 (today, day-boundary) $207.40
+
+### TP1 State — no changes
+tp1_state unchanged: {AMD: True, AVAV: False, CIFR: False, HOOD: FULLY_CLOSED dict, NBIS: True, ONDS: True, PYPL: True, SMCI: True, SYM: False, DHR: True, ADBE: True, MSFT: True, JD: True, ANET: True, PATH: True, CRWV: True, IREN: True, SNDK: True}. 0 TP1 / 0 TP2 fires. trades_log frozen at 286 entries.
+
+### P-MR-281 Soft-Reset Push Status
+Prior push #7 (commit 0d7f291) validated 2026-08-27 23:04 BJT — recipe continues at 7/7 success.
+This cron is push candidate #8 — soft-reset to origin/main before commit if needed (P-MR-250/256).
+
+### 當日總結 (2026-08-28 BJT, 1 cron: 01:00)
+- Buy signals fired today: **0**
+- TP1 / TP2 triggered: **0 / 0**
+- SL fired: **0**
+- Realized P&L today: **$0.00** (all-time stays $+1,212.94)
+- Unrealized P&L: **$+6,627.89** (per FIFO cost-basis); 帳戶總值 $100,407.57 (23:00 prev day) → $100,441.99 (01:00 today, +$34.42 intra-window RTH-mid gain, pure stale-quote per P-MR-183)
+- Verdict: healthy full-invested steady-state; day-boundary reset triggered cleanly (P-MR-247); PATH OVER TP2 watch continues at 8th validation with sustained acceleration
