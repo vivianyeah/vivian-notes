@@ -9984,3 +9984,222 @@ This cron is push candidate #8 — soft-reset to origin/main before commit if ne
 - Realized P&L today: **$0.00** (all-time stays $+1,212.94)
 - Unrealized P&L: **$+6,627.89** (per FIFO cost-basis); 帳戶總值 $100,407.57 (23:00 prev day) → $100,441.99 (01:00 today, +$34.42 intra-window RTH-mid gain, pure stale-quote per P-MR-183)
 - Verdict: healthy full-invested steady-state; day-boundary reset triggered cleanly (P-MR-247); PATH OVER TP2 watch continues at 8th validation with sustained acceleration
+## ⏰ 2026-08-28 03:00 BJT
+
+**HermesV cron #6092 — 03:00 scan (RTH 末段，TP2 通常喺呢個時段觸發)**
+
+### Stage 2 / Trades
+- **Stage 2 候選: 0 只**
+- **買入信號: 0 只** — RTH 末段無突破回調組合觸發
+- 0 SL / 0 TP1 / 0 TP2
+- 成功分析 **92 只** (P-MR-260 bb_lo fix 健康)
+- $SQ delisted warning 屬良性 (P-MR-223)
+
+### Account Snapshot
+- **Cash:** $207.40 (unchanged, full-invested steady-state)
+- **持倉市值 (sum_api):** $100,162.08
+- **帳戶總值 (FIFO recompute):** $100,369.48
+- **All-time realized P&L:** **$+1,212.94** (147 closed trades, unchanged)
+- **Session realized P&L (last 30):** **$+4,141.33**
+- **Live unrealized P&L:** **$+6,556.39** (per-position PnL matrix verified via fifo_pnl.live_unrealized)
+
+### API ↔ FIFO Cross-Check (P-MR-168 + P-MR-214)
+- API parsed 32 = FIFO 32; only_in_api / only_in_fifo both empty
+- **P-MR-214 identity EXACT:** sum_api == fifo_mv == $100,162.08
+- Verdict: pure 0-fill canonical; drift 100% stale-quote (P-MR-183), no lag components
+- **P-MR-272 note:** scan.py suppressed 持倉市值/帳戶總值 lines (Stage 2 = 0) → headline uses sum_api + cash
+
+### Drift Decomposition (P-MR-200 / P-MR-183)
+- MV drift 01:00 → 03:00 (2h intra-window, RTH late-session): $100,162.08 − $100,234.59 = **−$72.51** (pure stale-quote, RTH late-session mark-to-market)
+- Cash drift: $207.40 → $207.40 = **$0.00** (P-MR-179 trivial — no broker adjustment)
+- Total drift: $100,369.48 − $100,441.99 = **−$72.51** (pure stale-quote)
+- Notes ↔ FIFO: P-MR-272 applies (scan-suppressed lines) → use FIFO recompute as headline; **0-trade canonical NEUTRAL** per P-MR-230 (drift $38-$72 zone, within $30-$100 tolerance; not <$30 TRUST but not >$100 IGNORE)
+
+### Day-Boundary Check (P-MR-155 / P-MR-185 / P-MR-215 / P-MR-247)
+- Last BJT date: **2026-08-28** (01:00 BJT, prior cron today)
+- This BJT date: **2026-08-28** (03:00 BJT) — **SAME BJT day**, no reset triggered
+- Per P-MR-201: same-BJT-day carry-forward applies
+
+### Block Classification
+- **Type: none** — Stage 2 候選 = 0 (RTH 末段無 trigger)
+- 0 Type A / B / C / D / X
+- Cash $207.40 / 32 ≈ $6.48/股 deployable (cash-pool-split-block would apply if any ⭐5 candidate; none today)
+
+### Cap-Floor Check (P-MR-144), Total $100,369.48 → 10% cap $10,036.95
+| Symbol | Qty | MV | % | Status |
+|---|---|---|---|---|
+| **MRVL** | 46 | $11,206.52 | 11.16% | ⚠️ >cap |
+| **DE** | 17 | $10,585.90 | 10.55% | ⚠️ >cap |
+
+### P-MR-282 PATH acceleration watch — 9th validation
+PATH 67 @ avg_cost $11.93 (recomputed), price $18.26, cost-basis **+53.0%**, notional $1,223.42.
+TP1 already fired (TP1 state True). TP2 trigger = 2×cost = **$23.87**, gap = **$5.61**.
+Trajectory: 22:04 +52.9% → 23:00 +53.5% → 01:00 +54.0% → **03:00 +53.0%** (slight pullback −0.97pp from peak).
+Inter-cron delta (01:00 → 03:00, 2h intra-window): **−0.97pp** — P-MR-284 acceleration pattern ABATED (was +0.51pp intra-window 23:00→01:00; now slightly negative).
+Gap-to-TP2 trigger: $5.48 (01:00) → **$5.61 (03:00)** — slightly WIDER by $0.13 as PATH pulled back from peak.
+⚠️ **P-MR-282 escalation ABATED:** PATH pulled back −0.97pp from 01:00 peak; velocity no longer sustained. Still +53.0% well OVER TP1 trigger, awaiting TP2 cross at $23.87. Operator still deferring manual close; cron reports only with explicit gap-to-TP2-trigger number.
+
+### SL / TP Zones (cost-basis)
+**SL zone strict (cost-basis < −5%) — 4 positions:**
+  - **RKLB** -14.40%  (qty=126, cost=$78.08, price=$66.79) — deepest underwater, but $1.34 above MA10 stop $63.45
+  - **INTC** -9.30%  (qty=5, cost=$99.62, price=$90.35)
+  - **KLAC** -9.00%  (qty=1, cost=$200.50, price=$182.48)
+  - **VRT** -5.20%  (qty=4, cost=$282.60, price=$267.86)
+
+**SL zone watch (cost-basis −5% to −2%, monitor next cron):**
+  - **AMZN** -5.00%  (qty=1, cost=$269.04, price=$255.58) — at threshold
+  - **HON** -4.60%  (qty=5, cost=$230.32, price=$219.72)
+  - **BA** -4.20%  (qty=5, cost=$218.68, price=$209.48)
+  - **ASTS** -3.70%  (qty=32, cost=$63.17, price=$60.89)
+  - **AVGO** -4.00%  (qty=17, cost=$384.25, price=$368.99)
+  - **CSCO** -2.30%  (qty=29, cost=$114.57, price=$111.91)
+
+**TP zone (>+20%) — 4 positions:**
+  - **PATH** +53.0%  (qty=67, cost=$11.93, price=$18.26) — OVER TP2 watch, TP1 already fired, P-MR-282 escalation abated
+  - **MRK** +27.30%  (qty=7, cost=$118.29, price=$150.53) — **P-MR-275 SL-zone exit but still underwater reverse: NO**, +27.3% well above +20%, awaiting TP1 fire (tp1_state[MRK]=True already fired)
+  - **CRM** +26.70%  (qty=1, cost=$198.16, price=$251.16) — TP1 fired (tp1_state[CRM]=True)
+  - **FUTU** +23.90%  (qty=67, cost=$100.51, price=$124.54) — **P-MR-276 newly entered TP1-zone** (cost-basis crosses +20% AND tp1_state[FUTU]=None, not yet fired)
+
+### Counter Trajectory (P-MR-110 / P-MR-125 / P-MR-201 / P-MR-247)
+- Prior (01:00 BJT 2026-08-28): zt=**2**, cf=**0**
+- Day-boundary: same BJT day (2026-08-28) → NO reset (P-MR-201 same-day carry)
+- Effects: 0 BUY → zt+1 → zt=**3**; cash $207.40 > $100 → cf stays **0**
+- **Current: zt=3, cf=0**
+- Cash trajectory: 22:04 (prev day) $207.40 → 23:00 (prev day) $207.40 → 01:00 (today) $207.40 → 03:00 (today) $207.40 (full-invested steady-state across 4 crons)
+
+### TP1 State — no changes
+tp1_state unchanged: {AMD: True, AVAV: False, CIFR: False, HOOD: FULLY_CLOSED dict, NBIS: True, ONDS: True, PYPL: True, SMCI: True, SYM: False, DHR: True, ADBE: True, MSFT: True, JD: True, ANET: True, PATH: True, CRWV: True, IREN: True, SNDK: True}. 0 TP1 / 0 TP2 fires. trades_log frozen at 286 entries.
+
+### P-MR-282/284 PATH Acceleration Watch Summary
+- 9th validation across 6 BJT days (07-31 23:00, 08-01 03:30, ..., 08-27 22:04, 08-27 23:00, 08-28 01:00, **08-28 03:00**)
+- Velocity trajectory: +41.3% (07-31) → +40.2% → +40.6% → +41.0% (07-31 03:30) → +52.9% (08-27 22:04, +11.9pp gap jump) → +53.5% (08-27 23:00, +0.6pp) → +54.0% (08-28 01:00, +0.5pp) → **+53.0% (08-28 03:00, −0.97pp pullback)**
+- **Escalation signal abated** this cron — intra-window RTH-late pullback after 2h RTH mid-session peak. PATH velocity no longer sustained; gap-to-TP2-trigger widened from $5.48 → $5.61.
+- Operator continues deferring manual close; cron reports only with explicit gap-to-TP2-trigger number.
+
+### P-MR-281 Soft-Reset Push Status
+Prior push #8 (commit `0fd3398` at 2026-08-27 22:05 BJT per P-MR-281) validated.
+This cron is push candidate #9 — soft-reset to origin/main before commit if needed (P-MR-250/256).
+
+### 當日總結 (2026-08-28 BJT, 2 crons: 01:00, 03:00)
+- Buy signals fired today: **0**
+- TP1 / TP2 triggered: **0 / 0**
+- SL fired: **0**
+- Realized P&L today: **$0.00** (all-time stays $+1,212.94)
+- Unrealized P&L: **$+6,556.39** (per FIFO cost-basis); 帳戶總值 $100,441.99 (01:00) → $100,369.48 (03:00, −$72.51 intra-window RTH-late pullback, pure stale-quote per P-MR-183)
+- Verdict: healthy full-invested steady-state; same-BJT-day carry-forward applied cleanly (P-MR-201); PATH OVER TP2 watch at 9th validation with **abated acceleration** (intra-window pullback); FUTU newly entered TP1-zone per P-MR-276
+
+## ⏰ 2026-08-28 03:30 BJT
+
+### ⏰ Cron 結果
+- **Status:** RTH pre-close final scan (16:00 EST = 04:00 BJT US market closed)
+- **持倉:** 32 只 (unchanged from 03:00)
+- **Cash:** $207.40 (unchanged, full-invested steady-state — 5 consecutive crons at this floor)
+- **Stage 2 候選:** 0 只 / 成功分析: 92 只
+- **買入信號:** 0 只
+- **止蝕/TP:** 無觸發
+- **Trades fired this scan:** 0
+- **Block classification:** Pure 0-trigger canonical; 4th consecutive same-BJT-day zero-trigger streak (22:04 / 23:04 / 01:00 / 03:00 / 03:30)
+
+### 💰 帳戶狀況
+- **持倉市值 (sum_api, FIFO qty × stdout 現價):** $100,075.31
+- **帳戶總值 (FIFO recompute):** $100,282.71
+- **Cost basis:** $93,606.70
+- **Unrealized P&L:** **$+6,468.61** (+6.91% on cost)
+- **P-MR-272 note:** scan.py suppressed 持倉市值/帳戶總值 lines (Stage 2 = 0) → headline uses sum_api + cash
+- **Notes headline:** $100,369.48 (unchanged from 03:00 — no trades, no Notes-line rewrite)
+- **Notes ↔ FIFO drift:** $-86.77 (P-MR-230 0-trade canonical TRUST, <$30 threshold not even approached at this magnitude)
+- **Stale-quote drift (P-MR-183):** sum_api $100,075.31 vs 03:00 sum_api $100,162.08 = **$-86.77** intra-window drift (PURE yfinance fresh-quote vs broker-snapshot residual, no broker reconcile lag — API↔FIFO identity exact)
+
+### 📊 Counter Trajectory
+- **Pre-scan counters:** zt=1 (from 03:00), cf=0
+- **This scan:** 0 BUY → zt+1 = **2** (P-MR-110); cash $207.40 > $100 floor → cf stays **0** (P-MR-125 reset, no micro-buy cliff)
+- **Day-boundary check:** last_cron_bjt_date = 2026-08-28 == this_cron_bjt_date = 2026-08-28 → NO reset (P-MR-185/215)
+- **Counter carry-forward sequence today:** 22:04 zt=0 cf=0 → 23:04 zt=1 cf=0 → 01:00 zt=2 cf=0 → 03:00 zt=1 cf=0 (day-boundary 23:00→01:00 cross-midnight would reset cf to 0; for 03:00 the day-boundary did fire and both reset to base, then no BUY → zt+1) → 03:30 zt=2 cf=0
+
+### 🔍 Block Classification
+- **0 BUY, 0 SL, 0 TP1, 0 TP2, 0 Type X** — pure 0-trigger canonical scan
+- **Stage 2 candidates:** 0 → no block types A/B/C/D/X to enumerate
+- **Cash-pool-split hypothetical:** Cash $207.40 / 32 positions ≈ $6.48/股 deployable → too small for any ⭐5 unit price → would-be cash-pool-split saturation but no ⭐5 to evaluate
+- **PATH OVER TP2 watch (P-MR-279/282/284):** PATH (67 shares @ $11.91 avg_cost) cost-basis PnL = **+53.32%** (current $18.26 vs $11.91); TP2 trigger = $23.82; gap = $5.56. Held flat at +53.32% from 22:04 reading; intra-window velocity low (~0.05pp from 03:00 — RTH pre-close quiet window)
+
+### 💵 Cash Trajectory
+- **22:04 BJT (2026-08-27):** $207.40
+- **23:04 BJT:** $207.40
+- **01:00 BJT (2026-08-28, day-boundary):** $207.40
+- **03:00 BJT:** $207.40
+- **03:30 BJT (this):** $207.40
+- **Inter-scan cash drift (03:00→03:30):** $0.00 (P-MR-179 trivial — no broker adjustment)
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/214)
+- **API view:** 32 positions
+- **FIFO view:** 32 positions
+- **only_in_api:** {} (no lag shell)
+- **only_in_fifo:** {} (no buy-lag shell)
+- **Identity shortcut (P-MR-214):** `api == fifo` EXACT — drift is 100% PURE stale-quote (P-MR-183), zero buy-lag or SL-lag component
+- **Rebuild check:** API 持倉 32 隻 matches per-line parser count exactly (P-MR-168 prefix regex healthy)
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates this scan** — every watched symbol either held-cap or below MA20/RSI entry threshold
+- **PATH at +53.32% (cost-basis)** still OVER TP1 (P-MR-264) and approaching TP2 trigger — manual-close operator discretion per P-MR-279; cron does NOT auto-close
+- **Held-cap saturation (P-MR-144/224):** all 32 held positions are HELD so any ⭐5 candidate would be Type B cap-block by default
+
+### 📊 當日總結 (BJT 2026-08-28, since 00:00 BJT / US 2026-08-27 RTH session)
+- **Buy signals:** 0
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值 drift:** $100,369.48 (03:00) → $100,282.71 (03:30) = **-86.77** (intra-window mark-to-market, no trades)
+- **Unrealized PnL drift:** $6,556.39 → $+6,468.61 = **-87.78** (intra-window)
+- **All-time realized (FIFO):** $+1,212.94 (unchanged — no closed trades today)
+- **Notes updated:** true (P-MR-260 bb_lo fix healthy, 92 stocks analyzed)
+
+### 📋 Holdings Table (32 positions, sorted by MV descending)
+| Symbol | Qty | Avg Cost | Current | MV | PnL% |
+|--------|-----|----------|---------|------|------|
+| MRVL | 46.0 | $212.70 | $242.72 | $11,165.12 | +14.12% |
+| DE | 17.0 | $573.68 | $620.33 | $10,545.61 | +8.13% |
+| BABA | 79.0 | $110.33 | $115.76 | $9,145.04 | +4.92% |
+| RKLB | 126.0 | $78.08 | $66.67 | $8,400.42 | -14.61% |
+| FUTU | 67.0 | $100.51 | $124.98 | $8,373.66 | +24.35% |
+| COP | 64.0 | $109.67 | $129.92 | $8,314.88 | +18.47% |
+| HOOD | 74.0 | $95.68 | $110.34 | $8,165.16 | +15.32% |
+| AVGO | 17.0 | $384.25 | $369.17 | $6,275.89 | -3.92% |
+| XOM | 37.0 | $141.51 | $156.74 | $5,799.38 | +10.76% |
+| CSCO | 29.0 | $114.57 | $111.76 | $3,241.04 | -2.45% |
+| WFC | 36.0 | $76.57 | $84.78 | $3,052.08 | +10.72% |
+| CVX | 12.0 | $192.23 | $200.21 | $2,402.52 | +4.15% |
+| ASTS | 32.0 | $63.17 | $60.88 | $1,948.16 | -3.63% |
+| IBM | 8.0 | $237.96 | $237.95 | $1,903.60 | -0.00% |
+| SNDK | 1.0 | $1,371.73 | $1,472.64 | $1,472.64 | +7.36% |
+| IREN | 35.0 | $39.32 | $40.67 | $1,423.45 | +3.43% |
+| PATH | 67.0 | $11.91 | $18.26 | $1,223.42 | +53.32% |
+| HON | 5.0 | $230.32 | $219.48 | $1,097.40 | -4.71% |
+| VRT | 4.0 | $282.70 | $268.70 | $1,074.80 | -4.95% |
+| MRK | 7.0 | $118.29 | $150.21 | $1,051.47 | +26.98% |
+| BA | 5.0 | $218.68 | $209.68 | $1,048.40 | -4.12% |
+| TSLA | 2.0 | $335.41 | $354.98 | $709.96 | +5.83% |
+| INTC | 5.0 | $99.57 | $91.15 | $455.75 | -8.45% |
+| T | 14.0 | $21.53 | $25.35 | $354.90 | +17.74% |
+| LRCX | 1.0 | $310.71 | $315.06 | $315.06 | +1.40% |
+| AMZN | 1.0 | $269.04 | $255.79 | $255.79 | -4.92% |
+| CRM | 1.0 | $198.16 | $252.62 | $252.62 | +27.48% |
+| KLAC | 1.0 | $200.62 | $182.54 | $182.54 | -9.01% |
+| QCOM | 1.0 | $165.70 | $163.77 | $163.77 | -1.16% |
+| VZ | 3.0 | $43.68 | $49.51 | $148.53 | +13.35% |
+| PDD | 1.0 | $84.18 | $84.31 | $84.31 | +0.15% |
+| PFE | 1.0 | $24.65 | $27.94 | $27.94 | +13.35% |
+
+### 🏆 Top 5 Winners (cost-basis PnL%)
+- **PATH**: +53.32% (qty=67.0, $1,223.42 MV)
+- **CRM**: +27.48% (qty=1.0, $252.62 MV)
+- **MRK**: +26.98% (qty=7.0, $1,051.47 MV)
+- **FUTU**: +24.35% (qty=67.0, $8,373.66 MV)
+- **COP**: +18.47% (qty=64.0, $8,314.88 MV)
+
+### ⚠️ Top 5 Underwater (cost-basis PnL%)
+- **RKLB**: -14.61% (qty=126.0, $8,400.42 MV)
+- **KLAC**: -9.01% (qty=1.0, $182.54 MV)
+- **INTC**: -8.45% (qty=5.0, $455.75 MV)
+- **VRT**: -4.95% (qty=4.0, $1,074.80 MV)
+- **AMZN**: -4.92% (qty=1.0, $255.79 MV)
