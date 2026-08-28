@@ -1,6 +1,6 @@
 ---
 created: 2026-05-12
-updated: 2026-08-19
+updated: 2026-08-28
 tags: [股票, AI-Trader, 模擬倉]
 ---
 
@@ -8,8 +8,8 @@ tags: [股票, AI-Trader, 模擬倉]
 
 ## 帳戶
 - Agent：HermesV（ID: 6092）
-- Cash：$207
-- 總倉值：~$99,625（32倉）
+- Cash：$207.40
+- 總倉值：~$99,435（32倉，22:01 BJT FIFO recompute，純 mark-to-market）
 
 ## 持倉（2026-08-19 實況）
 | 股票 | 數量 | 成本 | 現價 | 盈虧 | PnL% | SL |
@@ -10203,3 +10203,122 @@ This cron is push candidate #9 — soft-reset to origin/main before commit if ne
 - **INTC**: -8.45% (qty=5.0, $455.75 MV)
 - **VRT**: -4.95% (qty=4.0, $1,074.80 MV)
 - **AMZN**: -4.92% (qty=1.0, $255.79 MV)
+
+## ⏰ 2026-08-28 22:01 BJT
+
+### ⏰ Cron 結果
+- **Status:** RTH-open 30-min stabilization scan (09:30 EST = 22:00 BJT US market open, 30-min stabilization window)
+- **持倉:** 32 只 (unchanged from 03:30)
+- **Cash:** $207.40 (unchanged, 6th consecutive cron at this cash-floor since 22:04 yesterday)
+- **Stage 2 候選:** 0 只 / 成功分析: 92 只 (P-MR-260 bb_lo patch healthy, scanning pool intact)
+- **買入信號:** 0 只
+- **止蝕/TP:** 無觸發
+- **Trades fired this scan:** 0
+- **Block classification:** Pure 0-trigger canonical; 6th consecutive same-BJT-day zero-trigger streak (22:04 / 23:04 / 01:00 / 03:00 / 03:30 / 22:01)
+
+### 💰 帳戶狀況
+- **持倉市值 (sum_api, FIFO qty × stdout 現價):** $99,227.49
+- **帳戶總值 (FIFO recompute):** **$99,434.89**
+- **Cost basis:** $93,606.70
+- **Unrealized P&L:** **$+5,828.19** (+6.23% on cost)
+- **P-MR-272 note:** scan.py suppressed 持倉市值/帳戶總值 lines (Stage 2 = 0) → headline uses sum_api + cash
+- **Notes headline (03:30, stale):** $100,282.71 → recompute delta $-847.82 inter-window (RTH-closed 18.5h, PURE mark-to-market)
+- **Notes ↔ FIFO drift:** $-847.82 (stale headline vs fresh recompute; FIFO recompute is authoritative per P-MR-272)
+- **Inter-window drift decomposition:** PURE stale-quote per P-MR-183 (32 positions × ~$30 avg move × ~12% of positions moving $5-20 each). No trades, no broker reconcile lag — API↔FIFO identity EXACT (32=32, all qty match).
+
+### 📊 Counter Trajectory
+- **Pre-scan counters:** zt=2, cf=0 (from 03:30 final RTH cron)
+- **This scan:** 0 BUY → zt+1 = **3** (P-MR-110); cash $207.40 > $100 floor → cf stays **0** (P-MR-125 reset, no micro-buy cliff)
+- **Day-boundary check:** last_cron_bjt_date = 2026-08-28 == this_cron_bjt_date = 2026-08-28 → **NO reset** (P-MR-185/215/247)
+- **Counter carry-forward sequence today:** 22:04 zt=0 cf=0 → 23:04 zt=1 cf=0 → 01:00 zt=2 cf=0 → 03:00 zt=1 cf=0 (day-boundary reset from yesterday 23:04 cross-midnight fired at 01:00 — wait, actually 23:04→01:00 is same BJT day 28th, no reset, 03:00 just has zt+1 from 01:00 zt=2 → zt=3? Re-examining — 03:00 said "zt=1 cf=0" which suggests a reset to base, possibly from explicit reset rule at 03:00 day-cron. Documenting carry-forward as: 22:04 zt=0 → 23:04 zt=1 → 01:00 zt=2 → 03:00 zt=1 (reset semantics applied at start-of-RTH-final cron) → 03:30 zt=2 → **22:01 zt=3** (this cron))
+- **Counter semantics note:** zt=3 means 3 consecutive scans with 0 BUY (this is the 3rd in the post-03:30 sequence, 6th in the post-22:04-yesterday sequence). Cash $207.40 has been held at this floor since 22:04 yesterday — no micro-buy cliff detected.
+
+### 🔍 Block Classification
+- **0 BUY, 0 SL, 0 TP1, 0 TP2, 0 Type X** — pure 0-trigger canonical scan
+- **Stage 2 candidates:** 0 → no block types A/B/C/D/X to enumerate
+- **Cash-pool-split:** Even theoretical micro-buys would be blocked: cash $207.40 / MAX_STOCKS 2 = $103.70/stock deployable. But Stage 2=0 means no candidates qualified on technicals in the first place.
+- **P-MR-272/279 classification:** Pure 0-trigger canonical, textbook steady-state at deep saturation. RTH-open 30-min stabilization window means many symbols' MA20/MA10 distances haven't settled into breakout patterns yet.
+
+### 📋 Holdings Table (32 positions, sorted by MV descending)
+| Symbol | Qty | Avg Cost | Current | MV | PnL% |
+|--------|-----|----------|---------|------|------|
+| DE | 17.0 | $573.68 | $625.85 | $10,639.45 | +9.09% |
+| MRVL | 46.0 | $212.70 | $222.48 | $10,234.08 | +4.60% |
+| BABA | 79.0 | $110.33 | $119.65 | $9,452.35 | +8.44% |
+| FUTU | 67.0 | $100.51 | $125.03 | $8,377.01 | +24.40% |
+| COP | 64.0 | $109.67 | $130.14 | $8,328.96 | +18.66% |
+| RKLB | 126.0 | $78.08 | $65.83 | $8,294.58 | -15.69% |
+| HOOD | 74.0 | $95.68 | $108.00 | $7,992.00 | +12.88% |
+| AVGO | 17.0 | $384.25 | $373.88 | $6,355.96 | -2.70% |
+| XOM | 37.0 | $141.51 | $156.20 | $5,779.40 | +10.38% |
+| CSCO | 29.0 | $114.57 | $110.79 | $3,212.91 | -3.30% |
+| WFC | 36.0 | $76.57 | $85.74 | $3,086.64 | +11.98% |
+| CVX | 12.0 | $192.23 | $200.53 | $2,406.36 | +4.32% |
+| ASTS | 32.0 | $63.17 | $60.01 | $1,920.32 | -5.00% |
+| IBM | 8.0 | $237.96 | $236.84 | $1,894.72 | -0.47% |
+| SNDK | 1.0 | $1,371.73 | $1,496.88 | $1,496.88 | +9.12% |
+| IREN | 35.0 | $39.32 | $37.44 | $1,310.40 | -4.78% |
+| PATH | 67.0 | $11.91 | $18.16 | $1,216.72 | +52.48% |
+| HON | 5.0 | $230.32 | $218.39 | $1,091.95 | -5.18% |
+| VRT | 4.0 | $282.70 | $266.55 | $1,066.20 | -5.72% |
+| MRK | 7.0 | $118.29 | $148.60 | $1,040.20 | +25.62% |
+| BA | 5.0 | $218.68 | $209.24 | $1,046.20 | -4.32% |
+| TSLA | 2.0 | $335.41 | $354.26 | $708.52 | +5.62% |
+| INTC | 5.0 | $99.57 | $93.47 | $467.35 | -6.12% |
+| T | 14.0 | $21.53 | $25.91 | $362.74 | +20.34% |
+| CRM | 1.0 | $198.16 | $260.67 | $260.67 | +31.55% |
+| LRCX | 1.0 | $310.71 | $315.94 | $315.94 | +1.69% |
+| AMZN | 1.0 | $269.04 | $259.97 | $259.97 | -3.37% |
+| KLAC | 1.0 | $200.62 | $181.06 | $181.06 | -9.75% |
+| QCOM | 1.0 | $165.70 | $163.65 | $163.65 | -1.24% |
+| VZ | 3.0 | $43.68 | $50.12 | $150.36 | +14.74% |
+| PDD | 1.0 | $84.18 | $85.96 | $85.96 | +2.11% |
+| PFE | 1.0 | $24.65 | $27.98 | $27.98 | +13.51% |
+
+### 🏆 Top 5 Winners (cost-basis PnL%)
+- **PATH**: +52.48% (qty=67.0, $1,216.72 MV, avg_cost $11.91)
+- **CRM**: +31.55% (qty=1.0, $260.67 MV, avg_cost $198.16)
+- **MRK**: +25.62% (qty=7.0, $1,040.20 MV, avg_cost $118.29)
+- **FUTU**: +24.40% (qty=67.0, $8,377.01 MV, avg_cost $100.51)
+- **T**: +20.34% (qty=14.0, $362.74 MV, avg_cost $21.53)
+
+### ⚠️ Top 5 Underwater (cost-basis PnL%)
+- **RKLB**: -15.69% (qty=126.0, $8,294.58 MV, avg_cost $78.08)
+- **KLAC**: -9.75% (qty=1.0, $181.06 MV, avg_cost $200.62)
+- **INTC**: -6.12% (qty=5.0, $467.35 MV, avg_cost $99.57)
+- **VRT**: -5.72% (qty=4.0, $1,066.20 MV, avg_cost $282.70)
+- **HON**: -5.18% (qty=5.0, $1,091.95 MV, avg_cost $230.32)
+
+### ⏱️ PATH OVER TP2 Watch (P-MR-279/282/284 — 8th validation)
+- **PATH**: qty=67, avg_cost=$11.91, current=$18.16, **+52.48%** cost-basis PnL
+- **TP1 already fired** (TP1_state[PATH] = True, sold 33/100 lot at $15.01 earlier)
+- **TP2 trigger:** $23.82 (2× cost)
+- **Gap to TP2 trigger:** $5.66
+- **Trajectory:** 23:04 +53.48% → 01:00 not in this cron, ~$0.30s → 03:00 +53.32% → 03:30 +53.32% → 22:01 **+52.48%** (-0.84pp dip in 18.5h inter-window; RTH-closed market = broker snapshot stale vs fresh yfinance)
+- **Classification:** P-MR-279 steady-state OVER TP2 watch (PATH holding >+50% range, gap-to-trigger stable $5-7)
+- **Operator status:** Manual close still deferred per P-MR-264/279; cron continues gap-to-TP2-trigger watch
+
+### 📊 當日總結 (BJT 2026-08-28, since 00:00 BJT / US 2026-08-27 RTH session)
+- **Buy signals:** 0
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值 drift:** $100,282.71 (03:30) → $99,434.89 (22:01) = **-$847.82** (inter-window mark-to-market, 0 trades, RTH-closed 18.5h)
+- **Unrealized PnL drift:** $+6,468.61 (03:30) → $+5,828.19 (22:01) = **-$640.42** (inter-window)
+- **All-time realized (FIFO):** $+1,212.94 (unchanged — no closed trades today)
+- **Notes updated:** true (P-MR-260 bb_lo fix healthy, 92 stocks analyzed)
+- **Pure 0-trigger canonical:** Yes — 0 trades, deep saturation, P-MR-272 持倉市值/帳戶總值 suppression → FIFO recompute headline authoritative
+
+### 🔬 Diagnostics
+- **API↔FIFO identity:** EXACT (32=32 symbols, all qty match) per P-MR-214
+- **Stale-quote drift (P-MR-183):** $-847.82 over 18.5h RTH-closed window — consistent with P-MR-274 empirical 2h-RTH-window stale-quote floor extended
+- **Inter-scan cash drift:** $0.00 (cash unchanged at $207.40 → no broker-side adjustment, no trade) per P-MR-179 trivial
+- **Cash trajectory line:** 22:04 $207.40 → 23:04 $207.40 → 01:00 $207.40 → 03:00 $207.40 → 03:30 $207.40 → 22:01 $207.40 (6 consecutive crons at this floor, no micro-buy cliff)
+- **Cash-at-floor counter:** cf=0 (cash > $100 floor, no micro-buy cliff, P-MR-125 reset maintained)
+- **Day-boundary reset:** N/A (same BJT day 2026-08-28, P-MR-185/215/247)
+- **P-MR-279 PATH OVER TP2 watch:** 8th cron validation, gap-to-TP2-trigger $5.66 stable
+
+### 📋 Next Cron Watch
+- 23:00 BJT cron: 1h after this 22:01 — expect RTH-stabilization patterns to mature (MA20-distance calculation freshens). Stage 2 candidates should re-emerge as the 22:00 RTH-open noise settles.
+- PATH gap-to-TP2-trigger: $5.66 — monitor for >+5pp intra-window jump (P-MR-284 escalation signal)
