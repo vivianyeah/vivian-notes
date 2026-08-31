@@ -10953,3 +10953,94 @@ This cron is push candidate #9 — soft-reset to origin/main before commit if ne
 - **P-MR-144 cash-floor saturation** — 11 consecutive crons at $207.40 cash floor; saturation deep but no candidates emerge even with resolved feed.
 - **P-MR-260 bb_lo fix healthy** — 92 stocks analyzed (vs 0 during outage period); structural pool-loop fix from 8/25 still working.
 - **No new trades, no new signals** — clean textbook 0-trigger post-holiday scan.
+
+## ⏰ 2026-08-31 23:00 BJT (cron — 1h after RTH-open; inter-scan monitor)
+
+### 📊 Block Classification (P-MR-286 RESOLVED, 2nd consecutive 0-trigger canonical)
+- **P-MR-286 RESOLVED (2nd observation)** — yfinance feed healthy; 92 stocks analyzed successfully (vs 0 during 03:00/03:30/01:00 outage). 22:01 → 23:00 transition stable.
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL/TP fires, 0 Type X rejects** — pure 0-trigger canonical scan
+- **Block type:** N/A (0 candidates to classify); reason for no trades = "Stage 2 突破回調策略 全部 92 只均未達標" — same as 22:01
+- **Counters (same-BJT-day carry-forward from 22:01 per P-MR-185/201, NOT day-boundary):**
+  - zt: prior (22:01) = 4 → this = **5** (0 BUY fired; +1 per P-MR-110)
+  - cf: prior (22:01) = 0 → this = **0** (cash $207.40 > $100 floor, no reset trigger per P-MR-125/129)
+- **Held-cap saturation (P-MR-144/224):** 32 positions HELD + cash $207.40; cash-pool-split denominator $103.70/stock (P-MR-211); no Stage 2 candidates emerged so no deploy attempted.
+- **P-MR-205/224/229 family classification:** Continuation of the "no candidates surface" 0-trigger canonical state. 22:01 → 23:00 trajectory shows zero change in scan outcomes — market continues to lack Stage 2 confluence entries.
+- **PATH OVER TP2 watch (P-MR-279/282/284):** PATH ticked +53.74% → **+54.32%** ($18.31 → $18.38, +$0.07). Inter-scan delta **+0.58pp in 1h** (similar velocity to P-MR-284 empirical rates). Gap to TP2 trigger: $5.44 (slightly tightened from $5.51 at 22:01).
+
+### 💰 Cash & Total (P-MR-114 + P-MR-272 — MV/Total suppressed per P-MR-272)
+- **Cash:** $207.40 (12th consecutive cron at this floor — P-MR-144 in full effect)
+- **持倉市值:** SUPPRESSED — P-MR-272 (⭐5 count == 0 → MV line not printed); recompute from per-line API parser
+- **API view (per-line parser P-MR-168):** 32 positions, sum_api = **$97,906.19**
+- **FIFO MV (using API prices):** **$97,906.19** (P-MR-214 identity EXACT — FIFO matches API qty-for-qty)
+- **FIFO Total (cash + sum_api):** $207.40 + $97,906.19 = **$98,113.59**
+- **Headline:** FIFO recompute **$98,113.59** (P-MR-272 + P-MR-214 — use FIFO recompute as authoritative since scan suppresses MV/Total in 0-stage-2)
+- **FIFO cost basis:** $93,606.70 → **Unrealized PnL: $+4,299.49 (+4.59%)**
+- **Inter-scan drift (22:01 → 23:00, 1h gap):** FIFO Total $98,240.47 → $98,113.59 = **−$126.88** (= Σ(qty × Δprice) across 32 positions; pure stale-quote component P-MR-183). Inter-scan cash drift = $0 (P-MR-179 trivial).
+- **P-MR-183 stale-quote fingerprint:** $126.88 from 32 positions × ~$3.96 avg delta — modest 1h intra-RTH quote-freshness refresh (in contrast to the 18.5h RTH-closed gap that produces $5-7k stale-quote drift).
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/168/214 — perfect identity, 5th sub-pattern)
+- **API view:** 32 positions (per-line parser P-MR-168)
+- **FIFO view:** 32 positions (fifo_open_positions(log))
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **Symbol/qty identity:** 32/32 exact match
+- **Identity shortcut (P-MR-214):** `sum_api = fifo_mv = $97,906.19` — EXACT hit (P-MR-214 hit 5th consecutive scan)
+- **Qty diff:** 0 (every held position matches API qty exactly)
+- **Rebuild check:** API 持倉 32 隻 (printed) matches per-line parser count exactly
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates** this scan — 92 stocks analyzed but none met Stage 2 criteria simultaneously (MA10 pullback + MA20 support + RSI 25-75 + RR≥0.8 + MACD>0 + KDJ>0)
+- **PATH OVER TP2 watch (P-MR-279/284/282):** PATH at **+54.32%** cost-basis (67股 @ cost $11.91 → $18.38, MV $1,231.46, PnL $+433.49). TP1 fired earlier (cycle 4, 33/100 sold at $15.01). TP2 trigger = $23.82 (2× cost). **Gap to TP2 trigger = $5.44** (tightened from $5.51 at 22:01 — 1h intra-RTH delta −$0.07). Trajectory extended: 8/27 22:05 = +53.0% (P-MR-282 cross-day acceleration), 8/28 23:02 = +54.58% (P-MR-284 intra-window peak), 8/31 22:01 = +53.74% (slight pullback), **8/31 23:00 = +54.32%** (intra-window +0.58pp/h within P-MR-284 expected velocity band). Manual-close operator discretion per P-MR-279; cron does NOT auto-close.
+- **Held-cap saturation (P-MR-144):** 32 positions HELD, 0 free slots; any Stage 2 candidate would be Type B cap-block by default.
+- **All-time realized (FIFO):** unchanged from 8/31 22:01 ($+1,212.94, 147 closed trades)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged — no new closures)
+
+### 🌟 Per-position PnL Highlights (cost-basis)
+**Top 5 winners:**
+| Symbol | Qty | Cost | Price | MV | PnL % | PnL $ |
+|---|---|---|---|---|---|---|
+| PATH | 67 | $11.91 | $18.38 | $1,231.46 | **+54.32%** | $+433.49 |
+| CRM | 1 | $198.16 | $259.39 | $259.39 | +30.90% | $+61.23 |
+| MRK | 7 | $118.29 | $147.57 | $1,032.99 | +24.75% | $+204.96 |
+| FUTU | 67 | $100.51 | $123.03 | $8,243.01 | +22.41% | $+1,508.84 |
+| T | 14 | $21.53 | $26.09 | $365.26 | +21.18% | $+63.84 |
+
+**Top 5 losers:**
+| Symbol | Qty | Cost | Price | MV | PnL % | PnL $ |
+|---|---|---|---|---|---|---|
+| IREN | 35 | $39.32 | $35.78 | $1,252.30 | -9.00% | $-123.90 |
+| VRT | 4 | $282.70 | $256.47 | $1,025.88 | -9.28% | $-104.90 |
+| INTC | 5 | $99.57 | $89.79 | $448.95 | -9.82% | $-48.88 |
+| KLAC | 1 | $200.62 | $174.74 | $174.74 | -12.90% | $-25.88 |
+| RKLB | 126 | $78.08 | $63.21 | $7,964.46 | **-19.04%** | $-1,873.62 |
+
+### 📊 當日總結 (BJT 2026-08-31, since 00:00 BJT)
+- **Buy signals:** 0 (all 5 of today's crons: 01:00 / 03:00 / 03:30 / 22:01 / 23:00)
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值 (FIFO recompute):** **$98,113.59** (cash $207.40 + MV $97,906.19, P-MR-272 + P-MR-214)
+- **Unrealized PnL (cost basis):** **$+4,299.49 (+4.59%)** (down −$126.88 from 22:01's +$4,426.37 due to 1h intra-RTH quote refresh)
+- **All-time realized (FIFO):** $+1,212.94 (147 closed trades, unchanged)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged)
+- **Notes updated:** true (this section appended; P-MR-101 0-trigger reporting rule satisfied)
+- **Day-boundary reset:** NO — same BJT day as 22:01 (both 2026-08-31). Counters carry forward (P-MR-185/201): zt 4→5, cf 0→0.
+- **P-MR-286 RESOLVED (2nd observation):** yfinance feed stable (92 stocks analyzed vs 0 during outage period).
+- **Next cron watch:** PATH OVER TP2 watch (P-MR-279/282/284) — gap $5.44 to TP2 trigger $23.82 (1h tightened $0.07 from $5.51); intra-RTH velocity +0.58pp/h consistent with P-MR-284 observation class. Manual-close operator discretion per P-MR-279.
+
+### 📊 Cash Trajectory (last 6 crons)
+- 2026-08-28 22:01 → $207.40 (same-day carry)
+- 2026-08-28 23:02 → $207.40 (P-MR-282 PATH acceleration peak)
+- 2026-08-31 01:00 → $207.40 (P-MR-286 outage 1st obs)
+- 2026-08-31 03:00 → $207.40 (P-MR-286 outage 2nd obs)
+- 2026-08-31 03:30 → $207.40 (P-MR-286 outage 3rd obs)
+- 2026-08-31 22:01 → $207.40 (P-MR-286 RESOLVED, 11th consecutive at floor)
+- **2026-08-31 23:00 → $207.40** (12 consecutive crons at $207.40 floor)
+
+### 🔖 Watch Items
+- **P-MR-279/282/284 PATH OVER TP2 watch** — PATH at +54.32% (intra-RTH +0.58pp from 22:01's +53.74%), TP2 trigger $23.82, gap $5.44; manual-close operator discretion per P-MR-279.
+- **P-MR-144 cash-floor saturation** — 12 consecutive crons at $207.40 cash floor; saturation deep but no candidates emerge even with resolved feed.
+- **P-MR-214 identity exact hit, 5th consecutive scan** — `sum_api = fifo_mv = $97,906.19` exact; cleanest possible 0-fill reconciliation (P-MR-206/227 0-trade canonical textbook).
+- **P-MR-260 bb_lo fix healthy** — 92 stocks analyzed (vs 0 during outage period); structural pool-loop fix from 8/25 still working.
+- **No new trades, no new signals** — clean textbook 0-trigger canonical, 22:01 → 23:00 trajectory shows pure intra-RTH quote refresh only (no signal evolution).
