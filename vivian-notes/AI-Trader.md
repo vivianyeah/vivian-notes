@@ -10463,3 +10463,493 @@ This cron is push candidate #9 — soft-reset to origin/main before commit if ne
 - **PATH P-MR-284 acceleration:** if 23:32 BJT cron shows PATH > +55% (continued >+0.5pp intra-window), escalate watch to "sustained acceleration"; gap-to-TP2-trigger under $5.00 triggers manual-close recommendation tone (NOT auto-close per P-MR-279)
 - **RTH-open stabilization:** 23:32 BJT (= 11:02 EST, ~2h into US RTH) is the typical post-stabilization signal emergence window — watch for Stage 2 candidates emerging
 - **Cash floor saturation:** $207.40 floor held for 7 crons. If 23:32 BJT shows Stage 2 ≥ 1 candidate, may trigger cash-pool-split micro-squeeze (P-MR-208/211) or full cap-block (P-MR-144/224)
+## ⏰ 2026-08-31 01:00 BJT
+**Cron ID:** 2026-08-31-0100-bjt (US Labor Day weekend — markets closed; yfinance data outage)
+
+### ⏰ Cron 結果
+- **Status:** ⚠️ **YFINANCE DATA OUTAGE** — `closes[-1] = NaN` for 2026-08-28 (last trading day) on all tickers; scan cannot compute Stage 2 / MA20 / 止蝕位 / PnL; **0 trades fired (forced by data, not by strategy)**
+- **持倉:** 32 只 (unchanged)
+- **Cash:** $207.40 (unchanged from 8/28 23:02)
+- **Stage 2 候選:** 0 只 (filter "no error" excludes all 92 tickers due to NaN)
+- **成功分析:** 0 只 (every get_price() returns None due to `closes[-1] = NaN`)
+- **買入信號:** 0 只
+- **止蝕/TP:** 無觸發（scan cannot evaluate MA20 / 5%止蝕 without price）
+- **Trades fired this scan:** 0
+- **Block classification:** **P-MR-286 NEW — yfinance data outage (last-trading-day Close=NaN)**
+
+### 🚨 P-MR-286 NEW (2026-08-31 01:00 BJT): yfinance data outage — `closes[-1]=NaN` for 2026-08-28
+- **Symptom:** `t.history(period='5d', interval='1d', auto_adjust=True)` returns 5 rows but `closes[-1] = NaN` for the most recent trading day (2026-08-28 Friday). All tickers affected.
+- **Verified scope:** `AAPL`, `TSLA`, `RKLB`, `PATH`, `HOOD`, `FUTU`, `MRVL`, `DE`, `BABA` all show same NaN pattern. period=10d and period=max also return NaN for 2026-08-28. Not a per-ticker issue; systemic yfinance data feed problem.
+- **Today context:** 2026-08-31 is **US Labor Day** (NYSE/NASDAQ closed). Friday 2026-08-28 was the last trading session. yfinance should have Friday's Close populated but is returning NaN — feed-side data quality issue.
+- **Scan behavior:** `get_price()` returns `None` (after NaN check); `check_exit()` returns `None`; both Stage 2 filter and 止蝕 evaluation paths are blocked. Print output shows `現價=$nan MA20=$nan 止蝕=$nan PnL=nan%` for all 32 positions.
+- **Recipe for future crons during yfinance outage:**
+  1. **DO NOT** attempt to bypass by injecting stale prices — this would mask the data feed problem and risk false signals.
+  2. **DO NOT** treat 0-trade as strategy-driven; classify as **P-MR-286 data-outage** in the Block Classification block.
+  3. **DO** use the last good FIFO recompute (8/28 23:02 BJT: $99,127.12 sum_api / $99,334.52 Total / $5,520.42 unrealized) as the authoritative account state until fresh yfinance data resumes.
+  4. **DO** apply day-boundary counter reset per P-MR-155/215 (last cron was 8/28 23:02 BJT; this cron is 8/31 01:00 BJT = 3-day gap → BJT date change → reset).
+  5. **DO** append the cron section even though 0 trades fired — P-MR-101 explicit "always report 0-trigger crons" applies. SILENT suppression would lose the data-outage audit trail.
+- **Watch for resolution:** when next cron (e.g. 8/31 03:00 BJT) shows `closes[-1]` populated for 2026-08-28 (or later), classify as "P-MR-286 RESOLVED" and resume normal scan behavior. If outage persists >24h, escalate to operator.
+
+### 💰 帳戶狀況
+- **持倉市值 (last-good sum_api, FIFO qty × stdout 現價 from 8/28 23:02):** $99,127.12
+- **帳戶總值 (last-good FIFO recompute from 8/28 23:02):** **$99,334.52**
+- **Cost basis:** $93,606.70
+- **Unrealized P&L:** **$+5,520.42** (+5.90% on cost)
+- **P-MR-272 note (extended):** scan.py suppresses 持倉市值/帳戶總值 lines (Stage 2 = 0) AND this scan cannot compute MV lines at all (NaN source). Headline uses last-good sum_api + cash from 8/28 23:02 FIFO recompute.
+- **P-MR-286 caveat:** No fresh yfinance data means no fresh MV recompute. Numbers from this section are EXACTLY the 8/28 23:02 BJT FIFO recompute — they are 50h+ stale (8/28 23:02 → 8/31 01:00 = ~50h RTH-closed window including Labor Day weekend).
+- **Inter-window drift (8/28 23:02 → 8/31 01:00):** UNKNOWN — no fresh quotes to mark-to-market. The cron cannot decompose drift without yfinance source. Per P-MR-274 empirical 2h-RTH-window stale-quote floor ~$2-8k on 32 positions, the actual drift over a 50h+ RTH-closed window is likely LARGER (could be ±$5-15k depending on Friday's close and weekend gap behavior).
+
+### 📊 Counter Trajectory
+- **Pre-scan counters:** zt=4, cf=0 (from 8/28 23:02 BJT, the most recent prior cron per the meta + last MD section)
+- **Day-boundary check:** last_cron_bjt_date = 2026-08-28 ≠ this_cron_bjt_date = 2026-08-31 → **DAY-BOUNDARY RESET** per P-MR-155/185/215
+- **Day-boundary reset applied FIRST:**
+  - zt: 4 → **1** (new BJT day base value per P-MR-110/155)
+  - cf: 0 → **0** (cash $207.40 > $100 floor per P-MR-125/129 — no increment needed, base value held)
+- **Trade effects applied SECOND:**
+  - 0 BUY → zt stays 1 (no +1 increment; day-boundary reset already set base)
+  - Cash $207.40 > $100 floor → cf stays 0 (P-MR-125 no micro-buy cliff)
+- **Final counters:** zt=**1**, cf=**0**
+- **Cross-day validation:** 3-day gap (8/28 23:02 → 8/31 01:00 = 50h elapsed) is the **largest BJT-date gap since P-MR-215 (72h validated)** but still well within binary reset semantics. Per P-MR-215 explicit rule: "the reset is a function of `last_cron_bjt_date != this_cron_bjt_date`, NOT of `now - last_cron_time`."
+
+### 🔍 Block Classification
+- **0 BUY, 0 SL, 0 TP1, 0 TP2, 0 Type X** — pure 0-trigger canonical scan
+- **Stage 2 candidates:** 0 (not strategy-driven; **P-MR-286 data outage** masks all candidates)
+- **Cash-pool-split hypothetical:** Cash $207.40 / MAX_STOCKS 2 = $103.70/stock deployable. But Stage 2 = 0 means no candidate even reaches the deployment gate — pure zero-candidate saturation per P-MR-144/224
+- **PATH OVER TP2 watch (P-MR-279/282/284) — STALE due to data outage:**
+  - PATH (67 shares @ $11.91 avg_cost) cost-basis PnL = **+54.58%** (last good read 8/28 23:02; current price UNKNOWN due to P-MR-286)
+  - TP2 trigger = $23.82 (2× cost); gap = **$5.41** (last known; current gap UNKNOWN)
+  - **Status:** TP1 fired (33/67 sold at $15.01 earlier); TP2 state still None. Operator continues deferring manual close per P-MR-279 — cron reports only with explicit `gap_to_TP2_trigger` per P-MR-279 recipe
+  - **P-MR-286 caveat:** PATH's current_price is NaN this scan, so any intra-window acceleration (P-MR-284) is unobservable. Watch resumes when yfinance data returns.
+
+### 💵 Cash Trajectory
+- **22:04 BJT (2026-08-27):** $207.40
+- **23:04 BJT:** $207.40
+- **01:00 BJT (2026-08-28, day-boundary):** $207.40
+- **03:00 BJT:** $207.40
+- **03:30 BJT:** $207.40
+- **22:01 BJT (2026-08-28):** $207.40
+- **23:02 BJT:** $207.40
+- **01:00 BJT (2026-08-31, day-boundary, this):** $207.40
+- **Inter-scan cash drift (8/28 23:02 → 8/31 01:00):** $0.00 (P-MR-179 trivial — no broker adjustment, no trade)
+- **Cash-at-floor counter:** cf=0 (cash > $100 floor, 8 consecutive crons at $207.40)
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/214)
+- **API view:** 32 positions (per scan stdout, all 持倉 lines)
+- **FIFO view:** 32 positions (fifo_open_positions(log))
+- **only_in_api:** ∅ (no lag shell)
+- **only_in_fifo:** ∅ (no buy-lag shell)
+- **Identity shortcut (P-MR-214):** Cannot validate this scan — no fresh yfinance price source to compute sum_api; FIFO recompute uses last-good prices from 8/28 23:02. Both views still show 32 positions with identical qty.
+- **Qty diff:** 0 (every held position matches API qty exactly)
+- **Rebuild check:** API 持倉 32 隻 matches per-line parser count exactly (P-MR-168 prefix regex healthy — but all prices NaN)
+- **P-MR-286 caveat:** Per-line API parser works for symbol/qty extraction but all `現價=$nan` lines yield `price=nan` — sum_api cannot be computed for drift decomposition.
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates this scan** — P-MR-286 data outage: scan printed "成功分析: 0 只" because every get_price() returned None after NaN filter
+- **PATH at +54.58% (cost-basis, last good read)** approaching TP2 trigger $23.82; gap $5.41 (last known) — manual-close operator discretion per P-MR-279; cron does NOT auto-close
+- **Held-cap saturation (P-MR-144/224):** all 32 held positions are HELD so any ⭐5 candidate would be Type B cap-block by default
+- **US Labor Day context:** 2026-08-31 is Labor Day (NYSE/NASDAQ closed). Next trading session is Tuesday 2026-09-01. Even if yfinance outage resolves, no trades would fire on Labor Day itself (no RTH).
+
+### 📊 當日總結 (BJT 2026-08-31, since 00:00 BJT / US 2026-08-30 RTH session — Labor Day weekend)
+- **Buy signals:** 0
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值:** Last-known $99,334.52 (from 8/28 23:02, ~50h+ stale due to P-MR-286)
+- **Unrealized PnL:** Last-known $+5,520.42 (from 8/28 23:02, ~50h+ stale)
+- **All-time realized (FIFO):** $+1,212.94 (147 closed trades, unchanged)
+- **Notes updated:** true (this section appended; P-MR-286 documented; P-MR-101 0-trigger reporting rule satisfied)
+- **Day-boundary reset:** YES (8/28 → 8/31 = 3-day gap, P-MR-155/185/215 binary reset; zt 4→1, cf 0→0)
+
+### 📋 Holdings Table (32 positions, last-known MV from 8/28 23:02 FIFO recompute — STALE due to P-MR-286)
+| Symbol | Qty | Avg Cost | Current | MV | PnL% |
+|--------|-----|----------|---------|------|------|
+| MRVL | 46.0 | $212.70 | $222.39 | $10,229.94 | +4.56% |
+| DE | 17.0 | $573.68 | $620.18 | $10,543.06 | +8.12% |
+| BABA | 79.0 | $110.33 | $118.90 | $9,393.10 | +7.76% |
+| RKLB | 126.0 | $78.08 | $65.59 | $8,264.34 | -16.00% |
+| FUTU | 67.0 | $100.51 | $124.89 | $8,367.63 | +24.26% |
+| COP | 64.0 | $109.67 | $130.28 | $8,337.92 | +18.79% |
+| HOOD | 74.0 | $95.68 | $109.44 | $8,098.56 | +14.38% |
+| AVGO | 17.0 | $384.25 | $373.59 | $6,351.03 | -2.77% |
+| XOM | 37.0 | $141.51 | $155.67 | $5,759.79 | +10.01% |
+| CSCO | 29.0 | $114.57 | $111.28 | $3,227.12 | -2.87% |
+| WFC | 36.0 | $76.57 | $86.29 | $3,106.44 | +12.69% |
+| CVX | 12.0 | $192.23 | $200.77 | $2,409.24 | +4.44% |
+| ASTS | 32.0 | $63.17 | $59.93 | $1,917.76 | -5.13% |
+| IBM | 8.0 | $237.96 | $237.69 | $1,901.52 | -0.11% |
+| SNDK | 1.0 | $1,371.73 | $1,497.50 | $1,497.50 | +9.17% |
+| IREN | 35.0 | $39.32 | $36.60 | $1,281.00 | -6.92% |
+| PATH | 67.0 | $11.91 | $18.41 | $1,233.47 | +54.58% |
+| HON | 5.0 | $230.32 | $216.98 | $1,084.90 | -5.79% |
+| VRT | 4.0 | $282.70 | $265.14 | $1,060.56 | -6.21% |
+| MRK | 7.0 | $118.29 | $147.67 | $1,033.69 | +24.84% |
+| BA | 5.0 | $218.68 | $209.14 | $1,045.70 | -4.36% |
+| TSLA | 2.0 | $335.41 | $354.40 | $708.80 | +5.66% |
+| INTC | 5.0 | $99.57 | $91.97 | $459.85 | -7.63% |
+| T | 14.0 | $21.53 | $25.91 | $362.74 | +20.34% |
+| LRCX | 1.0 | $310.71 | $315.62 | $315.62 | +1.58% |
+| CRM | 1.0 | $198.16 | $261.05 | $261.05 | +31.74% |
+| AMZN | 1.0 | $269.04 | $265.78 | $265.78 | -1.21% |
+| KLAC | 1.0 | $200.62 | $180.37 | $180.37 | -10.09% |
+| QCOM | 1.0 | $165.70 | $164.47 | $164.47 | -0.74% |
+| VZ | 3.0 | $43.68 | $49.99 | $149.97 | +14.45% |
+| PDD | 1.0 | $84.18 | $86.31 | $86.31 | +2.53% |
+| PFE | 1.0 | $24.65 | $27.89 | $27.89 | +13.14% |
+
+### 🏆 Top 5 Winners (cost-basis PnL%, last-known from 8/28 23:02)
+- **PATH**: +54.58% (qty=67.0, $1,233.47 MV) — ⚠️ P-MR-279/284 OVER TP2 watch (P-MR-286 cannot refresh)
+- **CRM**: +31.74% (qty=1.0, $261.05 MV)
+- **MRK**: +24.84% (qty=7.0, $1,033.69 MV)
+- **FUTU**: +24.26% (qty=67.0, $8,367.63 MV)
+- **T**: +20.34% (qty=14.0, $362.74 MV)
+
+### ⚠️ Top 5 Underwater (cost-basis PnL%, last-known from 8/28 23:02)
+- **RKLB**: -16.00% (qty=126.0, $8,264.34 MV)
+- **KLAC**: -10.09% (qty=1.0, $180.37 MV)
+- **INTC**: -7.63% (qty=5.0, $459.85 MV)
+- **IREN**: -6.92% (qty=35.0, $1,281.00 MV)
+- **VRT**: -6.21% (qty=4.0, $1,060.56 MV)
+
+### 📝 Notes
+- **P-MR-286 NEW (2026-08-31 01:00 BJT):** yfinance data outage — `closes[-1] = NaN` for 2026-08-28 on all tickers, systemic feed-side issue. Verified across AAPL/TSLA/RKLB/PATH/HOOD/FUTU/MRVL/DE/BABA and likely affects entire 92-ticker pool. Today is US Labor Day; markets closed. Recipe for handling: classify as P-MR-286 in Block Classification, use last-good FIFO recompute as authoritative state, do NOT inject stale prices, apply day-boundary counter reset per P-MR-155, do NOT auto-close positions.
+- **P-MR-215 cross-day reset validated 2nd time at 50h gap:** last cron 8/28 23:02 (zt=4 cf=0) → this cron 8/31 01:00 (zt=1 cf=0 after reset). Binary BJT-date change triggers reset regardless of elapsed hours. cf stays 0 because cash $207.40 > $100 floor (no micro-buy cliff).
+- **Cash floor saturation (8 crons at $207.40):** Cash has not moved since 8/27 22:04 BJT. With 32 positions fully invested and P-MR-144 cap-floor collapse in effect, no micro-buy can deploy until either (a) Stage 2 candidate emerges that fits inside $207.40 / 2 = $103.70/stock (P-MR-211 cash-pool-split) or (b) SL/TP fires to flush cash.
+- **PATH OVER TP2 watch STALE:** P-MR-279/284 cannot refresh during P-MR-286. Last known read was 8/28 23:02 (+54.58%, gap $5.41). Operator should re-evaluate when fresh yfinance data resumes.
+- **Inter-scan cash drift $0.00 (P-MR-179 trivial):** 8/28 23:02 → 8/31 01:00 = $0.00 cash movement. No broker-side adjustment, no trade.
+
+### 📋 Next Cron Watch
+- **P-MR-286 resolution watch:** if next cron (8/31 03:00 BJT or later) shows `closes[-1]` populated for 2026-08-28 (or 8/31 if market data appears), classify as "P-MR-286 RESOLVED" and resume normal scan behavior. If outage persists >24h, escalate to operator.
+- **US Labor Day context:** 8/31 is Labor Day (markets closed). Next trading session is Tuesday 9/1. Even if yfinance outage resolves, the cron may not see fresh RTH data until 9/1 22:00 BJT (US RTH open).
+- **Cash floor saturation:** $207.40 floor held for 8 crons. If Stage 2 emerges and is deployable, may trigger P-MR-208 2nd-rank-RR micro-squeeze or P-MR-211 cash-pool-split, or P-MR-144/224 pure cap-block.
+- **PATH P-MR-284 acceleration watch:** STALE; resume when yfinance data returns. If gap-to-TP2-trigger under $5.00 at next read, manual-close recommendation tone (NOT auto-close per P-MR-279).
+## ⏰ 2026-08-31 03:00 BJT (cron 4th scan)
+
+### 📊 Block Classification (P-MR-286 PERSISTS — 2nd observation)
+- **P-MR-286 (yfinance data outage, US Labor Day holiday):** `closes[-1] = NaN` for ALL 32 held tickers, identical fingerprint to 01:00 BJT cron (2h ago). System-level feed outage confirmed: scan printed `成功分析: 0 只` because every yfinance `get_price()` returned None after NaN filter. **2nd consecutive observation of P-MR-286.** US Labor Day (NYSE/NASDAQ closed) — expected that markets would not have produced new RTH data today.
+- **Block type:** N/A (no Stage 2 evaluation possible; data feed failure pre-strategy)
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL/TP fires, 0 Type X rejects** — P-MR-286 forces 0-trade regardless of strategy intent
+- **Counters:** zt **1 → 2** (P-MR-110, no BUY fired), cf **0 → 0** (cash $207.40 > $100 floor, no reset trigger). Same-BJT-day carry-forward from 01:00 BJT (P-MR-185/201, NOT day-boundary — both 01:00 and 03:00 are 2026-08-31 BJT).
+- **Block signature:** identical to 01:00 BJT cron; recipe P-MR-286 unchanged from first observation.
+
+### 💰 Cash & Total (P-MR-114 + P-MR-272 + P-MR-286)
+- **Cash:** $207.40 (unchanged for **9 consecutive crons** since 8/27 22:04 BJT; floor saturation P-MR-144 in full effect)
+- **持倉市值:** STALE — P-MR-286 prevents fresh MV computation (all API prices NaN)
+- **帳戶總值:** Last-known **$99,334.52** from 8/28 23:02 (P-MR-286 STALE, ~52h+ old)
+- **Unrealized PnL:** Last-known **$+5,520.42** from 8/28 23:02
+- **Inter-scan cash drift (01:00 → 03:00):** $0.00 (P-MR-179 trivial; no broker adjustment, no trade)
+- **P-MR-272 note (extended):** scan.py suppresses 持倉市值/帳戶總值 lines when Stage 2 = 0 (P-MR-272); this 03:00 cron also cannot print them because NaN prevents MV line construction. Headline uses last-good FIFO recompute from 8/28 23:02.
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/214 + P-MR-286)
+- **API view:** 32 positions (per-line parser healthy on symbol/qty extraction; ALL 32 prices = NaN)
+- **FIFO view:** 32 positions (fifo_open_positions(log))
+- **only_in_api:** ∅ (no lag shell)
+- **only_in_fifo:** ∅ (no buy-lag shell)
+- **Identity shortcut (P-MR-214):** Cannot validate — sum_api cannot be computed (all NaN). FIFO MV recompute uses last-good prices from 8/28 23:02.
+- **Qty diff:** 0 (every held position matches API qty exactly)
+- **Rebuild check:** API 持倉 32 隻 matches per-line parser count exactly (P-MR-168 prefix regex healthy — symbol+qty extraction works, only price field is NaN)
+- **P-MR-286 caveat:** Per-line API parser extracts symbol+qty correctly but all `現價=$nan` lines yield `price=None`; MV/Total cannot be refreshed until yfinance feed resumes.
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates this scan** — P-MR-286 data outage: scan printed `成功分析: 0 只` because every `get_price()` returned None
+- **PATH at +54.58% (cost-basis, last good read 8/28 23:02)** approaching TP2 trigger $23.82; gap **$5.41** (last known); TP1 already fired, TP2 not yet triggered. Manual-close operator discretion per P-MR-279; cron does NOT auto-close. Cannot refresh during P-MR-286.
+- **Held-cap saturation (P-MR-144/224):** All 32 positions are HELD; any ⭐5 candidate would be Type B cap-block by default. Cash $207.40 below $103.70/stock cash-pool-split denominator (P-MR-211) — even micro-buys blocked if Stage 2 emerged.
+- **US Labor Day context:** 2026-08-31 is Labor Day (markets closed). Next trading session is Tuesday 2026-09-01 RTH open = Tuesday 2026-09-01 22:30 BJT. Even if yfinance outage resolves mid-day, no fresh RTH data will be available until US markets reopen.
+
+### 📊 當日總結 (BJT 2026-08-31, since 00:00 BJT)
+- **Buy signals:** 0
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值:** Last-known $99,334.52 (from 8/28 23:02, ~52h+ stale, P-MR-286)
+- **Unrealized PnL:** Last-known $+5,520.42 (from 8/28 23:02, ~52h+ stale)
+- **All-time realized (FIFO):** $+1,212.94 (147 closed trades, unchanged)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged — no new closures)
+- **Notes updated:** true (this section appended; P-MR-101 0-trigger reporting rule satisfied; P-MR-286 documented; P-MR-272 + P-MR-286 compose: no MV/Total lines possible)
+- **Day-boundary reset:** NO — same BJT day as 01:00 cron (both 2026-08-31). Counters carry forward (P-MR-185/201): zt 1→2, cf 0→0.
+
+### 📋 Holdings Table (32 positions, last-known MV from 8/28 23:02 FIFO recompute — STALE due to P-MR-286)
+| Symbol | Qty | Avg Cost | Current | MV | PnL% |
+|--------|-----|----------|---------|------|------|
+| MRVL | 46.0 | $212.70 | $222.39 | $10,229.94 | +4.56% |
+| DE | 17.0 | $573.68 | $620.18 | $10,543.06 | +8.12% |
+| BABA | 79.0 | $110.33 | $118.90 | $9,393.10 | +7.76% |
+| RKLB | 126.0 | $78.08 | $65.59 | $8,264.34 | -16.00% |
+| FUTU | 67.0 | $100.51 | $124.89 | $8,367.63 | +24.26% |
+| COP | 64.0 | $109.67 | $130.28 | $8,337.92 | +18.79% |
+| HOOD | 74.0 | $95.68 | $109.44 | $8,098.56 | +14.38% |
+| AVGO | 17.0 | $384.25 | $373.59 | $6,351.03 | -2.77% |
+| XOM | 37.0 | $141.51 | $155.67 | $5,759.79 | +10.01% |
+| CSCO | 29.0 | $114.57 | $111.28 | $3,227.12 | -2.87% |
+| WFC | 36.0 | $76.57 | $86.29 | $3,106.44 | +12.69% |
+| CVX | 12.0 | $192.23 | $200.77 | $2,409.24 | +4.44% |
+| ASTS | 32.0 | $63.17 | $59.93 | $1,917.76 | -5.13% |
+| IBM | 8.0 | $237.96 | $237.69 | $1,901.52 | -0.11% |
+| SNDK | 1.0 | $1,371.73 | $1,497.50 | $1,497.50 | +9.17% |
+| IREN | 35.0 | $39.32 | $36.60 | $1,281.00 | -6.92% |
+| PATH | 67.0 | $11.91 | $18.41 | $1,233.47 | +54.58% |
+| HON | 5.0 | $230.32 | $216.98 | $1,084.90 | -5.79% |
+| VRT | 4.0 | $282.70 | $265.14 | $1,060.56 | -6.21% |
+| MRK | 7.0 | $118.29 | $147.67 | $1,033.69 | +24.84% |
+| BA | 5.0 | $218.68 | $209.14 | $1,045.70 | -4.36% |
+| TSLA | 2.0 | $335.41 | $354.40 | $708.80 | +5.66% |
+| INTC | 5.0 | $99.57 | $91.97 | $459.85 | -7.63% |
+| T | 14.0 | $21.53 | $25.91 | $362.74 | +20.34% |
+| LRCX | 1.0 | $310.71 | $315.62 | $315.62 | +1.58% |
+| CRM | 1.0 | $198.16 | $261.05 | $261.05 | +31.74% |
+| AMZN | 1.0 | $269.04 | $265.78 | $265.78 | -1.21% |
+| KLAC | 1.0 | $200.62 | $180.37 | $180.37 | -10.09% |
+| QCOM | 1.0 | $165.70 | $164.47 | $164.47 | -0.74% |
+| VZ | 3.0 | $43.68 | $49.99 | $149.97 | +14.45% |
+| PDD | 1.0 | $84.18 | $86.31 | $86.31 | +2.53% |
+| PFE | 1.0 | $24.65 | $27.89 | $27.89 | +13.14% |
+
+### 🏆 Top 5 Winners (cost-basis PnL%, last-known from 8/28 23:02)
+- **PATH**: +54.58% (qty=67.0, $1,233.47 MV) — ⚠️ P-MR-279/284 OVER TP2 watch (P-MR-286 cannot refresh; last known gap $5.41)
+- **CRM**: +31.74% (qty=1.0, $261.05 MV)
+- **MRK**: +24.84% (qty=7.0, $1,033.69 MV)
+- **FUTU**: +24.26% (qty=67.0, $8,367.63 MV)
+- **T**: +20.34% (qty=14.0, $362.74 MV)
+
+### ⚠️ Top 5 Underwater (cost-basis PnL%, last-known from 8/28 23:02)
+- **RKLB**: -16.00% (qty=126.0, $8,264.34 MV)
+- **KLAC**: -10.09% (qty=1.0, $180.37 MV)
+- **INTC**: -7.63% (qty=5.0, $459.85 MV)
+- **IREN**: -6.92% (qty=35.0, $1,281.00 MV)
+- **VRT**: -6.21% (qty=4.0, $1,060.56 MV)
+
+### 📝 Notes
+- **P-MR-286 (2nd observation, 2026-08-31 03:00 BJT):** yfinance data outage confirmed 2nd time, 2h after first observation. US Labor Day 2026-08-31 — markets closed, so fresh RTH data is not expected today. Recipe unchanged from first observation: classify as P-MR-286 in Block Classification, use last-good FIFO recompute (8/28 23:02) as authoritative state, do NOT inject stale prices, do NOT auto-close positions. Diagnostic: every `現價=$nan` AND every get_price() returns None AND `成功分析: 0 只`. Watch for resolution: when next cron shows `closes[-1]` populated AND MV/Total lines printable, classify "P-MR-286 RESOLVED" and resume normal scan behavior.
+- **P-MR-201 same-BJT-day carry-forward validated:** 01:00 (zt=1 cf=0) → 03:00 (zt=2 cf=0). No day-boundary reset (both 2026-08-31 BJT). zt +1 (no BUY), cf unchanged (cash $207.40 > $100).
+- **Cash floor saturation (9 crons at $207.40):** Cash has not moved since 8/27 22:04 BJT. P-MR-144 cap-floor collapse + P-MR-211 cash-pool-split + P-MR-224 degenerate-cap all in effect. No micro-buy can deploy until either (a) Stage 2 candidate emerges that fits inside $207.40 / 2 = $103.70/stock OR (b) SL/TP fires to flush cash. P-MR-286 makes (a) impossible today.
+- **PATH OVER TP2 watch STALE:** P-MR-279/284 cannot refresh during P-MR-286. Last known read was 8/28 23:02 (+54.58%, gap $5.41). Operator should re-evaluate when yfinance feed resumes.
+- **Inter-scan cash drift $0.00 (P-MR-179 trivial):** 8/31 01:00 → 8/31 03:00 = $0.00 cash movement. No broker-side adjustment, no trade.
+
+### 📋 Next Cron Watch
+- **P-MR-286 resolution watch:** if next cron (8/31 22:00 BJT or later, after US markets reopen 9/1) shows `closes[-1]` populated for recent trading day AND MV/Total lines printable, classify as "P-MR-286 RESOLVED" and resume normal scan behavior. If outage persists past 9/1 RTH-open, escalate to operator (likely feed-side issue requiring manual intervention).
+- **US Labor Day → RTH reopen:** US markets reopen Tuesday 2026-09-01 22:30 BJT (RTH open). Earliest fresh data expected: 2026-09-01 23:00 BJT cron or later (post-RTH-open 30-min stabilization). Even then, Stage 2 ⭐5 evaluation depends on data feed recovery, not just market open.
+- **Cash floor saturation:** $207.40 floor held for 9 crons. If Stage 2 emerges AND is deployable (post P-MR-286 resolution), may trigger P-MR-208 2nd-rank-RR micro-squeeze or P-MR-211 cash-pool-split, or P-MR-144/224 pure cap-block.
+- **PATH P-MR-284 acceleration watch:** STALE; resume when yfinance data returns. If gap-to-TP2-trigger under $5.00 at next read, manual-close recommendation tone (NOT auto-close per P-MR-279).
+- **Next cron 22:00 BJT (same-day):** expected P-MR-286 RESOLVED scenario; if Stage 2 emerges on freshly-reopened US markets, may see first trades in ~52h.
+
+---
+
+## ⏰ 2026-08-31 03:30 BJT (cron 5th scan — pre-RTH-close)
+
+### 📊 Block Classification (P-MR-286 3rd observation — outage persists)
+- **P-MR-286 (yfinance data outage, US Labor Day holiday):** `closes[-1] = NaN` for ALL 32 held tickers, identical fingerprint to 01:00 BJT (1st obs) and 03:00 BJT (2nd obs). System-level feed outage confirmed: scan printed `成功分析: 0 只` because every yfinance `get_price()` returned None after NaN filter. **3rd consecutive observation of P-MR-286.** US Labor Day 2026-08-31 — markets closed today.
+- **Block type:** N/A (no Stage 2 evaluation possible; data feed failure pre-strategy)
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL/TP fires, 0 Type X rejects** — P-MR-286 forces 0-trade regardless of strategy intent
+- **Counters:** zt **2 → 3** (P-MR-110, no BUY fired), cf **0 → 0** (cash $207.40 > $100 floor, no reset trigger). Same-BJT-day carry-forward from 03:00 BJT (P-MR-185/201, NOT day-boundary — both 03:00 and 03:30 are 2026-08-31 BJT).
+- **Block signature:** identical to 01:00 BJT and 03:00 BJT crons; recipe P-MR-286 unchanged across all 3 observations today.
+- **P-MR-286 watch:** Cron is the LAST US RTH pre-close scan (04:00 BJT = 16:00 EST = RTH closed). Trades log freezes after this scan per task instructions. Even if yfinance outage resolves mid-day, no fresh RTH data will arrive before next US trading session (Tuesday 2026-09-01).
+
+### 💰 Cash & Total (P-MR-114 + P-MR-272 + P-MR-286)
+- **Cash:** $207.40 (unchanged for **10 consecutive crons** since 8/27 22:04 BJT; floor saturation P-MR-144 in full effect)
+- **持倉市值:** STALE — P-MR-286 prevents fresh MV computation (all API prices NaN)
+- **帳戶總值:** Last-known **$99,334.52** from 8/28 23:02 (P-MR-286 STALE, ~52.5h+ old)
+- **Unrealized PnL:** Last-known **$+5,520.42** from 8/28 23:02
+- **Inter-scan cash drift (03:00 → 03:30):** $0.00 (P-MR-179 trivial; no broker adjustment, no trade)
+- **P-MR-272 + P-MR-286 compose:** scan.py suppresses 持倉市值/帳戶總值 lines (Stage 2 = 0, P-MR-272); this 03:30 cron also cannot print them because NaN prevents MV line construction. Headline uses last-good FIFO recompute from 8/28 23:02.
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/168/214 + P-MR-286)
+- **API view:** 32 positions (tolerant per-line parser healthy on symbol/qty extraction; ALL 32 prices = NaN)
+- **FIFO view:** 32 positions (fifo_open_positions(log))
+- **only_in_api:** ∅ (no lag shell)
+- **only_in_fifo:** ∅ (no buy-lag shell)
+- **Symbol/qty identity:** 32/32 exact match (P-MR-168 prefix regex tolerant to NaN prices)
+- **Identity shortcut (P-MR-214):** Cannot validate price-level — sum_api cannot be computed (all NaN). FIFO MV recompute uses last-good prices from 8/28 23:02.
+- **Qty diff:** 0 (every held position matches API qty exactly)
+- **Rebuild check:** API 持倉 32 隻 (printed) matches per-line parser count exactly (P-MR-168 tolerant prefix regex healthy — symbol+qty extraction works, only price field is NaN)
+- **P-MR-286 caveat:** Per-line API parser extracts symbol+qty correctly but all `現價=$nan` lines yield `price=None`; MV/Total cannot be refreshed until yfinance feed resumes.
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates this scan** — P-MR-286 data outage: scan printed `成功分析: 0 只` because every `get_price()` returned None
+- **PATH OVER TP2 watch (P-MR-279/284) STALE for 3rd consecutive cron:** PATH at +54.58% cost-basis (last known 8/28 23:02 = 52.5h+ ago), gap to TP2 trigger $23.82 was $5.41 at last read. Cannot refresh during P-MR-286. Manual-close operator discretion per P-MR-279; cron does NOT auto-close.
+- **Held-cap saturation (P-MR-144/224):** All 32 positions are HELD; any ⭐5 candidate would be Type B cap-block by default. Cash $207.40 below $103.70/stock cash-pool-split denominator (P-MR-211) — even micro-buys blocked if Stage 2 emerged.
+- **US Labor Day context:** 2026-08-31 is Labor Day (markets closed). Next trading session is Tuesday 2026-09-01 RTH open = Tuesday 2026-09-01 22:30 BJT. Even if yfinance outage resolves mid-day, no fresh RTH data will be available until US markets reopen.
+
+### 📊 當日總結 (BJT 2026-08-31, since 00:00 BJT)
+- **Buy signals:** 0 (P-MR-286 forced 0-trade across all 3 of today's crons: 01:00 / 03:00 / 03:30)
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值:** Last-known $99,334.52 (from 8/28 23:02, ~52.5h+ stale, P-MR-286)
+- **Unrealized PnL:** Last-known $+5,520.42 (from 8/28 23:02, ~52.5h+ stale)
+- **All-time realized (FIFO):** $+1,212.94 (147 closed trades, unchanged since 8/28 23:02)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged — no new closures today)
+- **Notes updated:** true (this section appended; P-MR-101 0-trigger reporting rule satisfied; P-MR-286 documented; P-MR-272 + P-MR-286 compose: no MV/Total lines possible)
+- **Day-boundary reset:** NO — same BJT day as 01:00 + 03:00 crons (all 2026-08-31). Counters carry forward (P-MR-185/201): zt 2→3, cf 0→0.
+- **Trades log frozen:** Per cron task rule (post-RTH-close), no more trade entries expected for this BJT day.
+
+### 📋 Holdings Table (32 positions, last-known MV from 8/28 23:02 FIFO recompute — STALE due to P-MR-286)
+| Symbol | Qty | Avg Cost | Current | MV | PnL% |
+|--------|-----|----------|---------|------|------|
+| MRVL | 46.0 | $212.70 | $222.39 | $10,229.94 | +4.56% |
+| DE | 17.0 | $573.68 | $620.18 | $10,543.06 | +8.12% |
+| BABA | 79.0 | $110.33 | $118.90 | $9,393.10 | +7.76% |
+| RKLB | 126.0 | $78.08 | $65.59 | $8,264.34 | -16.00% |
+| FUTU | 67.0 | $100.51 | $124.89 | $8,367.63 | +24.26% |
+| COP | 64.0 | $109.67 | $130.28 | $8,337.92 | +18.79% |
+| HOOD | 74.0 | $95.68 | $109.44 | $8,098.56 | +14.38% |
+| AVGO | 17.0 | $384.25 | $373.59 | $6,351.03 | -2.77% |
+| XOM | 37.0 | $141.51 | $155.67 | $5,759.79 | +10.01% |
+| CSCO | 29.0 | $114.57 | $111.28 | $3,227.12 | -2.87% |
+| WFC | 36.0 | $76.57 | $86.29 | $3,106.44 | +12.69% |
+| CVX | 12.0 | $192.23 | $200.77 | $2,409.24 | +4.44% |
+| ASTS | 32.0 | $63.17 | $59.93 | $1,917.76 | -5.13% |
+| IBM | 8.0 | $237.96 | $237.69 | $1,901.52 | -0.11% |
+| SNDK | 1.0 | $1,371.73 | $1,497.50 | $1,497.50 | +9.17% |
+| IREN | 35.0 | $39.32 | $36.60 | $1,281.00 | -6.92% |
+| PATH | 67.0 | $11.91 | $18.41 | $1,233.47 | +54.58% |
+| HON | 5.0 | $230.32 | $216.98 | $1,084.90 | -5.79% |
+| VRT | 4.0 | $282.70 | $265.14 | $1,060.56 | -6.21% |
+| MRK | 7.0 | $118.29 | $147.67 | $1,033.69 | +24.84% |
+| BA | 5.0 | $218.68 | $209.14 | $1,045.70 | -4.36% |
+| TSLA | 2.0 | $335.41 | $354.40 | $708.80 | +5.66% |
+| INTC | 5.0 | $99.57 | $91.97 | $459.85 | -7.63% |
+| T | 14.0 | $21.53 | $25.91 | $362.74 | +20.34% |
+| LRCX | 1.0 | $310.71 | $315.62 | $315.62 | +1.58% |
+| CRM | 1.0 | $198.16 | $261.05 | $261.05 | +31.74% |
+| AMZN | 1.0 | $269.04 | $265.78 | $265.78 | -1.21% |
+| KLAC | 1.0 | $200.62 | $180.37 | $180.37 | -10.09% |
+| QCOM | 1.0 | $165.70 | $164.47 | $164.47 | -0.74% |
+| VZ | 3.0 | $43.68 | $49.99 | $149.97 | +14.45% |
+| PDD | 1.0 | $84.18 | $86.31 | $86.31 | +2.53% |
+| PFE | 1.0 | $24.65 | $27.89 | $27.89 | +13.14% |
+
+### 🏆 Top 5 Winners (cost-basis PnL%, last-known from 8/28 23:02)
+- **PATH**: +54.58% (qty=67.0, $1,233.47 MV) — ⚠️ P-MR-279/284 OVER TP2 watch (P-MR-286 cannot refresh; last known gap $5.41)
+- **CRM**: +31.74% (qty=1.0, $261.05 MV)
+- **MRK**: +24.84% (qty=7.0, $1,033.69 MV)
+- **FUTU**: +24.26% (qty=67.0, $8,367.63 MV)
+- **T**: +20.34% (qty=14.0, $362.74 MV)
+
+### ⚠️ Top 5 Underwater (cost-basis PnL%, last-known from 8/28 23:02)
+- **RKLB**: -16.00% (qty=126.0, $8,264.34 MV)
+- **KLAC**: -10.09% (qty=1.0, $180.37 MV)
+- **INTC**: -7.63% (qty=5.0, $459.85 MV)
+- **IREN**: -6.92% (qty=35.0, $1,281.00 MV)
+- **VRT**: -6.21% (qty=4.0, $1,060.56 MV)
+
+### 💵 Cash Trajectory (P-MR-114, last 5 crons)
+- 8/28 23:02: $207.40 (clean run; P-MR-286 not yet active)
+- 8/31 01:00: $207.40 (P-MR-286 1st obs; same-day reset didn't apply — 8/31 first cron)
+- 8/31 03:00: $207.40 (P-MR-286 2nd obs; same BJT day carry)
+- 8/31 03:30: $207.40 (P-MR-286 3rd obs; same BJT day carry)
+- **Pattern:** Cash floor saturation locked for ~10 days (last cash movement: 8/27 22:04 BJT). P-MR-144/211/224 cap-floor collapse + cash-pool-split in full effect.
+
+### 📝 Notes
+- **P-MR-286 (3rd observation, 2026-08-31 03:30 BJT):** yfinance data outage confirmed 3rd time, 30min after 2nd observation. US Labor Day 2026-08-31 — markets closed, so fresh RTH data is not expected today. Recipe unchanged from first observation: classify as P-MR-286 in Block Classification, use last-good FIFO recompute (8/28 23:02) as authoritative state, do NOT inject stale prices, do NOT auto-close positions. Diagnostic: every `現價=$nan` AND every get_price() returns None AND `成功分析: 0 只`. Watch for resolution: when next cron shows `closes[-1]` populated AND MV/Total lines printable, classify "P-MR-286 RESOLVED" and resume normal scan behavior.
+- **P-MR-201 same-BJT-day carry-forward validated (3rd observation today):** 8/31 01:00 (zt=1 cf=0) → 8/31 03:00 (zt=2 cf=0) → 8/31 03:30 (zt=3 cf=0). No day-boundary reset (all 2026-08-31 BJT). zt +1 each cron (no BUY fired). cf unchanged (cash $207.40).
+- **P-MR-168 prefix regex tolerant to NaN (NEW pitfall observation):** Updated per-line parser to match `現價=\$[\d.nan]+` so the NaN-priced 32-position API view can be extracted. Original regex `現價=\$[\d.]+` returned 0 positions because $nan doesn't match digit-only pattern. Tolerant version returned 32/32 with `price=None`. **P-MR-286-NEW: per-line API parser requires NaN-tolerant pattern during P-MR-286 outage; document for future crons.**
+- **Cash floor saturation (10 crons at $207.40):** Cash has not moved since 8/27 22:04 BJT. P-MR-144 cap-floor collapse + P-MR-211 cash-pool-split + P-MR-224 degenerate-cap all in effect. No micro-buy can deploy until either (a) Stage 2 candidate emerges that fits inside $207.40 / 2 = $103.70/stock OR (b) SL/TP fires to flush cash. P-MR-286 makes (a) impossible today.
+- **PATH OVER TP2 watch STALE for 3rd cron:** P-MR-279/284 cannot refresh during P-MR-286. Last known read was 8/28 23:02 (+54.58%, gap $5.41). Operator should re-evaluate when yfinance feed resumes (post US Labor Day, Tuesday 9/1 RTH open).
+- **Inter-scan cash drift $0.00 (P-MR-179 trivial):** 8/31 03:00 → 8/31 03:30 = $0.00 cash movement. No broker-side adjustment, no trade.
+- **Pre-RTH-close (04:00 BJT = 16:00 EST):** This 03:30 cron is the LAST RTH-active scan; cron task says "trades log freezes" post-RTH-close. Next cron likely 8/31 22:00 BJT (RTH-open for Tuesday 9/1) — but US Labor Day means markets closed today, so no fresh data until Tuesday.
+
+### 📋 Next Cron Watch
+- **P-MR-286 resolution watch:** if next cron (8/31 22:00 BJT or later, after US markets reopen 9/1) shows `closes[-1]` populated for recent trading day AND MV/Total lines printable, classify as "P-MR-286 RESOLVED" and resume normal scan behavior. If outage persists past 9/1 RTH-open, escalate to operator (likely feed-side issue requiring manual intervention).
+- **US Labor Day → RTH reopen:** US markets reopen Tuesday 2026-09-01 22:30 BJT (RTH open). Earliest fresh data expected: 2026-09-01 23:00 BJT cron or later (post-RTH-open 30-min stabilization). Even then, Stage 2 ⭐5 evaluation depends on data feed recovery, not just market open.
+- **Cash floor saturation:** $207.40 floor held for 10 crons. If Stage 2 emerges AND is deployable (post P-MR-286 resolution), may trigger P-MR-208 2nd-rank-RR micro-squeeze or P-MR-211 cash-pool-split, or P-MR-144/224 pure cap-block.
+- **PATH P-MR-284 acceleration watch:** STALE; resume when yfinance data returns. If gap-to-TP2-trigger under $5.00 at next read, manual-close recommendation tone (NOT auto-close per P-MR-279).
+- **Next cron 22:00 BJT (same-day, 8/31):** expected P-MR-286 RESOLVED scenario; if Stage 2 emerges on freshly-reopened US markets, may see first trades in ~52h. Watch for `closes[-1]` populated signal.
+
+### 🛠 Pitfalls Validated This Cron
+- **P-MR-168**: Tolerant per-line API parser (`現價=\$[\d.nan]+`) extracts 32 positions even when all prices are NaN (P-MR-286). Update recipe: original regex fails on NaN; tolerant version handles both $nan and $123.45.
+- **P-MR-273**: f-string backslash trap re-encountered in execute_code (`\d.+` inside f-string expression). Recipe: extract regex matches to variables BEFORE the f-string (not just inline regexes; multi-step ternaries also fail).
+- **P-MR-286 3rd observation:** US Labor Day + yfinance outage pattern confirmed. Recipe stable: classify + use last-good FIFO + no auto-close + no stale-price injection. Watch for `closes[-1]` populated signal.
+- **P-MR-272 + P-MR-286 compose:** No MV/Total lines possible in 0-stage-2 + NaN-price scan. Headline must use sum_api + cash from last-good FIFO recompute.
+- **P-MR-201 same-BJT-day carry-forward:** 3rd consecutive cron today (01:00 / 03:00 / 03:30) all 2026-08-31 BJT; counters carried forward correctly. zt 1→2→3 (no BUY each cron), cf 0→0→0 (cash > $100).
+
+---
+## ⏰ 2026-08-31 22:01 BJT (cron — US Labor Day RTH reopen, post-holiday)
+
+### 📊 Block Classification (P-MR-286 RESOLVED — clean 0-trigger canonical)
+- **P-MR-286 RESOLVED** — yfinance data outage from US Labor Day 2026-08-31 (3rd observation at 03:30 BJT) is now RESOLVED. This 22:01 BJT scan ran cleanly: `成功分析: 92 只` (vs `成功分析: 0 只` in 03:00 / 03:30 / 01:00 BJT). US RTH reopened after Labor Day holiday; yfinance feed healthy.
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL/TP fires, 0 Type X rejects** — pure 0-trigger canonical scan
+- **Block type:** N/A (0 candidates to classify); reason for no trades = "Stage 2 突破回調策略 全部 92 只均未達標"
+- **Counters (same-BJT-day carry-forward from 8/31 03:30 per P-MR-185/201, NOT day-boundary):**
+  - zt: prior (03:30) = 3 → this = **4** (0 BUY fired; +1 per P-MR-110)
+  - cf: prior (03:30) = 0 → this = **0** (cash $207.40 > $100 floor, no reset trigger per P-MR-125/129)
+- **Held-cap saturation (P-MR-144/224):** 32 positions HELD + cash $207.40; cash-pool-split denominator $103.70/stock (P-MR-211); even if Stage 2 emerged, micro-buys < $103.70 unit-price only.
+- **P-MR-205/224/229 family classification:** This is the cleanest "no candidates even surfaced" 0-trigger canonical in many crons. The market has fully recovered but no setups meet MA10/MA20/RSI/MACD/volume Stage 2 entry thresholds simultaneously.
+
+### 💰 Cash & Total (P-MR-114 + P-MR-272 — MV/Total suppressed per P-MR-272)
+- **Cash:** $207.40 (unchanged from 8/27 22:04 BJT — 11 consecutive crons at $207.40 floor, P-MR-144 in full effect)
+- **持倉市值:** SUPPRESSED — P-MR-272 (⭐5 count == 0 → MV line not printed); recompute from per-line API parser
+- **API view (per-line parser P-MR-168):** 32 positions, sum_api = **$98,033.07**
+- **FIFO MV (using API prices):** **$98,033.07** (P-MR-214 identity EXACT — FIFO matches API qty-for-qty)
+- **FIFO Total (cash + sum_api):** $207.40 + $98,033.07 = **$98,240.47**
+- **Headline:** FIFO recompute **$98,240.47** (P-MR-272 + P-MR-214 — use FIFO recompute as authoritative since scan suppresses MV/Total in 0-stage-2)
+- **FIFO cost basis:** $93,606.70 → **Unrealized PnL: $+4,426.37 (+4.73%)**
+- **Inter-scan cash drift (8/31 03:30 → 8/31 22:01, ~18.5h gap, RTH-closed in middle):** $0.00 (P-MR-179 trivial; no broker adjustment, no trade)
+- **P-MR-183 stale-quote fingerprint:** Cannot quantify this scan (no scan-printed MV; FIFO recompute IS the headline). Last comparable (8/28 23:02) had ~$5-7k pure stale-quote. This 22:01 scan is fully fresh-quoted from yfinance.
+
+### 📈 API ↔ FIFO Reconciliation (P-MR-92/168/214 — perfect identity, 4th sub-pattern)
+- **API view:** 32 positions (per-line parser P-MR-168, all prices fresh post-Labor-Day-resolved)
+- **FIFO view:** 32 positions (fifo_open_positions(log))
+- **only_in_api:** ∅
+- **only_in_fifo:** ∅
+- **Symbol/qty identity:** 32/32 exact match
+- **Identity shortcut (P-MR-214):** `sum_api = fifo_mv = $98,033.07` — EXACT hit (0 stale-quote component since API source = yfinance fresh quote in scan stdout)
+- **Qty diff:** 0 (every held position matches API qty exactly)
+- **Rebuild check:** API 持倉 32 隻 (printed) matches per-line parser count exactly
+
+### 🌟 Stage 2 / Hold Watch
+- **0 ⭐5 candidates** this scan — 92 stocks analyzed but none met Stage 2 criteria simultaneously (MA10 pullback + MA20 support + RSI 40-60 + MACD confirmation + volume 1.2x)
+- **PATH OVER TP2 watch (P-MR-279/284/282):** PATH at **+53.74%** cost-basis (67股 @ cost $11.91 → $18.31, MV $1,226.77, PnL $+428.80). TP1 fired earlier (cycle 4, 33/100 sold at $15.01). TP2 trigger = $23.82 (2× cost). **Gap to TP2 trigger = $5.51.** Trajectory: 8/27 22:05 = +53.0% (P-MR-282 acceleration), 8/28 23:02 = +54.58% (P-MR-284 intra-window peak), 8/31 22:01 = **+53.74%** (slight pullback from peak). Manual-close operator discretion per P-MR-279; cron does NOT auto-close.
+- **Held-cap saturation (P-MR-144):** 32 positions HELD, 0 free slots; any Stage 2 candidate would be Type B cap-block by default.
+- **All-time realized (FIFO):** unchanged from 8/31 03:30 ($+1,212.94, 147 closed trades)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged — no new closures)
+
+### 🌟 Per-position PnL Highlights (cost-basis)
+**Top 5 winners:**
+| Symbol | Qty | Cost | Price | MV | PnL % | PnL $ |
+|---|---|---|---|---|---|---|
+| PATH | 67 | $11.91 | $18.31 | $1,226.77 | **+53.74%** | $+428.80 |
+| CRM | 1 | $198.16 | $257.10 | $257.10 | +29.7% | $+58.94 |
+| MRK | 7 | $118.29 | $147.20 | $1,030.40 | +24.4% | $+202.37 |
+| COP | 64 | $109.67 | $133.42 | $8,538.88 | +21.7% | $+1,520.16 |
+| FUTU | 67 | $100.51 | $122.20 | $8,187.40 | +21.6% | $+1,453.23 |
+
+**Top 5 losers:**
+| Symbol | Qty | Cost | Price | MV | PnL % | PnL $ |
+|---|---|---|---|---|---|---|
+| VRT | 4 | $282.70 | $258.68 | $1,034.72 | -8.5% | $-96.06 |
+| ASTS | 32 | $63.17 | $57.58 | $1,842.56 | -8.8% | $-178.88 |
+| INTC | 5 | $99.57 | $90.43 | $452.15 | -9.2% | $-45.68 |
+| KLAC | 1 | $200.62 | $175.83 | $175.83 | -12.4% | $-24.79 |
+| RKLB | 126 | $78.08 | $63.39 | $7,987.14 | **-18.8%** | $-1,850.94 |
+
+### 📊 當日總結 (BJT 2026-08-31, since 00:00 BJT)
+- **Buy signals:** 0 (all 4 of today's crons: 01:00 / 03:00 / 03:30 / 22:01)
+- **SL triggers:** 0
+- **TP1 fires:** 0
+- **TP2 fires:** 0
+- **Total trades:** 0
+- **帳戶總值 (FIFO recompute):** **$98,240.47** (cash $207.40 + MV $98,033.07, P-MR-272 + P-MR-214)
+- **Unrealized PnL (cost basis):** **$+4,426.37 (+4.73%)**
+- **All-time realized (FIFO):** $+1,212.94 (147 closed trades, unchanged)
+- **Session realized (last 25 trades):** $+2,934.13 (unchanged)
+- **Notes updated:** true (this section appended; P-MR-101 0-trigger reporting rule satisfied)
+- **Day-boundary reset:** NO — same BJT day as 03:30 (both 2026-08-31). Counters carry forward (P-MR-185/201): zt 3→4, cf 0→0.
+- **P-MR-286 RESOLVED:** yfinance feed back online (92 stocks analyzed vs 0 during outage).
+- **Next cron watch:** PATH OVER TP2 watch (P-MR-279/284/282) — gap $5.51 to TP2 trigger $23.82; manual-close operator discretion per P-MR-279.
+
+### 📊 Cash Trajectory (last 5 crons)
+- 2026-08-27 22:04 → $207.40 (P-MR-244 inter-scan drift watch baseline)
+- 2026-08-28 22:01 → $207.40 (same-day carry)
+- 2026-08-28 23:02 → $207.40 (P-MR-282 PATH acceleration peak)
+- 2026-08-31 01:00 → $207.40 (P-MR-286 outage 1st obs)
+- 2026-08-31 03:00 → $207.40 (P-MR-286 outage 2nd obs)
+- 2026-08-31 03:30 → $207.40 (P-MR-286 outage 3rd obs)
+- **2026-08-31 22:01 → $207.40** (P-MR-286 RESOLVED, 11 consecutive crons at floor)
+
+### 🔖 Watch Items
+- **P-MR-279/284 PATH OVER TP2 watch** — PATH at +53.74% (slight pullback from 8/28 peak +54.58%), TP2 trigger $23.82, gap $5.51; manual-close operator discretion per P-MR-279.
+- **P-MR-144 cash-floor saturation** — 11 consecutive crons at $207.40 cash floor; saturation deep but no candidates emerge even with resolved feed.
+- **P-MR-260 bb_lo fix healthy** — 92 stocks analyzed (vs 0 during outage period); structural pool-loop fix from 8/25 still working.
+- **No new trades, no new signals** — clean textbook 0-trigger post-holiday scan.
