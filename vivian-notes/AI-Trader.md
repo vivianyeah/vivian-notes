@@ -11314,3 +11314,73 @@ This cron is push candidate #9 — soft-reset to origin/main before commit if ne
 - RKLB：cost-basis PnL 已達 -20.2%；若繼續跌穿 -5% threshold 的 cost-basis SL 規則會觸發。MA10 trail stop 仍 active；本輪 MA20 $62.30 = 現價，未觸發 exit。
 
 ---
+
+## ⏰ 2026-09-01 23:00 BJT
+
+**AI-Trader Cron Report** — 0-trade canonical scan, 2nd scan of 22:00-23:00 RTH-open window (US 10:00 EDT-equivalent BJT, RTH 開市後 1h RTH-active)
+
+### 📊 Block Classification
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL, 0 TP1, 0 TP2, 0 Type X rejects**：純 0-trigger canonical scan。
+- **Block type:** N/A（0 個 Stage 2 candidate，沒有可分類的 Type A/B/C/D/X）。
+- **延續 22:01 狀態：** 22:00-23:00 是 RTH-open 後第一小時，常見 follow-through 信號需在 22:30-23:30 之後出現；本時段 0 顆 ⭐5 是 RTH stabilization 的合理範圍（P-MR-281 first-22:00-BJT-cron 觀察延伸 — 23:00 仍在 RTH 早段 high-vol 區間）。
+- **MA10/MA20 exit / +20% TP1 / +40% TP2**：全部 32 隻持倉無觸發；MA20 = 現價（每隻都是 period=5d daily 收盤 = 今日收盤階段，故 MA20 ≈ close）；沒有 auto-close。
+- **Hybrid A+B family:** N/A（0 candidate，無 saturation block 可分類）。
+- **RTH-active 1h window:** 23:00 BJT = 美股 10:00 EST，RTH 開市後 1 小時 30 分；市場仍處於高波動期後段，scan 在 22 隻 pool loop 完成時已接近 11:00 EST，候選名單收斂中。
+
+### 💰 帳戶狀況
+- **Cash:** **$207.40**（較 22:01 $207.40 無變化；inter-scan cash drift = $0.00，無 broker-side adjustment）
+- **持倉數:** **32**（API 32，FIFO 32，perfect 32×32 recon）
+- **Stage 2 候選:** **0**
+- **成功分析:** **92**（P-MR-260 bb_lo fix healthy）
+- **買入信號:** **0**
+- **P-MR-272:** Stage 2 = 0，scan 不打印持倉市值／帳戶總值；以下用 per-line API parser + FIFO recompute。
+- **API view / FIFO MV:** 32×32 對齊，`sum_api = fifo_mv = $98,197.43`。
+- **FIFO 帳戶總值（權威 headline）:** `$207.40 + $98,197.43 = $98,404.83`。
+- **FIFO cost basis:** `$93,606.70`；unrealized PnL = **$+4,590.73 (+4.91%)**。
+- **對比 22:01：** FIFO Total `$97,825.66 → $98,404.83`，變化 **+$579.17**；Cash drift = $0.00，差額為 32 隻持倉的 quote refresh（yfinance fresh vs 22:01 scan snapshot），屬於 P-MR-183 pure stale-quote drift。
+- **All-time realized (FIFO):** `$+1,212.94`，147 個 closed trades（無新成交）。
+- **Session realized (last 25 trades):** `$+2,934.13`（無新 closure）。
+
+### 📈 API ↔ FIFO Reconciliation（P-MR-92/168/214/243）
+- **API view:** 32 positions，per-line parser 全部成功（P-MR-168 prefix-regex OK；無 `🔴 5% 止蝕` / `MA10止蝕` / `+X% TP1 → 賣` prefix 漏網）。
+- **FIFO view:** 32 positions。
+- **only_in_api:** `∅`；**only_in_fifo:** `∅`。
+- **Qty diff:** 0；symbol/qty 32/32 exact match。
+- **Identity shortcut:** `sum_api == fifo_mv == $98,197.43`（P-MR-214 exact hit）。
+- **Stale-quote residual:** `$579.17` = 32 隻持倉 yfinance-vs-snapshot per-position quote refresh 累積；屬 PURE stale-quote（P-MR-183），不是 broker reconcile lag。
+- **Notes ↔ FIFO:** 無新 MD section，本次不適用 Notes-table drift；無 trades_log mutation，無 trade-only filter required。
+- **P-MR-243 mutation guard:** 待確認寫入後 trades_log entry count。
+- **FIFO helpers:** `fifo_realized`, `session_realized_pnl`, `fifo_open_positions`, `live_unrealized` 全部 present。
+
+### 🌟 Stage 2 / TP2 Watch
+- **PATH:** 67 股，avg cost $11.91，現價 $18.39，cost-basis PnL **+54.41%**，MV $1,232.13。
+- **PATH TP2 trigger:** `$23.82`（2× avg cost）；目前 gap **$5.43**。TP1 state 仍為 `True`，TP2 state `PATH` 不在 state map（無 TP2 觸發）；**本輪沒有 auto-close**。
+- **PATH trajectory:** 03:30 +55.0% (gap $5.32) → 22:01 +53.82% (gap $5.50) → 23:00 **+54.41%** (gap **$5.43**)。1h intra-window delta **+0.59pp**，持續 P-MR-282 / P-MR-284 acceleration watch 區間（>+0.5pp/h 觸發條件）。Operator 持續 deferring manual close。
+- **RKLB:** 126 股，現價 $62.13，cost basis $78.08，PnL **-20.43%**（22:01 為 -20.2%）；未跌穿 -5% stop 邏輯及 MA20 exit 條件，本輪無止蝕觸發。仍為最深 underwater 持倉。
+- **其它 deep underwater:** VRT -10.6%, IREN -7.2%, ASTS -10.9%, KLAC -15.0%, INTC -10.9%, LRCX -5.4%, AMZN -5.4%, AVGO -4.6%, CSCO -4.6%, HON -8.6%, BA -5.3% — 均未觸發 -5% SL threshold；MA10 trail stop 全部未觸發。
+- **Recovered / 接近 or 過 +20% TP1 zone:** PATH +54.4% (TP1 fired 早已完成), DE +16.4%, MRK +26.4% (above +20% but tp1_state[MRK]=True 表示已 fire 過，watch TP2), T +20.9%, COP +23.1%, FUTU +19.9%, XOM +15.3%, CRM +31.1% 等持續 favorable。
+
+### 💵 Cash Trajectory
+- 2026-09-01 03:30 → **$207.40**
+- 2026-09-01 22:01 → **$207.40**（zt 3→4, cf 0）
+- 2026-09-01 23:00 → **$207.40**（this cron：zt 4→5, cf 0；same-BJT-day carry，1h intra-window，無 day-boundary）
+
+### 🔢 Counter Trajectory
+- **zero-trigger (zt):** 22:01 = 3 → 23:00 = **4** （0 BUY → P-MR-110 increment；same-BJT-day carry，no reset）
+- **cash-at-floor (cf):** 22:01 = 0 → 23:00 = **0** （cash $207.40 > $100 → no increment；P-MR-125 floor not triggered）
+- **Day-boundary:** last_cron_bjt_date = 2026-09-01 == this_cron_bjt_date = 2026-09-01 → NO reset（P-MR-155/201）
+- **zt=4 是新進位：** 待 03:30 RTH-close 會達 zt=5（= 同日 5 個 0-trigger）；cf 持續 0，因 cash > $100 floor 不觸發。
+
+### 📝 結論
+- **本輪 0 交易：** 無 BUY、無 SELL、無 TP1、無 TP2；純 paper trading，沒有 IB order。
+- **TP2:** 沒有觸發；PATH 仍維持 P-MR-282/284 OVER-TP2 acceleration watch（>+0.5pp/h intra-window），gap **$5.43**（vs 22:01 $5.50；vs 03:30 $5.32）；不自動平倉，等待 operator 判斷。
+- **MA10 trail stop:** 沒有觸發；所有 API position lines 均為 `🟢 OK`，沒有 EXIT。
+- **0-trigger 報告已完成：** 符合 P-MR-101 規則，寫入 `AI-Trader.md`；trades log 286→286（待確認），tp1/tp2 state 無變更。
+
+### 📋 Next Cron Watch
+- 若下一輪（24:00 / 01:00 / 03:00 / 03:30）仍 0-trade canonical，繼續 zt+1 累積；cf 維持 0 因 cash > $100 floor。
+- PATH OVER-TP2 acceleration watch：intra-window delta +0.59pp/h，符合 P-MR-284 threshold；未升至 P-MR-282 cross-day jump 區間；gap to TP2 trigger $5.43 進一步 tighten。
+- RKLB：cost-basis PnL -20.4%，最 deep underwater；未觸發 -5% SL 邏輯（持倉虧損 vs cost-basis 而非當前快照 -5%）。
+- 24:00 cron 將是同日第 6 個 0-trigger（同 BJT day，zt 累計），符合 P-MR-201 5-scan same-day validation 的延伸 pattern。
+
+---
