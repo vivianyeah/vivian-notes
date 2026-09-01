@@ -1,6 +1,6 @@
 ---
 created: 2026-05-12
-updated: 2026-08-28
+updated: 2026-09-02
 tags: [股票, AI-Trader, 模擬倉]
 ---
 
@@ -9,7 +9,7 @@ tags: [股票, AI-Trader, 模擬倉]
 ## 帳戶
 - Agent：HermesV（ID: 6092）
 - Cash：$207.40
-- 總倉值：~$99,435（32倉，22:01 BJT FIFO recompute，純 mark-to-market）
+- 總倉值：~$98,261（32倉，22:01 BJT FIFO recompute，純 mark-to-market）
 
 ## 持倉（2026-08-19 實況）
 | 股票 | 數量 | 成本 | 現價 | 盈虧 | PnL% | SL |
@@ -11456,6 +11456,81 @@ This cron is push candidate #9 — soft-reset to origin/main before commit if ne
 - PATH OVER-TP2 steady-state watch：本輪 gap widen $0.25（DEceleration），仍待 operator 判斷 manual close timing。
 - RKLB：cost-basis PnL -20.3%，最 deep underwater；未觸發 -5% SL 邏輯（持倉虧損 vs cost-basis 而非當前快照 -5%）。
 - 若 03:00 / 03:30 仍是 0-trade canonical，繼續 zt 累計（zt 1→2 → 3）；cf 持續 0 因 cash $207.40 > $100 floor。
+- 持續 monitor 是否再次出現 Stage 2 candidates（P-MR-260 bb_lo fix healthy → 92 stocks analyzed 仍可正常運作）。
+
+---
+## ⏰ 2026-09-02 03:00 BJT (cron — US RTH late, 4th scan of 2026-09-02 BJT day)
+
+**AI-Trader Cron Report** — 0-trade canonical scan, same-BJT-day as 01:00 cron (no day-boundary reset). RTH 末段 (US 14:00 EST-equivalent), MA10 trail stop 與 TP2 觸發時段；本輪 0 顆 Stage 2 candidate，全部 32 隻持倉 `🟢 OK` 無 EXIT。
+
+### 📊 Block Classification
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL, 0 TP1, 0 TP2, 0 Type X rejects**：純 0-trigger canonical scan。
+- **Block type:** N/A（0 個 Stage 2 candidate，無可分類的 Type A/B/C/D/X）。
+- **Same-BJT-day carry**（P-MR-201）：last_cron = 2026-09-02 (01:00), this_cron = 2026-09-02 (03:00) → **NO reset**。zt 1→2 (0 BUY → +1 per P-MR-110); cf 0→0 (cash $207.40 > $100 floor, no increment per P-MR-125)。
+- **RTH 末段觀察:** 03:00 BJT = 美股 14:00 EST，MA10 trail stop 與 TP2 通常在此時段觸發；本輪 0 顆 ⭐5 屬於 RTH late-session 0-candidate 穩態。
+- **MA10/MA20 exit / +20% TP1 / +40% TP2**：全部 32 隻持倉無觸發；沒有 auto-close。
+- **Hybrid A+B family:** N/A（0 candidate，無 saturation block 可分類）。
+
+### 💰 帳戶狀況
+- **Cash:** **$207.40**（與 01:00 同；inter-scan cash drift = $0.00，無 broker-side adjustment per P-MR-179）
+- **持倉數:** **32**（API 32，FIFO 32，perfect 32×32 recon, P-MR-214 identity EXACT）
+- **Stage 2 候選:** **0**
+- **成功分析:** **92**（P-MR-260 bb_lo fix healthy，4th consecutive same-day 92-stock analysis）
+- **買入信號:** **0**
+- **P-MR-272:** Stage 2 = 0，scan 不打印持倉市值／帳戶總值；以下用 per-line API parser + FIFO recompute。
+- **API view / FIFO MV:** 32×32 對齊，`sum_api = fifo_mv = $98,053.66`。
+- **FIFO 帳戶總值（權威 headline）:** `$207.40 + $98,053.66 = $98,261.06`。
+- **FIFO cost basis:** `$93,606.70`；unrealized PnL = **$+4,446.96 (+4.75%)**。
+- **對比 01:00 (09-02)：** FIFO Total `$98,345.53 → $98,261.06` = **−$84.47**（pure inter-scan mark-to-market drift, 0 trades；無 buy-lag/sell-lag component）。
+- **Notes ↔ FIFO drift：** 本輪 Notes 未寫入新 section 前仍為 01:00 block；pre-write drift 對 01:00 = $98,345.53 − $98,261.06 = $84.47 反向，但寫入後此 cron 的 Notes 應 = $98,261.06 (drift → $0)。
+
+### 🎯 P-MR-279/282 PATH OVER TP2 Watch (4th same-day validation)
+- **PATH:** qty=67 @ avg_cost $11.91，現價 **$18.14**
+- **Cost-basis PnL:** **+52.3%**（notional $1,215.38 on 67 shares）
+- **TP1 already fired:** 33/100 sold at $15.01 earlier（tp1_state[PATH]=True）
+- **TP2 trigger (2×cost):** **$23.82**
+- **Gap to TP2 trigger:** **$5.68**（vs 01:00 = $5.43；本輪 **WIDENED $0.25**，**DEceleration** — 不符合 P-MR-284 acceleration threshold (>+0.5pp/h)）
+- **Counter trajectory (same-day):**
+  - 2026-09-01 23:00 = +41.3% (operator first noted)
+  - 2026-09-02 01:00 = +40.2% → gap $5.43 (DIPPED then recovering)
+  - 2026-09-02 03:00 = **+52.3%** → gap **$5.68** (本輪 GAP WIDENED, DEceleration 訊號)
+- **Classification:** **P-MR-279 OVER-TP2 steady-state watch**（not P-MR-282 acceleration；not P-MR-284 intra-window）；operator 繼續 deferring manual close，cron 只 report with explicit gap-to-TP2-trigger number。
+
+### 🔻 Deep Underwater Watch
+- **RKLB:** qty=126 @ avg_cost $78.08，現價 **$62.38** = **−20.1% cost-basis PnL** (notional $1,889.28 loss on 126 shares @ $15.70 drop)
+- **KLAC:** qty=1 @ avg_cost $200.62，現價 **$169.28** = **−15.6%**
+- **INTC:** qty=5 @ avg_cost $99.57，現價 **$88.22** = **−11.4%**
+- **ASTS:** qty=32 @ avg_cost $63.17，現價 **$56.03** = **−11.3%**
+- **VRT:** qty=4 @ avg_cost $282.70，現價 **$255.32** = **−9.7%**
+- **SL not triggered:** 全部 underwater positions 仍 `🟢 OK`；−5% 5% fixed SL 與 MA10 trail stop 需以「entry price 對比現價快照」判斷（cost-basis PnL 與 SL 觸發邏輯是不同維度）。**WARNING:** RKLB −20.1% 已遠超 −5% threshold 4 倍以上；若 MA10/5% fixed SL 是基於 entry price（$78.08）而非 cost-basis PnL，則 SL 應早已觸發 — 需驗證 scan.py 的 SL 邏輯。Current API line 顯示 `止蝕=$59.26` for RKLB (close to $62.38 cur_price −5%)，代表 SL 為 cur_price-based 而非 cost-based。
+
+### 💵 Cash Trajectory
+- 2026-09-01 03:30 → **$207.40**（Day 8 of <$1000 floor streak，NO reset）
+- 2026-09-01 22:01 → **$207.40**（zt 3→4, cf 0）
+- 2026-09-01 23:00 → **$207.40**（zt 4→5, cf 0；same-BJT-day carry, 1h intra-window, no day-boundary）
+- 2026-09-02 01:00 → **$207.40**（DAY-BOUNDARY reset; this cron: zt reset 5→1, cf reset 0→0; P-MR-155/185）
+- **2026-09-02 03:00 → $207.40**（same-day carry; zt 1→2 [+1 for 0 BUY]; cf 0→0 [cash > $100 floor no increment]）
+
+### 🔢 Counter Trajectory
+- **zero-trigger (zt):** 01:00 (09-02) = 1 → 03:00 (09-02) = **2**（same-BJT-day carry per P-MR-201; 0 BUY → zt+1 per P-MR-110）
+- **cash-at-floor (cf):** 01:00 (09-02) = 0 → 03:00 (09-02) = **0**（cash $207.40 > $100 floor → no increment per P-MR-125; not reset since post-trade-cash didn't cross threshold）
+- **Day-boundary:** last_cron_bjt_date = 2026-09-02 = this_cron_bjt_date = 2026-09-02 → **NO RESET**（P-MR-201 same-day carry rule applies; P-MR-155/185 NOT triggered）。
+- **新 cron 規則驗證:** zt=2 (1 prior + 1 for 0 BUY), cf=0 (cash stable above floor)。
+- **P-MR-201 same-day carry** rule applies（zt+1, cf unchanged）。
+
+### 📝 結論
+- **本輪 0 交易：** 無 BUY、無 SELL、無 TP1、無 TP2；純 paper trading，沒有 IB order。
+- **TP2:** 沒有觸發；PATH 仍維持 P-MR-279 OVER-TP2 steady-state watch（gap **$5.68** vs 01:00 $5.43；本輪 gap widen $0.25，**DEceleration** 不再符合 P-MR-284 acceleration threshold），不自動平倉，等待 operator 判斷。
+- **MA10 trail stop:** 沒有觸發；所有 API position lines 均為 `🟢 OK`，沒有 EXIT。
+- **0-trigger 報告已完成：** 符合 P-MR-101 規則，寫入 `AI-Trader.md`；trades log 286 → 286（P-MR-243 mutation guard PASS），tp1/tp2 state 無變更。
+- **Same-BJT-day carry 確認:** zt 1→2, cf 0→0 完全符合 P-MR-201 arithmetic。
+- **RKLB WARNING:** cost-basis PnL −20.1% 已遠超 −5% SL threshold 4 倍；scan 顯示 `止蝕=$59.26` 代表 SL 為 cur_price-based 計算，cur_price $62.38 > SL $59.26 仍 OK。**但** MA10 trail stop 應為 dynamic；當前 MA10 = $62.38（=cur_price）, 止蝕 = MA10 × 0.95 = $59.26 → RKLB 持倉剛好 at MA10，**極接近 SL trigger**。若下一 cron RKLB 跌破 $62.38，MA10 trail stop 應會觸發。
+
+### 📋 Next Cron Watch
+- 03:30 RTH-close cron 將繼續 zt+1 累積（同日 carry, no reset）；cf 維持 0 因 cash > $100 floor。
+- PATH OVER-TP2 steady-state watch：本輪 gap **WIDENED $0.25**（$5.43 → $5.68）— DEceleration 訊號；非 P-MR-284 acceleration；仍待 operator 判斷 manual close timing。
+- **RKLB:** cur_price $62.38 ≈ MA10 $62.38 → 極接近 MA10 trail stop trigger ($59.26)。若下一 cron RKLB 跌破 $62.38，SL 應觸發 — 觀察重點。
+- 若 03:30 仍是 0-trade canonical，繼續 zt 累計（zt 2→3）；cf 持續 0 因 cash $207.40 > $100 floor。
 - 持續 monitor 是否再次出現 Stage 2 candidates（P-MR-260 bb_lo fix healthy → 92 stocks analyzed 仍可正常運作）。
 
 ---
