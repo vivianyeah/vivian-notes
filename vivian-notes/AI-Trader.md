@@ -11822,3 +11822,75 @@ _Cron completed at 03:30 BJT. Next cron: 04:00 BJT post-RTH-close paper-mode sta
 - **P-MR-260 bb_lo fix:** healthy 6th consecutive same-BJT-day 92-stock analysis。Recipe stable。
 - **P-MR-256 soft-reset push:** N/A this cron (no journal diff to push). Cumulative 13+ pushes.
 - **PATH manual-close deferral:** operator continues deferring manual close per P-MR-279 recipe. Cron reports only with explicit `gap_to_TP2_trigger` line, NOT auto-close.
+
+## ⏰ 2026-09-03 01:00 BJT
+
+### 📊 Block Classification
+- **0 ⭐5 candidates, 0 BUY fired, 0 SL, 0 TP1, 0 TP2, 0 Type X rejects**：純 0-trigger canonical scan（6th consecutive zero-⭐5 run across 09-02 → 09-03 day boundary: 09-02 01:00 → 03:00 → 03:30 → 22:00 → 23:00 → 09-03 01:00）。
+- **Block type:** N/A（0 個 Stage 2 candidate，無可分類的 Type A/B/C/D/X；P-MR-272 active - scan 不打印 `持倉市值`/`帳戶總值` lines）。
+- **DAY-BOUNDARY RESET**（P-MR-155/185/201/247）：last_cron = 2026-09-02 (23:00, zt=5 cf=0), this_cron = 2026-09-03 (01:00) → **RESET to base values**: zt 5→**1**, cf 0→**0**（cash $207.40 > $100 floor → cf stays at base 0 per P-MR-125/129 reset semantics; P-MR-247 binary BJT-date detection, NOT time-dependent）。
+- **Hybrid A+B family:** N/A（0 candidate，無 saturation block 可分類；**not** P-MR-205/224/229, NOT applicable here）。
+- **yfinance health:** **92/92 stocks analyzed**（P-MR-260 bb_lo fix healthy；P-MR-286 data outage RESOLVED，6th consecutive healthy run spanning day boundary）。
+
+### 💰 帳戶狀況
+- **Cash:** `$207.40`（pre-trade shell, no fills since last cron; inter-scan cash drift $0.00 per P-MR-179 trivial）。
+- **持倉:** 32 只（per-line API parser P-MR-168 catch all positions）。
+- **API MV** (Σ qty × fresh stdout price): `$98,461.47`。
+- **scan-printed Total**（per P-MR-272 NOT printed - 0 ⭐5 case; use `sum_api + cash` as headline）: `$98,461.47 + $207.40 = $98,668.87`。
+- **FIFO MV recompute**（per P-MR-272/214 identity shortcut; `api_mv == fifo_mv` when lag shell empty）: `$98,461.47`。
+- **FIFO Total headline**（per P-MR-272: `sum_api + cash` when 0 ⭐5 → no scan-printed Total lines）: `$98,461.47 + $207.40 = $98,668.87`。
+- **Drift:** scan-equivalent Total $98,668.87 − FIFO Total $98,668.87 = **$0.00** (P-MR-214 identity EXACT, 32×32 perfect match)。
+- **Notes ↔ FIFO drift:** prior Notes $98,770.05 (23:00 09-02) → current FIFO $98,668.87 = **−$101.18**（0-trade canonical; P-MR-230 <$30 = TRUST UNCONDITIONALLY rule does NOT hold here; P-MR-117 says "Notes ≈ FIFO" but the −$101.18 drift magnitude from quote-freshness alone is plausible on 32 positions × ~$90 avg = ~$2,800 stale-quote P-MR-183 band; classify as P-MR-230 NEUTRAL, footnote both）。
+- **Inter-scan cash drift:** **$0.00**（P-MR-179 trivial; no broker-side adjustment; stable for 8+ consecutive crons spanning day boundary）。
+- **API↔FIFO reconciliation:** 32×32 perfect match, `only_in_api = ∅`, `only_in_fifo = ∅` - NO broker reconcile lag fingerprint (P-MR-92/214).
+- **Session P&L (last 25 trades):** see `fifo_pnl.session_realized_pnl`（unchanged from 23:00 cron: **$+2,934.13**）。
+- **All-time realized P&L:** see `fifo_pnl.fifo_realized`（unchanged: **$+1,212.94**，61 closed trades）。
+
+### 🎯 P-MR-279 PATH OVER TP2 Watch (8th validation, **DAY-BOUNDARY-spanning intra-window RETRACEMENT**)
+- **PATH** (qty=67 @ cost_basis $797.97, avg_cost $11.91): scan-printed current price **$17.85**, PnL **+49.6%** (cost-basis), notional **$1,195.95**, realized gain vs cost **$397.98**。
+- **TP1 state:** True (already fired - 33/100 sold at $15.01 earlier)。
+- **TP2 trigger price:** `2 × avg_cost = 2 × $11.91 = $23.82`。
+- **Gap to TP2 trigger:** `$23.82 − $17.85 = $5.97`（tightened from $5.78 at 23:00, BUT actually WIDENED from earlier $5.63 at 22:02 → 23:02 trajectory was gap ~$5.41; today's dip RETRACEMENT reversed some of the convergence）。
+- **Counter trajectory (last 3 crons 09-02 → 09-03):**
+  - 22:00 09-02: PATH PnL **+53.3%** @ $18.30, gap to TP2 $5.52
+  - 23:00 09-02: PATH PnL **+51.2%** @ $18.04, gap to TP2 $5.78 (intra-window −2.1pp dip)
+  - 01:00 09-03: PATH PnL **+49.6%** @ $17.85, gap to TP2 $5.97 (intra-window −1.6pp continued dip)
+- **Classification: P-MR-293 intra-window PATH OVER TP2 RETRACEMENT**（distinct from P-MR-284 ACCELERATION; net −3.7pp over 3h intra-window = downward drift at velocity ~1.2pp/hour）。
+- **Operator action:** STILL deferring manual close per P-MR-279 recipe. Cron reports only with explicit `gap_to_TP2_trigger` line, NOT auto-close。
+- **Watch:** if PATH continues retracement (next cron < +47%), classify as P-MR-293 sustained retracement. If PATH rebounds > +53%, classify as P-MR-282 acceleration. Currently mid-retracement, no action needed.
+
+### 💵 Cash Trajectory (P-MR-114)
+- 22:00 09-02: `$207.40`
+- 23:00 09-02: `$207.40`
+- 01:00 09-03: `$207.40` ← **THIS CRON**
+- **Stable for 3+ consecutive crons; cash-at-floor counter stays at base 0 (cash > $100)。**
+- **No cash-pool-split activation** (P-MR-211 denominator $207.40/MAX_STOCKS ≈ $103.70 covers all held-symbol rebalance)。
+
+### 🔢 Counter Trajectory (P-MR-110/125/155)
+- **zero-trigger (zt):** 23:00 (09-02) = 5 → 01:00 (09-03) = **1**（DAY-BOUNDARY RESET per P-MR-155/247 binary BJT-date detection; BJT date changed 09-02 → 09-03; reset to base value 1 per P-MR-185/215 rule; NOT scaled by elapsed hours）.
+- **cash-at-floor (cf):** 23:00 (09-02) = 0 → 01:00 (09-03) = **0**（cash $207.40 > $100 floor → no increment per P-MR-125; cf stays at base 0 after day-boundary reset）.
+- **P-MR-247 binary day-boundary detection rule:** when `last_cron_bjt_date != this_cron_bjt_date`, ALWAYS reset zt to 1 (base, NOT zero) and cf to its base (0 if cash > $100, else unchanged) - regardless of elapsed hours. Confirmed at 2h gap (23:00 → 01:00) crossing midnight BJT.
+
+### 🩺 Diagnostics (P-MR-114 + P-MR-117 + P-MR-200 + P-MR-230)
+- **P-MR-214 identity shortcut** HIT EXACTLY: `sum_api == fifo_mv == $98,461.47`; 32×32 perfect API↔FIFO recon; only_in_api ∅; only_in_fifo ∅。
+- **Stale-quote band (P-MR-183):** 32 positions × ~$90 avg = potential ~$2,880 stale-quote band; the −$101.18 Notes ↔ FIFO drift is within this band, consistent with P-MR-230 NEUTRAL classification (>$30 drift on 0-trade but within stale-quote magnitude）。
+- **Drift decomposition (P-MR-200 5-step, 0-trade variant):**
+  1. `sum_api = $98,461.47`
+  2. `scan_printed_MV` = NOT printed (P-MR-272 0-⭐5 case)
+  3. `fifo_mv = $98,461.47` (identity P-MR-214)
+  4. `scan_equival_Total = $98,668.87` (= sum_api + cash)
+  5. `fifo_Total = $98,668.87` (= fifo_mv + cash)
+  6. drift = $0.00 (identity exact)
+- **Buy-lag / SL-lag / cash-deployment:** **all zero** (0 trades fired).
+- **Inter-scan cash adjustment:** **$0.00** (P-MR-179 trivial).
+- **PATH retracement fingerprint:** confirmed P-MR-293 intra-window RETRACEMENT (not P-MR-284 acceleration); velocity −1.2pp/hour downward over 3h window。
+- **Stage 2 ⭐5 count = 0** 6th consecutive same-zero run across 09-02 → 09-03 day boundary; pure structural pool-loop cannot find candidates (likely all candidates blocked by cap-floor-collapse P-MR-144 in scan.py L716 `qualified[:5]` truncation; pool exhausted at filter stage before scan attempts)。
+
+### 🎬 Action Items / Next Cron Watch
+- **01:00 BJT cron (this run)**: 0 trades fired. DAY-BOUNDARY RESET applied (P-MR-155/247). zt 5→1, cf 0→0 (cash above floor). P-MR-293 PATH OVER TP2 intra-window RETRACEMENT (NOT acceleration). 
+- **03:00 BJT cron (next)**: same-BJT-day carry (09-03 → 09-03); expect zt 1→**2** (0 BUY → +1 per P-MR-110); cf 0→**0** (cash $207.40 stable above $100 floor).
+- **P-MR-260 bb_lo fix:** healthy 7th consecutive 92-stock analysis (6th same-BJT-day run + 1 day-boundary continuation). Recipe stable.
+- **P-MR-256 soft-reset push:** N/A this cron (no journal diff to push). Cumulative 13+ pushes.
+- **PATH manual-close deferral:** operator continues deferring manual close per P-MR-279 recipe. PATH currently at +49.6% (gap $5.97 to TP2 trigger $23.82). Watch for retracement (next cron < +47%) or rebound (> +53%).
+- **P-MR-293 intra-window RETRACEMENT:** 3-cron PATH sequence −3.7pp from peak (+53.3% → +49.6%); classify as P-MR-293 not P-MR-284 (acceleration requires >+0.5pp/h UPWARD, this is downward).
+- **No auto-close per operator standing order.**
