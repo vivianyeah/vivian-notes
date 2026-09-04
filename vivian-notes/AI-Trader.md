@@ -12228,7 +12228,7 @@ _Cron completed at 03:30 BJT. Next cron: 04:00 BJT post-RTH-close paper-mode sta
 - **23:00 BJT cron (next, 2026-09-04 RTH open):** 1.5h later. All 32 positions MA10 trail stop re-evaluate. PATH TP2 trigger at $23.82 still pending (gap $8.31); if PATH recovers back above $18 (gap closes to $5.82), classify back to P-MR-279 OVER TP2 watch; if continues lower (e.g. below $13 avg_cost threshold), classify as P-MR-275 SL-zone exit pattern watch。
 - **If market regime shifts** (RSI breakouts, MA10-pullback setups in 92-stock pool), Stage 2 may populate and break the 14-run zero-⭐5 streak (P-MR-294 14th validation; structural pattern observed across 2 BJT days)。
 - **PATH position RE-ENTRY to normal TP1-fired-but-not-TP2 zone** — gap $8.31 widened significantly; sustained retracement may continue. Watch for either (a) recovery back to +40% PnL zone = P-MR-279 OVER TP2 re-activation, or (b) further pullback below $14 = P-MR-275 SL-zone exit watch。
-- **P-MR-256 push** (pending) — current cron commit → soft-reset push #13 cumulative。
+- **P-MR-256 push** (✓ DONE) — commit `f797338` → soft-reset push #16 cumulative SUCCESS。
 
 ### 📦 State Files Updated
 - `/tmp/ai_trader_trades_log.json` — unchanged (286 entries, 0 new)
@@ -12246,4 +12246,4 @@ _Cron completed at 03:30 BJT. Next cron: 04:00 BJT post-RTH-close paper-mode sta
 - **P-MR-294 retracement**: PATH OVER TP2 pullback from +53.32% → +30.23% (deepest single-window retracement on record; gap widened $5.56 → $8.31)
 - **P-MR-183**: stale-quote drift is PURE (no buy-lag/sell-lag components given perfect API=FIFO recon + 0 trades)
 - **P-MR-260**: bb_lo fix healthy (92 stocks analyzed, no NameError)
-- **P-MR-256**: push #13 cumulative soft-reset recipe (待 this cron's commit → push)
+- **P-MR-256**: push #16 cumulative soft-reset recipe (✓ DONE — commit f797338 → origin/main, push SUCCESS)
