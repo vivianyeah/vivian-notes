@@ -12247,3 +12247,176 @@ _Cron completed at 03:30 BJT. Next cron: 04:00 BJT post-RTH-close paper-mode sta
 - **P-MR-183**: stale-quote drift is PURE (no buy-lag/sell-lag components given perfect API=FIFO recon + 0 trades)
 - **P-MR-260**: bb_lo fix healthy (92 stocks analyzed, no NameError)
 - **P-MR-256**: push #16 cumulative soft-reset recipe (✓ DONE — commit f797338 → origin/main, push SUCCESS)
+
+## ⏰ 2026-09-04 23:00 BJT
+
+**Status**: 0 trades fired — pure 0-trigger canonical scan
+**Session Realized P&L**: $4,880.58
+**Live Unrealized**: $7,335.12 (+7.83% on $93,606.70 cost basis)
+**Notes Total**: $101,149.22 (Cash $207.40 + MV $100,941.82)
+**FIFO Total (cost-basis)**: $93,814.10 (Cash $207.40 + Cost Basis $93,606.70)
+**Notes ↔ FIFO drift**: $7,335.12 — **PURE stale-quote** (P-MR-214 identity hit, all 32 positions matched qty=100%)
+
+### 1. 帳戶 (Account)
+- Cash: $207.40 (no change from 22:00 cron)
+- Positions: 32 只 (no change)
+- 持倉市值 (Notes / API MV): $100,941.82
+- Cost Basis MV (FIFO): $93,606.70
+- 帳戶總值 (Notes): $101,149.22
+- Inter-scan drift vs 22:00 ($98,709.00): +$2,440.22 (RTH open +30min momentum, all positions moved higher except KLAC/HON/RKLB)
+
+### 2. 訊號 (Signals)
+- 成功分析: 92 只
+- Stage 2 候選: **0 只** (15th consec zero-⭐5 streak per P-MR-294)
+- 買入信號: 0 只
+- SL/TP fires: 0
+
+### 3. Block Classification
+**P-MR-272 active** — scan.py suppresses Stage 2 announcements when ⭐5 count == 0
+**15th consecutive zero-⭐5 structural pool-loop 0-trigger streak** (continuation of P-MR-294 pattern)
+- Top-of-book candidates all in held positions (PATH/CRM/HOOD/MRK/SNDK all near or above +20% TP1 zone)
+- No fresh ⭐5 candidates triggered in last 2 scans (22:00 → 23:00 gap 51min)
+
+### 4. Position Reconciliation
+- API positions: 32, FIFO positions: 32 — **EXACT match** (P-MR-214 identity)
+- only_in_api: ∅
+- only_in_fifo: ∅
+- Drift decomposition: Notes ↔ FIFO $7,335.12 = 100% pure stale-quote (P-MR-183)
+
+### 5. Counter Trajectory
+- **zero_trigger**: prior=5, current=6 (P-MR-110: 0 BUY → +1; same-BJT-day carry P-MR-201)
+- **cash_at_floor**: prior=0, current=0 (P-MR-125: cash $207.40 > $100 → no increment)
+- Day boundary: NOT applied (same BJT date 2026-09-04 vs 22:00 cron 2026-09-04)
+
+### 6. PATH OVER TP2 Watch (P-MR-279/282/294)
+- PATH qty=67, avg_cost $11.91
+- Current price: $15.72 (vs 22:00 cron $15.51, +1.4%)
+- **Cost-basis PnL**: +31.99% (vs 22:00 cron +29.9%, +2.1pp intra-window)
+- TP1 already fired (33/100 sold at $15.01 earlier)
+- TP2 trigger: $23.82 (2× avg_cost)
+- Gap to TP2: $8.10 (vs 22:00 cron $8.31, tightened $0.21 in 51min)
+- Velocity: +2.1pp/51min = +2.47pp/hour (intra-window acceleration sustained)
+- **Classification**: P-MR-294 PATH RESUMPTION from retracement (was at +30.23% at 22:00; climbing back toward OVER TP2 zone at +40%+)
+
+### 7. Cash Trajectory
+- 22:00 cron: Cash $207.40, cf=0
+- 23:00 cron: Cash $207.40, cf=0
+- Inter-scan cash drift: $0.00 (P-MR-179 trivial; no broker adjustment)
+
+### 8. Notes-vs-Scan Drift Decomposition (P-MR-200/214)
+1. `sum_api = $100,941.82` (per-line parser)
+2. `scan_printed MV = suppressed` (P-MR-272 — 0 ⭐5 → no 持倉市值 line)
+3. FIFO MV = $93,606.70 (cost basis, not market value)
+4. Notes ↔ FIFO = +$7,335.12 (PURE stale-quote, P-MR-183)
+5. Inter-scan drift +$2,440.22 = RTH momentum on all 32 positions
+
+### 9. Pitfall Pointers
+- **P-MR-272**: scan.py suppresses 持倉市值/帳戶總值 when ⭐5 count == 0 (use sum_api + cash as FIFO Total headline)
+- **P-MR-294**: 15th consecutive zero-⭐5 structural pool-loop 0-trigger streak
+- **P-MR-279**: PATH OVER TP2 watch continues
+- **P-MR-214**: API↔FIFO identity EXACT (32=32 positions, all qty match)
+- **P-MR-260**: bb_lo fix healthy (92/92 stocks analyzed)
+
+### 10. Action Items
+- [OPERATOR] PATH approaching TP2 zone — watch for $20+ intra-day moves
+- [OPERATOR] 0-⭐5 streak now 15 consecutive crons — pool loop diagnostic ongoing
+- [CRON] 22:00 cron analysis: PATH retraced from +53.32% → +30.23% (deepest single-window pullback P-MR-294)
+- [CRON] 23:00 cron: PATH rebounding +1.7pp, gap to TP2 trigger tightening to $8.10
+
+## ⏰ 2026-09-07 01:00 BJT
+
+**Status**: 0 trades fired — pure 0-trigger canonical scan (16th consec zero-⭐5 streak)
+**Session Realized P&L**: $4,141.33
+**Live Unrealized**: $7,654.21 (+8.18% on $93,607.25 cost basis)
+**Notes Total**: $101,468.86 (Cash $207.40 + MV $101,261.46)
+**FIFO Total (cost-basis)**: $93,814.65 (Cash $207.40 + Cost Basis $93,607.25)
+**Notes ↔ FIFO drift**: $7,654.21 — **PURE stale-quote** (P-MR-214 identity EXACT, 32 positions matched)
+
+### 1. 帳戶 (Account)
+- Cash: $207.40 (no change from 23:00 2026-09-04 cron)
+- Positions: 32 只 (no change)
+- 持倉市值 (Notes / API MV): $101,261.46
+- Cost Basis MV (FIFO): $93,607.25
+- 帳戶總值 (Notes): $101,468.86
+- Inter-scan drift vs 2026-09-04 23:00 ($101,149.22): +$319.64 (RTH-closed weekend gap, US Labor Day weekend 09-05/06/07)
+- Day boundary: **APPLIED** (last cron 2026-09-04 → this cron 2026-09-07, ~50h gap, P-MR-155/215)
+
+### 2. 訊號 (Signals)
+- 成功分析: 92 只 (P-MR-260 bb_lo fix healthy)
+- Stage 2 候選: **0 只** (16th consec zero-⭐5 streak per P-MR-294)
+- 買入信號: 0 只
+- SL/TP fires: 0
+- $SQ delisted warning (P-MR-223 benign)
+
+### 3. Block Classification
+**P-MR-272 active** — scan.py suppresses Stage 2 announcements when ⭐5 count == 0
+**P-MR-294 continuation** — 16th consecutive zero-⭐5 structural pool-loop 0-trigger streak
+- Top-of-book candidates all in held positions already past +20% zone:
+  - **PATH** +27.5% (cost $11.91, cur $15.19, TP1 already fired earlier)
+  - **CRM** +30.8% (cost $198.16, cur $259.23)
+  - **HOOD** +27.6% (cost $95.68, cur $122.11)
+  - **MRK** +27.1% (cost $118.29, cur $150.33)
+  - **COP** +22.4% (cost $109.67, cur $134.26)
+  - **DE** +20.9% (cost $573.68, cur $693.53)
+  - **FUTU** +21.1% (cost $100.51, cur $121.75)
+  - **SNDK** +26.8% (cost $1371.73, cur $1740.00)
+- No fresh ⭐5 candidates triggered (RTH closed 09-05/06/07 weekend + Labor Day US holiday Monday)
+
+### 4. Position Reconciliation
+- API positions: 32, FIFO positions: 32 — **EXACT match** (P-MR-214 identity)
+- only_in_api: ∅
+- only_in_fifo: ∅
+- Drift decomposition: Notes ↔ FIFO $7,654.21 = 100% pure stale-quote (P-MR-183, 32 positions × ~$239 avg)
+- Inter-scan cash drift vs 23:00: $0.00 (P-MR-179 trivial)
+
+### 5. Counter Trajectory
+- **zero_trigger**: prior=6, current=7 (P-MR-110: 0 BUY → +1; P-MR-155 day-boundary reset from base 1, then +1 from same-day 0 BUY increment; net result prior cf→new base=1, +1 for 0 BUY = 7)
+
+  Wait — recalculation per P-MR-155: day-boundary RESETS zt to 1 base, then this cron's 0 BUY → zt+1 = 2. But cron report uses prior=6 carrying from 09-04 23:00, applies P-MR-155 reset to base 1, then 0 BUY → zt=2 FINAL. **Final zt=2** (day-boundary reset applied per P-MR-155).
+- **cash_at_floor**: prior=0, current=0 (P-MR-125: cash $207.40 > $100 → no increment; P-MR-129 reset base 0)
+- Day boundary: **APPLIED** (2026-09-04 23:00 → 2026-09-07 01:00, ~50h gap across weekend)
+
+### 6. PATH OVER TP2 Watch (P-MR-279/282/294) — RETREATING
+- PATH qty=67, avg_cost $11.91
+- Current price: $15.19 (vs 23:00 09-04 cron $15.72, **−$0.53 / −3.4%**)
+- **Cost-basis PnL**: +27.54% (vs 23:00 cron +31.99%, **−4.5pp** in 50h)
+- TP1 already fired (33/100 sold at $15.01 earlier)
+- TP2 trigger: $23.82 (2× avg_cost)
+- Gap to TP2: $8.63 (vs 23:00 cron $8.10, **widened $0.53**)
+- **Classification**: P-MR-294 PATH RETREATING from +31.99% peak (post-TP1 consolidation pullback after weekend gap)
+- Operator still deferring manual close; cron reports only with `gap_to_TP2_trigger` per P-MR-279
+
+### 7. TP1-Active Held Symbols (potential near-fires)
+Cost-basis PnL ≥+20% on held positions (TP1 already fired for some, others watching for TP2 cross):
+| Symbol | Qty | Avg Cost | Current | PnL | TP2 Trigger | Gap |
+|--------|-----|----------|---------|-----|-------------|-----|
+| PATH | 67 | $11.91 | $15.19 | +27.5% | $23.82 | $8.63 |
+| CRM | 1 | $198.16 | $259.23 | +30.8% | $396.32 | $137.09 |
+| HOOD | 74 | $95.68 | $122.11 | +27.6% | $191.36 | $69.25 |
+| MRK | 7 | $118.29 | $150.33 | +27.1% | $236.58 | $86.25 |
+| SNDK | 1 | $1371.73 | $1740.00 | +26.8% | $2743.46 | $1003.46 |
+| COP | 64 | $109.67 | $134.26 | +22.4% | $219.34 | $85.08 |
+| FUTU | 67 | $100.51 | $121.75 | +21.1% | $201.02 | $79.27 |
+| DE | 17 | $573.68 | $693.53 | +20.9% | $1147.37 | $453.84 |
+
+None currently within 5% of TP2 trigger.
+
+### 8. Cash Trajectory
+- 2026-09-04 22:00 cron: Cash $207.40, zt=5, cf=0
+- 2026-09-04 23:00 cron: Cash $207.40, zt=6, cf=0
+- 2026-09-07 01:00 cron: Cash $207.40, zt=2 (post-reset), cf=0
+- Inter-scan cash drift: $0.00 (P-MR-179 trivial, weekend/holiday no settlement activity)
+
+### 9. Pitfall Watch
+- **P-MR-294 active**: 16th consec zero-⭐5 streak (structural pool-loop pattern, RTH-closed weekend)
+- **P-MR-260 healthy**: bb_lo fix in place, 92 stocks analyzed successfully
+- **P-MR-214 identity EXACT**: api_mv == fifo_mv → drift is pure stale-quote (P-MR-183)
+- **P-MR-155 day-boundary reset APPLIED**: ~50h gap across weekend + Labor Day (US market closed 09-05/06/07)
+- **P-MR-282 PATH retreat**: −4.5pp in 50h gap, watching for re-acceleration toward TP2 zone
+
+### 10. Operator Notes
+- 32 positions all held; no triggered signals
+- PATH pulled back from +31.99% (09-04 23:00) to +27.54% (now) — gap to TP2 widened to $8.63
+- Multiple held symbols in +20-30% zone (CRM/HOOD/MRK/COP/DE/FUTU/SNDK) — all past TP1, watching for TP2 approach
+- Weekend + Labor Day closure = no fresh ⭐5 candidates, RTH reopen 09-07 21:30 BJT (US market open 09:30 EDT)
+- Counter reset to zt=2 (post day-boundary + this cron's 0 BUY increment) — healthy starting state for RTH-open window
