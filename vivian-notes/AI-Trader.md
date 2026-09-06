@@ -12519,3 +12519,130 @@ None currently within 5% of TP2 trigger. PATH still closest at $8.63 gap (~36% b
 - **Stage 2 ⭐5 candidates**: 18th consec zero-⭐5 threshold approaching (P-MR-294 17/18) — but structural pattern is RTH-closed, will resolve on Mon 21:30 BJT RTH open
 - **TP1/TP2 fires**: 0 fires expected in RTH-closed window; watch for 22:00 BJT RTH-open scan for any TP2 cross on PATH/CRM/HOOD/MRK/SNDK
 - **US market**: closed Mon 09-07 for Labor Day holiday; Tue 09-08 normal open
+## ⏰ 2026-09-07 03:30 BJT
+
+**Status**: 0 trades fired — pure 0-trigger canonical scan (**18th consec zero-⭐5 streak** per P-MR-294)
+**Session Realized P&L**: $2,934.13
+**Live Unrealized**: $7,654.76 (+8.18% on $93,606.70 cost basis)
+**Notes Total**: $101,468.86 (Cash $207.40 + MV $101,261.46)
+**FIFO Total (cost-basis)**: $93,814.10 (Cash $207.40 + Cost Basis $93,606.70)
+**Notes ↔ FIFO drift**: $7,654.76 — **PURE stale-quote** (P-MR-214 identity EXACT, 32 positions matched)
+
+### 1. 帳戶 (Account)
+- Cash: $207.40 (no change from 03:00 2026-09-07 cron)
+- Positions: 32 只 (no change)
+- 持倉市值 (Notes / API MV): $101,261.46
+- Cost Basis MV (FIFO): $93,606.70
+- 帳戶總值 (Notes): $101,468.86
+- Inter-scan drift vs 03:00 2026-09-07 ($101,468.86): $0.00 (RTH-closed, US Labor Day weekend no movement)
+- Day boundary: **NOT APPLIED** (last cron 2026-09-07 03:00 → this cron 2026-09-07 03:30, same BJT date, P-MR-155/247)
+- US market status: **CLOSED** (US Labor Day 2026-09-07 Monday; 03:30 BJT = Sun 09-06 15:30 EDT, market reopens Tue 09-08 21:30 BJT = 09:30 EDT)
+
+### 2. 訊號 (Signals)
+- 成功分析: 92 只 (P-MR-260 bb_lo fix healthy)
+- Stage 2 候選: **0 只** (**18th consec zero-⭐5 streak** per P-MR-294)
+- 買入信號: 0 只
+- SL/TP fires: 0
+- $SQ delisted warning (P-MR-223 benign)
+
+### 3. Block Classification
+**P-MR-272 active** — scan.py suppresses 持倉市值 / 帳戶總值 lines when ⭐5 count == 0
+**P-MR-294 continuation** — 18th consecutive zero-⭐5 structural pool-loop 0-trigger streak (RTH-closed US Labor Day weekend)
+- Top-of-book candidates all in held positions already past +20% zone (quotes frozen at Fri 09-04 close):
+  - **CRM** +30.8% (cost $198.16, cur $259.23)
+  - **HOOD** +27.6% (cost $95.68, cur $122.11)
+  - **PATH** +27.5% (cost $11.91, cur $15.19, TP1 already fired earlier)
+  - **MRK** +27.1% (cost $118.29, cur $150.33)
+  - **SNDK** +26.8% (cost $1371.73, cur $1740.00)
+  - **COP** +22.4% (cost $109.67, cur $134.26)
+  - **FUTU** +21.1% (cost $100.51, cur $121.75)
+  - **DE** +20.9% (cost $573.68, cur $693.53)
+- No fresh ⭐5 candidates triggered (RTH-closed US Labor Day weekend; quotes frozen at Fri 09-04 close)
+
+### 4. Position Reconciliation
+- API positions: 32, FIFO positions: 32 — **EXACT match** (P-MR-214 identity)
+- only_in_api: ∅
+- only_in_fifo: ∅
+- Drift decomposition: Notes ↔ FIFO $7,654.76 = 100% pure stale-quote (P-MR-183, 32 positions × ~$239 avg)
+- Inter-scan cash drift vs 03:00: $0.00 (P-MR-179 trivial, weekend/holiday no settlement activity)
+
+### 5. Counter Trajectory
+- **zero_trigger**: prior=3, current=4 (P-MR-110: 0 BUY → +1; P-MR-201 same-BJT-day carry from 03:00; same BJT date so NO day-boundary reset)
+- **cash_at_floor**: prior=0, current=0 (P-MR-125: cash $207.40 > $100 → no increment; P-MR-129 reset base 0)
+- Day boundary: **NOT APPLIED** (2026-09-07 03:00 → 2026-09-07 03:30, same BJT date)
+
+### 6. PATH OVER TP2 Watch (P-MR-279/282/294) — STEADY (RTH-closed)
+- PATH qty=67, avg_cost $11.91
+- Current price: $15.19 (UNCHANGED vs 03:00 cron $15.19)
+- **Cost-basis PnL**: +27.54% (UNCHANGED vs 03:00 cron +27.54%)
+- TP1 already fired (33/100 sold at $15.01 earlier)
+- TP2 trigger: $23.82 (2× avg_cost)
+- Gap to TP2: $8.63 (UNCHANGED — RTH-closed, no price movement)
+- **Classification**: P-MR-279 steady-state OVER TP2 watch (RTH-closed = no acceleration possible; quotes frozen at Fri 09-04 close)
+- Operator still deferring manual close; cron reports only with `gap_to_TP2_trigger` per P-MR-279
+
+### 7. TP1-Active Held Symbols (potential near-fires)
+Cost-basis PnL ≥+20% on held positions (TP1 already fired for some, others watching for TP2 cross):
+| Symbol | Qty | Avg Cost | Current | PnL | TP2 Trigger | Gap |
+|--------|-----|----------|---------|-----|-------------|-----|
+| CRM | 1 | $198.16 | $259.23 | +30.8% | $396.32 | $137.09 |
+| HOOD | 74 | $95.68 | $122.11 | +27.6% | $191.36 | $69.25 |
+| PATH | 67 | $11.91 | $15.19 | +27.5% | $23.82 | $8.63 |
+| MRK | 7 | $118.29 | $150.33 | +27.1% | $236.58 | $86.25 |
+| SNDK | 1 | $1371.73 | $1740.00 | +26.8% | $2743.46 | $1003.46 |
+| COP | 64 | $109.67 | $134.26 | +22.4% | $219.34 | $85.08 |
+| FUTU | 67 | $100.51 | $121.75 | +21.1% | $201.02 | $79.27 |
+| DE | 17 | $573.68 | $693.53 | +20.9% | $1147.37 | $453.84 |
+
+None currently within 5% of TP2 trigger. PATH still closest at $8.63 gap (~36% below trigger).
+
+### 8. Cash Trajectory
+- 2026-09-04 23:00 cron: Cash $207.40, zt=6, cf=0
+- 2026-09-07 01:00 cron: Cash $207.40, zt=2 (post day-boundary reset), cf=0
+- 2026-09-07 03:00 cron: Cash $207.40, zt=3 (P-MR-201 same-BJT-day carry +1), cf=0
+- 2026-09-07 03:30 cron: Cash $207.40, zt=4 (P-MR-201 same-BJT-day carry +1), cf=0
+- Inter-scan cash drift: $0.00 (P-MR-179 trivial, US Labor Day weekend no settlement)
+
+### 9. Pitfall Watch
+- **P-MR-294 active**: 18th consec zero-⭐5 streak (structural pool-loop pattern, RTH-closed US Labor Day weekend)
+- **P-MR-260 healthy**: bb_lo fix in place, 92 stocks analyzed successfully
+- **P-MR-214 identity EXACT**: api_mv == fifo_mv → drift is pure stale-quote (P-MR-183)
+- **P-MR-155 day-boundary NOT APPLIED**: same BJT day 2026-09-07, carry-forward from 03:00 (P-MR-201)
+- **P-MR-272 active**: scan.py suppresses MV/Total lines when ⭐5 count == 0 (use sum_api + cash as FIFO Total headline)
+- **P-MR-230 0-trade canonical TRUST**: drift $7,654.76 is pure stale-quote (P-MR-183), Notes headline valid
+- **P-MR-279 PATH steady-state**: no acceleration in RTH-closed window; quotes frozen at Fri 09-04 close
+- **P-MR-247 day-boundary reset rule**: binary BJT-date detection (NOT time-dependent); same BJT date = no reset
+
+### 10. Next-Cron Watch
+- **RTH reopens**: 2026-09-08 21:30 BJT (= 09:30 EDT Tue) — US Labor Day holiday Mon 09-07, market closed
+- **PATH acceleration watch resumes**: if PATH re-enters +5pp inter-cron jump range on RTH open, escalate to P-MR-282 acceleration (vs current P-MR-279 steady-state)
+- **Stage 2 ⭐5 candidates**: 19th consec zero-⭐5 threshold approaching (P-MR-294 18/19+) — but structural pattern is RTH-closed holiday, will resolve on Tue 09-08 21:30 BJT RTH open
+- **TP1/TP2 fires**: 0 fires expected in RTH-closed window; watch for 22:00 BJT Tue 09-08 RTH-open scan for any TP2 cross on PATH/CRM/HOOD/MRK/SNDK
+- **US market**: closed Mon 09-07 for Labor Day holiday; Tue 09-08 normal open
+
+---
+
+## 📊 當日總結 (2026-09-07 BJT)
+
+**Session totals (since 09-07 01:00 BJT day start):**
+- Cron runs today: 3 (01:00, 03:00, 03:30) — all pure 0-trigger canonical scans
+- 買入信號 (BUY signals): 0
+- TP1 fires: 0
+- TP2 fires: 0
+- SL fires: 0
+- Trades executed: 0
+
+**Position state:**
+- Positions held: 32 (UNCHANGED)
+- Cash: $207.40 (UNCHANGED since 09-04 23:00)
+- 帳戶總值 (Notes): $101,468.86
+- Cost-basis (FIFO): $93,814.10
+- Unrealized P&L: +$7,654.76 (+8.18%)
+
+**Realized P&L (session, last 25 trades):** +$2,934.13
+
+**Day classification**: Pure 0-trigger canonical Saturday — US Labor Day weekend, RTH-closed since Fri 09-04 16:00 EDT. All quotes frozen at Fri close. 18th consec zero-⭐5 streak per P-MR-294 (structural pool-loop pattern). P-MR-214 identity EXACT (api_mv == fifo_mv). Day-boundary NOT APPLIED (same BJT date across all 3 today's crons; P-MR-201 same-BJT-day carry-forward).
+
+**PATH OVER TP2 status**: +27.5% (UNCHANGED — frozen at Fri close), TP2 trigger $23.82, gap $8.63. P-MR-279 steady-state.
+
+**Next cron**: Tue 2026-09-08 21:30 BJT RTH-open scan (US Labor Day Mon 09-07 closed; Tue 09-08 normal open). Expect pool-loop reset, fresh ⭐5 candidates, possible Stage 2 BUY signals after 18:00h RTH-closed gap.
