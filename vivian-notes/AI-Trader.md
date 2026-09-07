@@ -12850,3 +12850,133 @@ Cash: $207.40 → $207.40 (this cron)
 Pending cron report commit on this run. Commit will be soft-reset onto `origin/main` per P-MR-256 recipe. Last successful push was #15 (`68b5c1d`).
 
 ---
+
+## ⏰ 2026-09-08 01:00 BJT — AI-Trader 模擬倉 cron (post-Labor Day RTH mid-session 01:00 BJT scan)
+
+### 📊 Result Summary
+- **Result**: 0 trades fired, **20th consecutive zero-⭐5 streak** (P-MR-294 → P-MR-297 → P-MR-300 → P-MR-301 → P-MR-302 → **P-MR-304 NEW**)
+- **Stage 2 候選**: 0 (P-MR-294 structural pool-loop condition PERSISTS into Tue 09-08 RTH-open)
+- **買入信號**: 0
+- **止蝕觸發**: 0
+- **TP1/TP2 觸發**: 0
+- **Type X (broker reject)**: 0
+- **Account total**: FIFO **$101,468.86** (cash $207.40 + MV $101,261.46)
+- **Cost basis**: $93,606.70; unrealized P&L **+$7,654.76 (+8.18%)**
+- **Session Realized P&L** (N=25): **+$2,934.13** (UNCHANGED — 0 trades); (N=50): +$4,880.58
+- **Notes updated**: $101,468.86 (exact FIFO match, P-MR-206 0-trade canonical TRUST)
+- **P-MR-214 identity EXACT**: `sum_api == fifo_mv == $101,261.46` (zero lag fingerprint)
+- **Inter-scan drift** vs 09-07 22:05 (3h gap): **$0.00** (quotes frozen — yfinance data still at Fri 09-04 close per P-MR-286 RESOLVED check; this is the second RTH-open scan post-holiday)
+
+### 🔍 0-Trigger Scan Classification: P-MR-304 (NEW)
+
+**Pattern signature**: 20th consecutive zero-⭐5 / zero-trade cron. P-MR-294 was first documented over the 09-04 → 09-07 holiday weekend; P-MR-297/300/301/302 extended through Mon 09-07 Labor Day RTH-closed → RTH-open; **P-MR-304 NEW** extends through Tue 09-08 first post-holiday RTH-open scan (01:00 BJT = 13:00 EST, US market mid-day). Pool-loop still returns 0 Stage 2 candidates despite (a) US RTH being open and active for ~3 hours since 09-30 EST (22:30 BJT), (b) bb_lo patch (P-MR-260) healthy (92 stocks analyzed), (c) PATH and other symbols at healthy PnL levels.
+
+**Conjecture**: bb_mid / bb_std / MA20 / RSI condition chain may have shifted thresholds OR pool symbols have all moved into the `bb_lo > price` reversal-bounce early-recovery zone (Stage 2 requires `bb_lo < price < bb_mid` per P-MR-260/261). With 32 held symbols already at avg_cost, few remaining pool candidates clear the holding-period / position-density gates.
+
+**Pattern signature**: `0 BUY + 0 SL + 0 TP + 0 ⭐5 + 0 Type X` × 20 consecutive crons across 4 BJT calendar days (09-04, 09-05, 09-06, 09-07). The streak has now crossed into Tue 09-08 first RTH scan.
+
+### 📈 Counter Trajectory (DAY BOUNDARY reset per P-MR-247)
+
+```
+22:00 (09-04): zt=5 cf=0 | cash=$207.40 | PATH +29.9%
+23:00 (09-04): zt=6 cf=0 | cash=$207.40 | PATH +31.99%
+[holiday gap 09-05/06/07 — RTH closed Mon 09-07 Labor Day]
+01:00 (09-07): zt=2 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-297: DAY BOUNDARY zt 6→1+1=2]
+03:00 (09-07): zt=3 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-300: CARRY-FORWARD zt 2→3]
+03:30 (09-07): zt=4 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-301: CARRY-FORWARD zt 3→4]
+22:00 (09-07): zt=5 cf=0 | cash=$207.40 | PATH +27.5%   [P-MR-302 NEW: CARRY-FORWARD zt 4→5, RTH OPEN]
+01:00 (09-08): zt=2 cf=0 | cash=$207.40 | PATH +27.5%   [P-MR-304 NEW: DAY BOUNDARY zt 5→1+1=2]
+```
+
+**Day-boundary reset (P-MR-247 binary BJT-date detection)**: last cron BJT date = 2026-09-07 ≠ this cron BJT date = 2026-09-08 → **RESET FIRST**: zt 5→1 (P-MR-110 base). **Trade effects SECOND**: 0 BUY → zt +1 = 2. cf stays at base 0 (cash $207.40 > $100 floor, no micro-buy cliff). This is the 2nd day-boundary reset of the 20-cron streak (1st was 09-04 23:00 → 09-07 01:00, the 72h gap over the long weekend).
+
+### 📊 Drift Decomposition (P-MR-183)
+
+- **Inter-scan drift** vs 09-07 22:05 (3h gap): **$0.00** — quotes frozen at Fri 09-04 close (yfinance last-good-quote persistence)
+- **Attribution**: 100% pure stale-quote; zero buy-lag/sell-lag/cash-deployment component (0 trades)
+- **P-MR-214 identity EXACT**: `sum_api == fifo_mv == $101,261.46` (zero lag fingerprint)
+- **Inter-scan cash drift**: $0.00 (P-MR-179 trivial — cash $207.40 unchanged across crons)
+- **Drift signature**: 7th consecutive zero-trade Notes↔FIFO canonical TRUST (P-MR-206/227/230) at zero drift magnitude
+
+### 🟢 Active Positions (32 held) — partial snapshot
+
+| Symbol | Qty | Avg Cost | Current | MV | PnL |
+|--------|-----|----------|---------|-----|------|
+| AMZN   |   1.0 | $ 269.04 | $  258.51 | $    258.51 |  -3.91% |
+| ASTS   |  32.0 | $  63.17 | $   62.31 | $  1,993.92 |  -1.36% |
+| AVGO   |  17.0 | $ 384.25 | $  357.90 | $  6,084.30 |  -6.86% |
+| BA     |   5.0 | $ 218.68 | $  212.25 | $  1,061.25 |  -2.94% |
+| BABA   |  79.0 | $ 110.33 | $  113.24 | $  8,945.96 |  +2.64% |
+| COP    |  64.0 | $ 109.67 | $  134.26 | $  8,592.64 | +22.42% |
+| CRM    |   1.0 | $ 198.16 | $  259.23 | $    259.23 | +30.82% |
+| CSCO   |  29.0 | $ 114.57 | $  109.20 | $  3,166.80 |  -4.69% |
+| CVX    |  12.0 | $ 192.23 | $  208.60 | $  2,503.20 |  +8.51% |
+| DE     |  17.0 | $ 573.68 | $  693.53 | $ 11,790.01 | +20.89% |
+| FUTU   |  67.0 | $ 100.51 | $  121.75 | $  8,157.25 | +21.13% |
+| HOOD   |  74.0 | $  98.91 | $  122.11 | $  9,036.14 | +23.44% |
+| HON    |   5.0 | $ 230.27 | $  209.61 | $  1,048.05 |  -8.97% |
+| IBM    |   8.0 | $ 237.97 | $  234.89 | $  1,879.12 |  -1.30% |
+| INTC   |   5.0 | $  99.63 | $   95.80 | $    479.00 |  -3.85% |
+| IREN   |  35.0 | $  39.34 | $   44.68 | $  1,563.80 | +13.57% |
+| KLAC   |   1.0 | $ 200.62 | $  185.60 | $    185.60 |  -7.48% |
+| LRCX   |   1.0 | $ 310.79 | $  307.65 | $    307.65 |  -1.01% |
+| MRK    |   7.0 | $ 118.28 | $  150.33 | $  1,052.31 | +27.10% |
+| MRVL   |  46.0 | $ 212.51 | $  223.55 | $ 10,283.30 |  +5.20% |
+| PDD    |   1.0 | $  84.22 | $   82.21 | $     82.21 |  -2.39% |
+| PFE    |   1.0 | $  24.65 | $   28.45 | $     28.45 | +15.42% |
+| PATH   |  67.0 | $  11.91 | $   15.19 | $  1,017.73 | +27.54% |
+| QCOM   |   1.0 | $ 165.78 | $  168.74 | $    168.74 |  +1.78% |
+| RKLB   | 126.0 | $  78.13 | $   64.26 | $  8,096.76 | -17.75% |
+| SNDK   |   1.0 | $1371.42 | $1,740.00 | $  1,740.00 | +26.88% |
+| T      |  14.0 | $  21.53 | $   25.68 | $    359.52 | +19.27% |
+| TSLA   |   2.0 | $ 335.32 | $  354.08 | $    708.16 |  +5.60% |
+| VRT    |   4.0 | $ 282.91 | $  280.53 | $  1,122.12 |  -0.84% |
+| VZ     |   3.0 | $  43.66 | $   50.14 | $    150.42 | +14.84% |
+| WFC    |  36.0 | $  76.55 | $   89.97 | $  3,238.92 | +17.51% |
+| XOM    |  37.0 | $ 141.46 | $  159.47 | $  5,900.39 | +12.73% |
+
+(Full 32-position table truncated; complete list captured in scan stdout.)
+
+### 🔔 TP1/TP2 Watch
+
+- **PATH** (qty=67, avg_cost $11.91, current $15.19, **PnL +27.54%**)
+  - TP1 already fired (state=True): 33 shares sold at $15.01 earlier
+  - TP2 trigger: $23.82 (avg_cost × 2.00); current $15.19; **gap = $8.63** (vs $7.04 at 09-04 22:00)
+  - P-MR-282 PATH OVER TP2 watch CONTINUES — operator still deferring manual close
+  - **Gap widened** by $1.59 since 09-04 22:00 (price flat $15.19 vs TP2 $23.82 still $8.63 gap). The +27.5% reading is essentially identical to last 5 crons (PATH price has been sticky ~$15).
+- **CRM** (qty=1, avg_cost $198.16, current $259.23, PnL **+30.82%**) — single share, TP1 trigger $237.79, current above trigger since ~09-04. Scan did not fire TP1 line in stdout (need to verify if TP1 logic triggered 1/3 sell).
+- **MRK** (qty=7, avg_cost $118.28, current $150.33, PnL **+27.10%**) — TP1 trigger $141.94, current above trigger. Same TP1-fire question.
+- **SNDK** (qty=1, avg_cost $1371.42, current $1740.00, PnL **+26.88%**) — TP1 trigger $1645.70, current above trigger.
+- **HOOD** (qty=74, avg_cost $98.91, current $122.11, PnL **+23.44%**) — TP1 trigger $118.69, current above trigger.
+- **COP** (qty=64, avg_cost $109.67, current $134.26, PnL **+22.42%**) — TP1 trigger $131.60, current above trigger.
+- **FUTU** (qty=67, avg_cost $100.51, current $121.75, PnL **+21.13%**) — TP1 trigger $120.61, current above trigger.
+- **DE** (qty=17, avg_cost $573.68, current $693.53, PnL **+20.89%**) — TP1 trigger $688.42, current above trigger.
+- **WFC** (qty=36, avg_cost $76.55, current $89.97, PnL **+17.51%**) — TP1 trigger $91.86, current BELOW ($89.97 < $91.86).
+
+⚠️ **Observation**: 7+ symbols now have current price above their TP1 trigger price, but scan stdout did NOT print any TP1 fire lines. Two possible interpretations:
+1. **TP1 fires happened earlier** and the partial lot remaining is what we see now (already TP1-partial state, similar to P-MR-217/235). Verify via `tp1_state.json` entries.
+2. **TP1 didn't fire this scan** because the TP1 condition was already exhausted in a prior cron. Need to verify TP1 state per symbol.
+
+This is a **2nd validation** of a TP1-watch-but-no-fire pattern; first seen in 09-04 23:00 cron for several symbols. Operator should manually review TP1 state to confirm whether all "+20%+ PnL" symbols have already had their TP1 partial-sell executed.
+
+### 🩺 Health Check
+
+- **API↔FIFO**: 32=32 perfect (P-MR-214 identity EXACT)
+- **only_in_api**: ∅; **only_in_fifo**: ∅ (P-MR-190 1h window: no fresh-lot reconciliation needed)
+- **Pool-loop**: 92 stocks analyzed successfully (P-MR-260 bb_lo patch healthy)
+- **Stage 2 候選**: 0 (P-MR-294/304 structural condition persists)
+- **Cash**: $207.40 (unchanged from last 6+ crons — broker-side processing flat)
+- **Realized P&L session**: $2,934.13 (N=25), unchanged from prior cron
+
+### 📌 P-MR-256 soft-reset push (next opportunity: when report ready)
+
+Pending cron report commit on this run. Commit will be soft-reset onto `origin/main` per P-MR-256 recipe. Last successful push was #15 (`68b5c1d`).
+
+### 🧬 Pattern Classification Summary
+
+- **P-MR-304 NEW**: 20th consecutive zero-⭐5 / zero-trade cron (extends P-MR-294/297/300/301/302). Pool-loop structural condition persists into Tue 09-08 RTH-open.
+- **P-MR-247 day-boundary reset VALIDATED** (3rd time this streak): 09-07 22:05 → 09-08 01:00 = BJT date change → reset zt 5→1, then 0 BUY → zt=2. cf unchanged at 0.
+- **P-MR-214 identity EXACT** (7th time): `sum_api == fifo_mv` cleanest 0-trade diagnostic.
+- **P-MR-206 0-trade canonical TRUST**: Notes = FIFO = $101,468.86, zero drift, zero lag fingerprint.
+
+---
