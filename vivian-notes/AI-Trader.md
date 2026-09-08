@@ -14017,14 +14017,14 @@ RTH 收市前 30 min 全部 32 倉 MA20 對齊 → 無任何倉位衝擊 +40% TP
 - 0 買入 / 0 賣出 / 0 TP1 / 0 TP2
 - API↔FIFO EXACT（第 13 次連續）
 - 報價新鮮（P-MR-303 RESOLVED 持續至 RTH close）
-- Drift 純 mark-to-market（−$+71.23 / 30 min）
+- Drift 純 mark-to-market（−$71.23 / 30 min）
 - MA10 trail stop 全數 active 且無觸發
 - 集中度違規已標記（DE 11.45% / MRVL 10.29%）
 - RTH-close trail stop 確認 → **收市後 trade log 凍結**安全
 
 ---
 
-🤖 **AI-Trader Cron #26 完成** — 09-09 03:30 BJT（15:30 EDT，**RTH 收市前 30 分鐘**）第五次 scan，亦係當日最後一次 scan。**TP1/TP2 重點檢查：0 觸發**。五窗對比顯示 MV 單向下滑 $102,179.27 → $101,971.87 → $101,883.75 → $101,535.26 → **$101,464.03**（累計 **−$715.24 / 5.5h**，全部純報價漂移，0 交易）。未實現 PnL 由 +9.1% 收窄至 **++8.36%**。Stage 2 池 loop 第 26 次連續零候選。**收市前 trail stop 確認：全部 32 倉 MA10 緩衝 > 5% 觸發線**，無 EXIT 信號。純模擬倉，無 IB order。RTH 收市後 trades log 凍結。
+🤖 **AI-Trader Cron #26 完成** — 09-09 03:30 BJT（15:30 EDT，**RTH 收市前 30 分鐘**）第五次 scan，亦係當日最後一次 scan。**TP1/TP2 重點檢查：0 觸發**。五窗對比顯示 MV 單向下滑 $102,179.27 → $101,971.87 → $101,883.75 → $101,535.26 → **$101,464.03**（累計 **−$715.24 / 5.5h**，全部純報價漂移，0 交易）。未實現 PnL 由 +9.1% 收窄至 **+8.36%**。Stage 2 池 loop 第 26 次連續零候選。**收市前 trail stop 確認：全部 32 倉 MA10 緩衝 > 5% 觸發線**，無 EXIT 信號。純模擬倉，無 IB order。RTH 收市後 trades log 凍結。
 
 📡 **下個交易日**：09-10 22:00 BJT（= 10:00 EDT，09-10 RTH 開盤）— 監控 SNDK TP2 線 $1,921.44（−10.9%）、RKLB（連續 4 窗走弱，MA10 緩衝 5.0%）、HOOD/COP TP1 manual review。集中度違規 DE/MRVL 持續標記。
 
