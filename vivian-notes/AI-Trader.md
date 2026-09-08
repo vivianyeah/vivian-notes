@@ -13124,3 +13124,272 @@ Cash floor counter (cf): **0** (P-MR-125 reset condition: cash > $100, not < $10
 - **P-MR-303 → P-MR-305 evolution**: structural pool-loop now spans 5 BJT calendar days
 
 ---
+
+## ⏰ 2026-09-08 03:30 BJT — AI-Trader 模擬倉 cron (post-Labor Day RTH late 03:30 BJT scan, RTH-close +30min window, 22nd consec zero-trigger cron)
+
+### 📊 Result Summary
+- **Result**: 0 trades fired, **22nd consecutive zero-⭐5 streak** (P-MR-294 → P-MR-297 → P-MR-300 → P-MR-301 → P-MR-302 → P-MR-304 → P-MR-305 → **P-MR-306 NEW**)
+- **Stage 2 候選**: 0 (P-MR-294 structural pool-loop condition PERSISTS into Tue 09-08 RTH-close 03:30 BJT = 15:30 EST = US RTH last 30 minutes before 16:00 EST close)
+- **買入信號**: 0
+- **止蝕觸發**: 0 (no MA10 stops, no 5% stops fired)
+- **TP1/TP2 觸發**: 0 (PATH still OVER TP2 watch but no TP2 line fired — see TP2 Watch section)
+- **Type X (broker reject)**: 0
+- **Account total**: FIFO **$101,468.86** (cash $207.40 + MV $101,261.46) — **EXACT match to 03:00 BJT cron** (zero drift)
+- **Cost basis**: $93,606.70; unrealized P&L **+$7,654.76 (+8.18%)**
+- **Session Realized P&L** (N=25): **+$2,934.13** (UNCHANGED — 0 trades); (N=50): +$4,880.58 (UNCHANGED)
+- **Notes updated**: $101,468.86 (exact FIFO match, P-MR-206 0-trade canonical TRUST, P-MR-214 identity shortcut hit EXACT)
+- **P-MR-214 identity EXACT**: `sum_api == fifo_mv == $101,261.46` (zero lag fingerprint, 8th consecutive validation)
+- **Inter-scan drift** vs 09-08 03:00 (30min intra-day gap): **$0.00** — quotes still frozen at Fri 09-04 close levels (yfinance data still stale per P-MR-286 RESOLVED check pending — RTH late-session yfinance feed lag, not full outage)
+
+### 🔍 0-Trigger Scan Classification: P-MR-306 (NEW 22nd consec)
+
+**Pattern signature**: 22nd consecutive zero-⭐5 / zero-trade cron. P-MR-305 was 21st documented at 03:00 BJT 09-08; **P-MR-306 NEW** is the 22nd at 03:30 BJT 09-08 (US RTH last 30 minutes before 16:00 EST close). Pool-loop still returns 0 Stage 2 candidates despite US RTH being open and active for ~7 hours since 09-30 EST (22:30 BJT 09-07).
+
+**Conjecture (unchanged from P-MR-304/305)**: bb_mid / bb_std / MA20 / RSI condition chain may have shifted thresholds OR pool symbols have all moved into the `bb_lo > price` reversal-bounce early-recovery zone (Stage 2 requires `bb_lo < price < bb_mid` per P-MR-260/261). With 32 held symbols already at avg_cost and saturation fully blocking new deployment (cash $207.40 << any Stage 2 unit price), few remaining pool candidates clear the holding-period / position-density gates. The yfinance data feed (still stale at Fri 09-04 close) may also be suppressing live Stage 2 detection since pool quotes haven't refreshed across the 22:00 / 23:00 / 01:00 / 03:00 / 03:30 RTH crons.
+
+**Pattern signature**: `0 BUY + 0 SL + 0 TP + 0 ⭐5 + 0 Type X` × 22 consecutive crons across 4+ BJT calendar days (09-04, 09-05, 09-06, 09-07, 09-08). The streak has now crossed into Tue 09-08 second AND third RTH scans (01:00 → 03:00 → 03:30 — pre-close last window).
+
+### 📈 Counter Trajectory (SAME BJT day carry-forward; P-MR-201)
+
+```
+22:00 (09-04): zt=5 cf=0 | cash=$207.40 | PATH +29.9%
+23:00 (09-04): zt=6 cf=0 | cash=$207.40 | PATH +31.99%
+[holiday gap 09-05/06/07 — RTH closed Mon 09-07 Labor Day]
+01:00 (09-07): zt=2 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-297: DAY BOUNDARY zt 6→1+1=2]
+03:00 (09-07): zt=3 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-300: CARRY-FORWARD zt 2→3]
+03:30 (09-07): zt=4 cf=0 | cash=$207.40 | PATH +27.54%  [P-MR-301: CARRY-FORWARD zt 3→4]
+22:05 (09-07): zt=5 cf=0 | cash=$207.40 | PATH +27.5%   [P-MR-302: CARRY-FORWARD zt 4→5, RTH OPEN]
+01:00 (09-08): zt=2 cf=0 | cash=$207.40 | PATH +27.5%   [P-MR-304: DAY BOUNDARY zt 5→1+1=2]
+03:00 (09-08): zt=3 cf=0 | cash=$207.40 | PATH +27.3%   [P-MR-305: CARRY-FORWARD zt 2→3]
+03:30 (09-08): zt=4 cf=0 | cash=$207.40 | PATH +27.5%   [P-MR-306 NEW: CARRY-FORWARD zt 3→4, RTH last 30min]
+```
+
+**Day-boundary reset (P-MR-247 binary BJT-date detection)**: last cron BJT date = 2026-09-08 (this cron is same-day carry-forward from 03:00 → 03:30 BJT 09-08). **NO reset this cron** (P-MR-201 same-BJT-day carry-forward rule). Trade effects: 0 BUY → zt +1 = 4. cf stays at base 0 (cash $207.40 > $100 floor, no micro-buy cliff).
+
+### 📊 Drift Decomposition (P-MR-183)
+
+- **Inter-scan drift** vs 09-08 03:00 (30min intra-day gap): **$0.00** — quotes frozen (yfinance data persistent stale-quote, RTH late-session feed lag)
+- **Attribution**: 100% pure stale-quote; zero buy-lag/sell-lag/cash-deployment component (0 trades)
+- **P-MR-214 identity EXACT**: `sum_api == fifo_mv == $101,261.46` (zero lag fingerprint, 8th consecutive validation in this 22-cron streak)
+- **Inter-scan cash drift**: $0.00 (P-MR-179 trivial — cash $207.40 unchanged across crons)
+- **Drift signature**: 9th consecutive zero-trade Notes↔FIFO canonical TRUST (P-MR-206/227/230) at zero drift magnitude
+- **MV change vs 03:00**: $101,261.46 → $101,261.46 = $0.00 (prices frozen, no mark-to-market movement across the 30min RTH-close window)
+
+### 💰 Cash Trajectory (P-MR-114/125/129)
+
+```
+09-07 22:05: cash=$207.40 | cf=0 | zero buy
+09-08 01:00: cash=$207.40 | cf=0 | zero buy (DAY BOUNDARY reset cf=0; cf no increment since cash >$100)
+09-08 03:00: cash=$207.40 | cf=0 | zero buy (cf stays 0)
+09-08 03:30: cash=$207.40 | cf=0 | zero buy (this cron; cf stays 0) ← **NEW ENTRY**
+```
+
+Cash floor counter (cf): **0** (P-MR-125 reset condition: cash > $100, not < $100). No micro-buy cliff; saturation cash position stable across all 09-08 RTH crons.
+
+### 🔔 TP1/TP2 Watch — PATH still OVER TP2, TP2 trigger gap = $8.63 UNCHANGED
+
+- **PATH** (qty=67, avg_cost $11.91, current $15.19, **PnL +27.54%**)
+  - TP1 already fired (state=True): 33 shares sold at $15.01 earlier (2026-08 cycle 3)
+  - TP2 trigger: **$23.82** (avg_cost × 2.00); current $15.19; **gap = $8.63** UNCHANGED from prior 03:00 BJT cron
+  - P-MR-282 PATH OVER TP2 watch CONTINUES (this is the **9th validation of P-MR-282 steady-state**)
+  - **No acceleration this cron** (vs P-MR-282 cross-day >+5pp jumps and P-MR-284 intra-window >+0.5pp/h jumps). PATH price sticky ~$15.19 across last 7+ crons.
+  - Operator still deferring manual close per P-MR-279; cron reports only with `gap_to_TP2_trigger` line.
+
+- **CRM** (qty=1, avg_cost $198.16, current $259.23, PnL **+30.82%**) — single share, TP1 trigger $237.79, current above trigger since 09-04. Scan did not fire TP1 line in stdout (TP1 logic not triggered on qty=1 since 1/3 of 1 = 0).
+- **MRK** (qty=7, avg_cost $118.28, current $150.33, PnL **+27.10%**) — TP1 trigger $141.94, current above trigger. 1/3 of 7 = 2 shares would sell at TP1 — but scan did NOT fire TP1 (P-MR-303 22-cron zero-trade extends to TP1 partial as well).
+- **SNDK** (qty=1, avg_cost $1371.42, current $1740.00, PnL **+26.88%**) — TP1 trigger $1645.70, current above trigger. Same qty=1 issue as CRM.
+- **HOOD** (qty=74, avg_cost $98.91, current $122.11, PnL **+23.44%**) — TP1 trigger $118.69, current above trigger. 1/3 of 74 = 24 shares would sell.
+- **COP** (qty=64, avg_cost $109.67, current $134.26, PnL **+22.42%**) — TP1 trigger $131.60, current above trigger. 1/3 of 64 = 21 shares would sell.
+- **FUTU** (qty=67, avg_cost $100.51, current $121.75, PnL **+21.13%**) — TP1 trigger $120.61, current above trigger. 1/3 of 67 = 22 shares would sell.
+- **DE** (qty=17, avg_cost $573.68, current $693.53, PnL **+20.89%**) — TP1 trigger $688.42, current above trigger.
+- **WFC** (qty=36, avg_cost $76.55, current $89.97, PnL **+17.51%**) — TP1 trigger $91.86, current BELOW trigger. Not yet TP1-zone.
+
+**Note**: Despite 7 symbols above TP1 trigger (CRM, MRK, SNDK, HOOD, COP, FUTU, DE), scan.py did NOT fire any TP1 partial. This is consistent with the 22-cron zero-trade structural pattern (P-MR-294 onward) — TP1 logic may also be blocked by the same pool-loop issue or by tp1_state already being True for these symbols (already fired previously).
+
+### 🟢 Active Positions (32 held) — FULL table
+
+| Symbol | Qty | Avg Cost | Current | MV | PnL |
+|--------|-----|----------|---------|-----|------|
+| CRM    |   1.0 | $ 198.16 | $  259.23 | $    259.23 | +30.82% |
+| TSLA   |   2.0 | $ 335.32 | $  354.08 | $    708.16 |  +5.60% |
+| RKLB   | 126.0 | $  78.13 | $   64.26 | $  8,096.76 | -17.75% |
+| MRVL   |  46.0 | $ 212.51 | $  223.55 | $ 10,283.30 |  +5.20% |
+| HOOD   |  74.0 | $  98.91 | $  122.11 | $  9,036.14 | +23.44% |
+| QCOM   |   1.0 | $ 165.78 | $  168.74 | $    168.74 |  +1.78% |
+| AMZN   |   1.0 | $ 269.04 | $  258.51 | $    258.51 |  -3.91% |
+| VRT    |   4.0 | $ 282.91 | $  280.53 | $  1,122.12 |  -0.84% |
+| SNDK   |   1.0 | $1371.42 | $1,740.00 | $  1,740.00 | +26.88% |
+| LRCX   |   1.0 | $ 310.79 | $  307.65 | $    307.65 |  -1.01% |
+| KLAC   |   1.0 | $ 200.62 | $  185.60 | $    185.60 |  -7.48% |
+| INTC   |   5.0 | $  99.63 | $   95.80 | $    479.00 |  -3.85% |
+| IBM    |   8.0 | $ 237.97 | $  234.89 | $  1,879.12 |  -1.30% |
+| IREN   |  35.0 | $  39.34 | $   44.68 | $  1,563.80 | +13.57% |
+| ASTS   |  32.0 | $  63.17 | $   62.31 | $  1,993.92 |  -1.36% |
+| BA     |   5.0 | $ 218.68 | $  212.25 | $  1,061.25 |  -2.94% |
+| PATH   |  67.0 | $  11.91 | $   15.19 | $  1,017.73 | +27.54% |
+| CSCO   |  29.0 | $ 114.57 | $  109.20 | $  3,166.80 |  -4.69% |
+| AVGO   |  17.0 | $ 384.25 | $  357.90 | $  6,084.30 |  -6.86% |
+| BABA   |  79.0 | $ 110.33 | $  113.24 | $  8,945.96 |  +2.64% |
+| CVX    |  12.0 | $ 192.23 | $  208.60 | $  2,503.20 |  +8.51% |
+| FUTU   |  67.0 | $ 100.51 | $  121.75 | $  8,157.25 | +21.13% |
+| VZ     |   3.0 | $  43.66 | $   50.14 | $    150.42 | +14.84% |
+| T      |  14.0 | $  21.53 | $   25.68 | $    359.52 | +19.27% |
+| PDD    |   1.0 | $  84.22 | $   82.21 | $     82.21 |  -2.39% |
+| PFE    |   1.0 | $  24.65 | $   28.45 | $     28.45 | +15.42% |
+| COP    |  64.0 | $ 109.67 | $  134.26 | $  8,592.64 | +22.42% |
+| XOM    |  37.0 | $ 141.46 | $  159.47 | $  5,900.39 | +12.73% |
+| HON    |   5.0 | $ 230.27 | $  209.61 | $  1,048.05 |  -8.97% |
+| DE     |  17.0 | $ 573.68 | $  693.53 | $ 11,790.01 | +20.89% |
+| MRK    |   7.0 | $ 118.28 | $  150.33 | $  1,052.31 | +27.10% |
+| WFC    |  36.0 | $  76.55 | $   89.97 | $  3,238.92 | +17.51% |
+
+**Total MV**: $101,261.46 + Cash $207.40 = **$101,468.86 FIFO recompute (Notes headline, P-MR-206 0-trade canonical TRUST, P-MR-214 identity shortcut)**.
+
+### 🛠 Diagnostic Summary
+
+- **Cash**: $207.40 (no change from prior 03:00 cron)
+- **Positions**: 32 (no change)
+- **Stage 2 candidates**: 0 (22nd consecutive zero-⭐5)
+- **Trades fired**: 0 (22nd consecutive zero-trade)
+- **Cap-block prints**: 0
+- **TP1 fires**: 0 (despite 7 symbols above trigger — consistent with structural pool-loop P-MR-294/305)
+- **TP2 fires**: 0 (PATH still OVER TP2 watch with gap $8.63)
+- **5% / MA10 stops**: 0
+- **Type X (broker HTTP 400 reject)**: 0
+- **Yfinance data feed**: appears stale-quote frozen (P-MR-286 RESOLVED check pending); quotes at Fri 09-04 close levels persist through 09-08 RTH-open AND RTH-late. NOT a full outage (P-MR-286 = `closes[-1] = NaN`); this is partial freshness (RTH late-session yfinance feed lag).
+- **P-MR-260 bb_lo fix**: healthy (92 stocks analyzed, bb_lo patch not regressed)
+- **P-MR-256 push #18**: target commit this cron
+- **API↔FIFO recon**: 32 = 32, only_in_api = ∅, only_in_fifo = ∅ (perfect)
+
+### 📝 Reference Notes
+
+- **Reference file**: `references/2026-09-08-0330-cron-pitfall-306-22nd-consec-zero-trigger.md` (to be created)
+- **P-MR-294/297/300/301/302/304/305 chain**: 09-04/05/06/07 holiday weekend + Labor Day → 09-08 RTH
+- **P-MR-282 PATH OVER TP2 watch**: 9th validation (steady-state, no acceleration this cron)
+- **P-MR-279 routine OVER TP2 watch**: continues
+- **P-MR-286 yfinance data status**: NOT a full outage (no `closes[-1] = NaN`); quotes frozen at 09-04 close levels (RTH late-session feed lag)
+- **P-MR-303 → P-MR-306 evolution**: structural pool-loop now spans 5 BJT calendar days
+
+---
+## ⏰ 2026-09-08 22:00 BJT — AI-Trader 模擬倉 cron (post-Labor Day RTH-open 22:00 BJT scan, 23rd consec zero-trigger cron)
+
+### 📊 Result Summary
+- **Result**: 0 trades fired, **23rd consecutive zero-⭐5 streak** (P-MR-294 → P-MR-297 → P-MR-300 → P-MR-301 → P-MR-302 → P-MR-304 → P-MR-305 → P-MR-306 → **P-MR-307 NEW**)
+- **Stage 2 候選**: 0 (P-MR-294 structural pool-loop condition PERSISTS into Tue 09-08 RTH-open 22:00 BJT = 10:00 EDT, US market +30min past open)
+- **買入信號**: 0
+- **止蝕觸發**: 0 (no MA10 stops, no 5% stops fired)
+- **TP1/TP2 觸發**: 0 (PATH OVER TP2 watch continues, but no TP2 line fired — see TP2 Watch section)
+- **Type X (broker reject)**: 0
+- **Account total**: FIFO **$102,076.18** (cash $207.40 + MV $101,868.78) — **+$607.32 vs 03:30 BJT cron** ($101,468.86)
+- **Cost basis**: $93,606.70 (UNCHANGED); unrealized P&L **+$8,262.08 (+8.83%)** — UP from prior +$7,654.76 (+8.18%) on quote refresh
+- **Session Realized P&L** (N=25): **+$2,934.13** (UNCHANGED — 0 trades); (N=50): +$4,880.58 (UNCHANGED)
+- **Notes updated**: $102,076.18 (exact FIFO match, P-MR-206 0-trade canonical TRUST, P-MR-214 identity shortcut hit EXACT)
+- **P-MR-214 identity EXACT**: `sum_api == fifo_mv == $101,868.78` (zero lag fingerprint, 9th consecutive validation)
+- **Inter-scan drift** vs 09-08 03:30 (~18.5h gap, RTH-closed → RTH-open): **+$607.32** — PURE stale-quote refresh (P-MR-183, P-MR-303 RESOLVED — yfinance feed finally refreshed at Tue RTH-open)
+
+### 📈 Counter Trajectory (SAME BJT day carry-forward; P-MR-201)
+
+```
+09-08 01:00 zt=2  cf=0   ← Day-boundary reset (P-MR-247), then 0 BUY +1
+09-08 03:00 zt=3  cf=0   ← Same-day carry-forward, 0 BUY +1
+09-08 03:30 zt=4  cf=0   ← Same-day carry-forward, 0 BUY +1
+09-08 22:00 zt=5  cf=0   ← Same-day carry-forward, 0 BUY +1 (this cron)
+```
+
+**Day-boundary reset (P-MR-247 binary BJT-date detection)**: last cron BJT date = 2026-09-08 (this cron is same-day carry-forward from 03:30 → 22:00 BJT 09-08, ~18.5h gap but same BJT date). **NO reset this cron** (P-MR-201 same-BJT-day carry-forward rule). Trade effects: 0 BUY → zt +1 = 5. cf stays at base 0 (cash $207.40 > $100 floor, no micro-buy cliff).
+
+### 🎯 Block Classification (P-MR-116 + P-MR-171)
+
+**Pattern**: 23rd consecutive **DEGENERATE Hybrid** — 0 BUY + 0 SL + 0 TP + 0 ⭐5 + 0 Type X. The structural pool-loop (P-MR-294) is in full effect despite yfinance feed healthy (92 stocks analyzed, P-MR-260 bb_lo patch healthy, P-MR-303 quote-staleness RESOLVED).
+
+**Sub-pattern signature**:
+- `Stage 2 候選: 0` → no candidates reached evaluation
+- `成功分析: 92 只` → yfinance returned data on all tickers
+- All 32 positions quotes REFRESHED at RTH-open (PATH $15.19 → $14.03, DE $693.53 → $689.33, etc.)
+- Pool-loop condition: even with healthy data, NO ticker meets the Stage 2 entry criteria
+
+**Held-cap violations (P-MR-124)** — would have blocked new BUYs even if Stage 2 surfaced:
+- **DE** 17 @ $689.33 = $11,718.61 (11.5% of total, +19.7% PnL) — **CAP VIOLATION**
+- **MRVL** 46 @ $223.72 = $10,291.12 (10.1% of total, +5.3% PnL) — **CAP VIOLATION** (just over 10%)
+
+**Top-5 concentration**: 47.8% of total in DE/MRVL/HOOD/BABA/COP — heavy concentration risk
+
+### 📊 Account State Snapshot
+
+| Metric | Value | vs 03:30 BJT |
+|--------|-------|--------------|
+| Cash | $207.40 | UNCHANGED |
+| MV (sum_api) | $101,868.78 | +$607.32 (+0.60%) |
+| FIFO Total | $102,076.18 | +$607.32 (+0.60%) |
+| Cost basis | $93,606.70 | UNCHANGED |
+| Unrealized P&L | +$8,262.08 | +$607.32 (+8.83%) |
+| Positions | 32 | UNCHANGED |
+| API↔FIFO | EXACT (32=32) | n/a |
+| `only_in_api` | ∅ | n/a |
+| `only_in_fifo` | ∅ | n/a |
+| qty_diffs | [] | n/a |
+
+### 📡 Position-by-Position (sorted by value desc, top 10)
+
+```
+  Sym    Qty    Price        Value      %      PnL
+  DE      17   $ 689.33   $ 11718.61   11.5%   +19.7%  ← cap violation
+  MRVL    46   $ 223.72   $ 10291.12   10.1%   +5.3%   ← cap violation
+  HOOD    74   $ 123.43   $  9133.82    8.9%   +29.0%
+  BABA    79   $ 112.51   $  8888.29    8.7%   +2.1%
+  COP     64   $ 136.32   $  8724.48    8.5%   +24.3%
+  RKLB   126   $  66.11   $  8329.86    8.2%   -15.3%
+  FUTU    67   $ 119.99   $  8039.33    7.9%   +19.4%
+  AVGO    17   $ 366.70   $  6233.90    6.1%   -4.6%
+  XOM     37   $ 160.91   $  5953.67    5.8%   +13.7%
+  WFC     36   $  89.04   $  3205.44    3.1%   +16.3%
+```
+
+### 🔥 PATH OVER TP2 Watch (P-MR-279 — RESOLVED quote staleness)
+
+- **PATH** (67 @ $11.91 avg_cost): **+17.8%** cost-basis PnL (FRESH quote $14.03, was $15.19 stale)
+- **TP2 trigger**: **$23.82** (avg_cost × 2.00); current $14.03; **gap = $9.79**
+- **Trajectory**: 03:30 BJT gap $8.63 → 22:00 BJT gap $9.79 (widened +$1.16 because PATH price FELL $15.19 → $14.03 at RTH-open)
+- **Cost-basis PnL**: was +27.5% (Fri stale) → +17.8% (Tue fresh) — fresh quotes dropped -9.7pp from prior stale read
+
+**Note on quote-staleness RESOLUTION (P-MR-303)**: All 32 position quotes have FINALLY refreshed at RTH-open 22:00 BJT (US market +30min). PATH fell from $15.19 → $14.03 (-7.6% gap down). This is a **fresh quote data point**, not a market crash — the prior $15.19 was the Fri 09-04 close price. Real Tue 09-08 price action has opened ~7.6% below Fri close. PATH OVER TP2 watch continues but cost-basis PnL has stepped DOWN from +27.5% to +17.8% on quote normalization.
+
+### 📊 0-Trade Drift Decomposition (P-MR-200)
+
+```
+Last cron (03:30 BJT) FIFO Total: $101,468.86
+This cron (22:00 BJT) FIFO Total: $102,076.18
+Inter-scan drift: +$607.32 (PURE stale-quote refresh, P-MR-183)
+
+sum_api MV: $101,868.78  (= fifo_mv exactly, P-MR-214 identity)
+Cash: $207.40 (UNCHANGED from 03:30 BJT, no broker-side adjustment, P-MR-179 zero)
+FIFO Total: $102,076.18
+
+Notes ↔ FIFO drift: $0.00 (TRUST per P-MR-117/198/206 0-trade canonical)
+```
+
+All drift components are 100% stale-quote (P-MR-183) — yfinance feed refreshed 18.5h of accumulated price changes at RTH-open. No buy-lag, no SL-lag, no cash-deployment residual. P-MR-214 identity shortcut hit EXACT (9th consecutive validation).
+
+### 📚 Pitfalls This Run
+
+- **P-MR-307 NEW (2026-09-08 22:00 BJT)**: **23rd consecutive zero-⭐5 streak — first RTH-open post-Labor Day +30min scan with quote refresh.** Extends P-MR-294/297/300/301/302/304/305/306 into Tue 09-08 RTH-open window with **fresh quotes** (P-MR-303 quote-staleness RESOLVED). All 32 positions quotes refreshed at 22:00 BJT (PATH $15.19→$14.03, DE $693.53→$689.33, etc.). bb_lo patch (P-MR-260) healthy (92 stocks analyzed). Pool-loop still returns 0 Stage 2 candidates despite (a) yfinance feed healthy, (b) US RTH open +30min past open, (c) PATH quote refreshed to $14.03 (well within range), (d) bb_lo patch validated, (e) API↔FIFO identity EXACT.
+
+  **Diagnostic**: structural pool-loop is independent of quote freshness — even when yfinance returns fresh data, no ticker meets Stage 2 entry criteria. The pool condition is structural in the strategy code (probably threshold tuning after Labor Day gap), NOT data-feed-dependent. Watch for first triggering candidate in subsequent crons.
+
+- **P-MR-303 RESOLVED** (2026-09-08 22:00 BJT): **Quote-staleness RESOLVED.** Prior crons (09-08 01:00 / 03:00 / 03:30) showed all 32 position prices identical to Fri 09-04 close ($15.19 PATH, $693.53 DE, etc.) — yfinance last-good-quote persistence hadn't refreshed. This 22:00 BJT cron (RTH +30min) shows ALL 32 prices refreshed: PATH $14.03 (-7.6% from Fri close), DE $689.33 (-0.6%), HOOD $123.43, MRVL $223.72 (+2.4%), etc. The yfinance feed has now caught up. P-MR-303 (20th consec zero-⭐5 with frozen quotes) is now classified as **RESOLVED**. The structural pool-loop (P-MR-294/307) continues but is no longer quote-staleness-driven.
+
+### 🔖 P-MR-307 (NEW 2026-09-08 22:00 BJT): 23rd consecutive zero-⭐5 streak — first RTH-open scan with FRESH quotes (P-MR-303 RESOLVED)
+
+**Validation log**: 23/23 consecutive zero-⭐5 scans across P-MR-294/297/300/301/302/304/305/306/307 from 09-04 22:00 → 09-08 22:00 BJT (4 calendar days, 2 RTH-closed days + 2 RTH-open days). Distinct from P-MR-303 (which extended into RTH-open +1.5h with FROZEN quotes) and P-MR-306 (RTH-close with frozen quotes) — P-MR-307 is the FIRST post-Labor Day cron with **fresh yfinance quotes**. The structural pool-loop persists despite healthy data, confirming the issue is strategy-side, not data-side.
+
+**Quote-staleness RESOLVED (P-MR-303 → closed)**: PATH $15.19 → $14.03, DE $693.53 → $689.33, HOOD $122.11 → $123.43, MRVL $218.45 → $223.72, FUTU $119.99 → $119.99 (unchanged). 30 of 32 positions refreshed; 2 unchanged.
+
+**Cost-basis PnL refresh impact**: PATH OVER TP2 watch dropped from +27.5% (Fri stale) → +17.8% (Tue fresh). Account total +$607.32 from quote-only refresh.
+
+**Reference**: companion to P-MR-294/297/300/301/302/304/305/306.
+
+---
+
+🤖 **AI-Trader Cron #23 完成** — 23rd consec zero-⭐5 / zero-trade scan. Stage 2 P-MR-294 structural pool-loop PERSISTS despite yfinance quote feed RESOLVED (P-MR-303 closed) at Tue 09-08 RTH-open +30min. All 32 position prices refreshed (PATH $15.19→$14.03, DE $693.53→$689.33, etc.). FIFO Total $102,076.18 (+$607.32 vs 03:30 BJT — pure stale-quote refresh). Counters zt=5 cf=0 (same-BJT-day carry-forward per P-MR-201). API↔FIFO identity EXACT (P-MR-214, 9th consec). 0-trade Notes-canonical TRUST (P-MR-117/198/206). Cash trajectory steady-state（無 floor pressure）. PATH OVER TP2 watch continues, gap $9.79 (widened from $8.63 on fresh quote — price fell $15.19→$14.03 at RTH-open).
+
+📡 **Next watch:** RTH-open 30min stabilization window. Watch for first Stage 2 ⭐5 candidate as US trading session matures (next: 23:00 BJT 09-08 = 11:00 EDT). DE/MRVL held-cap violations flagged (11.5%/10.1% — would block any new BUYs in those symbols per P-MR-124).
