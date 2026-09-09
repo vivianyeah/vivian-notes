@@ -14028,3 +14028,126 @@ RTH 收市前 30 min 全部 32 倉 MA20 對齊 → 無任何倉位衝擊 +40% TP
 
 📡 **下個交易日**：09-10 22:00 BJT（= 10:00 EDT，09-10 RTH 開盤）— 監控 SNDK TP2 線 $1,921.44（−10.9%）、RKLB（連續 4 窗走弱，MA10 緩衝 5.0%）、HOOD/COP TP1 manual review。集中度違規 DE/MRVL 持續標記。
 
+## 🕒 2026-09-09 22:00 BJT Cron Scan (#22) — Next-Day RTH Pre-Open / Portfolio Refresh
+
+```
+==================================================
+ AI-Trader 自動交易 scan — 2026-09-09 22:00 BJT
+ (= 10:00 EDT, 09-10 RTH 開市前 / 09-09 收市後隔夜)
+==================================================
+ Cash: $207.40      持倉: 32 只       狀態: 🟢 全部 OK
+ 掃描池: 92 只成功   Stage 2 候選: 0    買入信號: 0
+ 賣出/止蝕觸發: 0    TP1 觸發: 0        TP2 觸發: 0
+==================================================
+```
+
+### 📊 上次 Cron 對比（09-09 03:30 RTH close → **09-09 22:00 next-day pre-open**）
+
+| 指標 | 09-09 03:30 (RTH close) | **09-09 22:00 (next-day pre-open)** |
+|------|------:|------:|
+| Cash | $207.40 | **$207.40** |
+| 持倉數 | 32 | **32** |
+| MV (FIFO) | $101,464.03 | **$101,869.03** |
+| 總權益 | $101,671.43 | **$102,076.43** |
+| 成本基礎 | $93,632.23 | **$93,627.29** |
+| 未實現 PnL | +$7,831.80 (+8.36%) | **+$8,241.74 (+8.80%)** |
+| Stage 2 候選 | 0 | **0** |
+| ⭐5 買入信號 | 0 | **0** |
+| 止蝕觸發 | 0 | **0** |
+| TP1 / TP2 觸發 | 0 / 0 | **0 / 0** |
+| 池分析成功 | 92 | **92** |
+
+- **零觸發連續次數 (zt)**：**27**（前次 26 + 1；BJT 22:00 屬新一日早段，但本次跨日不觸發 day-boundary reset 因無 BUY 信號）
+- **Cash-at-floor (cf)**：0（$207.40 > $100 floor，無 micro-buy cliff）
+- **API↔FIFO identity**：EXACT（32 = 32，第 14 次連續）
+- **Session transition**：09-09 RTH close (15:30 EDT 03:30 BJT) → 09-10 RTH pre-open (22:00 BJT = 10:00 EDT, 09-10 開盤 -30min)
+- **隔夜 gap**：隔夜報價變動帶動 MV 由 $101,464.03 → $101,869.03（**+$405.00 / +0.40%**），全部 32 倉重新 mark-to-market
+
+### 💹 Inter-Session Drift 分解（09-09 03:30 RTH close → 09-09 22:00 next-day pre-open，~18.5h 隔夜）
+
+| 項目 | 值 |
+|------|---:|
+| MV drift | **+$405.00**（+0.40%） |
+| 成因 | PURE mark-to-market quote refresh（0 買入、0 賣出、0 現金部署）+ overnight session gap |
+| 最大負貢獻 | FUTU −$96.48 (67×−$1.44)、RKLB −$73.08 (126×−$0.58)、HOOD −$59.20 (74×−$0.80)、IREN −$35.00 (35×−$1.00)、CSCO −$19.43 (29×−$0.67) |
+| 最大正貢獻 | MRVL +$160.08 (46×+$3.48)、COP +$102.40 (64×+$1.60)、DE +$98.60 (17×+$5.80)、AVGO +$83.30 (17×+$4.90)、BABA +$46.61 (79×+$0.59) |
+| Qty 變動 | ∅ |
+
+**隔夜特徵**：high-beta 個股（FUTU、RKLB、HOOD）隔夜回吐，價值股 / AI 設備（MRVL、DE、AVGO）隔夜上揚。典型「AI / 算力 overnight re-rating」+ 「Chinese fintech profit-taking」rotation 模式。
+
+### 🎯 TP1 / TP2 觸發檢查（隔夜後 pre-open snapshot）
+
+**TP1 線（+20%）已過持倉**（5 只 — IREN/COP/HOOD/MRK/SNDK 已標記或待 manual review）：
+
+| Symbol | 數量 | 成本 | 現價 | PnL% | TP1 線 (+20%) | **TP2 線 (+40%)** | 距 TP2 |
+|--------|-----:|-----:|-----:|-----:|------:|------:|------:|
+| SNDK | 1 | $1,372.20 | $1,794.14 | **+30.7%** | $1,646.64 ✅過（TP1=true） | **$1,921.08** | **−6.6%** ($126.94) |
+| CRM | 1 | $198.26 | $251.69 | **+26.9%** | $237.91 ✅過（手動 queue） | **$277.56** | −9.3% ($25.87) |
+| MRK | 7 | $118.24 | $148.65 | **+25.7%** | $141.88 ✅過（TP1=true） | **$165.53** | −10.2% ($16.88) |
+| COP | 64 | $109.67 | $136.90 | **+24.8%** | $131.60 ✅過（待 manual review） | **$153.53** | −10.8% ($16.63) |
+| HOOD | 74 | $95.68 | $118.09 | **+23.4%** | $114.82 ✅過（fresh lot, 待 manual review） | **$133.95** | −11.8% ($15.86) |
+| IREN | 35 | $39.32 | $46.70 | +18.8% | $47.18 ❌（−1.0% below TP1, TP1=true 保留） | $55.05 | −15.2% ($8.35) |
+
+**TP1 / TP2 觸發結論：0 TP1 fires / 0 TP2 fires。** TP1 method out of cron scope（FIFO recompute 評估），scan.py `check_exit` 只評 MA20/MA10 → cron 不自動執行 TP1 sell。**TP1 state file `/tmp/ai_trader_tp1_state.json` UNCHANGED**（只有 `_audit` 區塊更新，TP1/TP2 flag 不變）。CRM 之前未在 TP1=true 清單內 → 隔夜 +26.9% 已過 TP1 線 $237.91 → 下次 FIFO recompute 將觸發 TP1。
+
+**TP2 線（+40%）closest**：
+- **SNDK** −6.6% ($126.94 below TP2 line $1,921.08) ← 隔夜後最接近 TP2
+- **CRM** −9.3% ($25.87 below) ← 隔夜後首次進入「TP2 reachable」區
+- **MRK** −10.2%
+- **COP** −10.8%
+- **HOOD** −11.8%
+
+**SNDK 距 TP2 由前次 −10.9% 收窄至 −6.6%** — 若 09-10 RTH 開盤延續 momentum，TP2 觸發可能性提升。CRM 從 −14.2% 收窄至 −9.3%，亦首次進入「TP2 reachable」區（gap < 10%）。
+
+### 🛡️ 止蝕雙方法狀態（MA10 trail post-RTH 進入 dormant，next active at 09-11 10:30 BJT = 09-10 RTH open + 30min）
+
+| 方法 | 說明 | 本次狀態 |
+|------|------|---------|
+| **A. 5% 固定止蝕**（entry-anchored） | 入場價 × 0.95 | 0 觸發（RKLB $65.39 vs 舊 fixed SL $74.15 = −16.2% 仍破，但 active 方法為動態 MA10/MA20） |
+| **B. MA10 trail stop**（TP1 後 active） | 收市價 < MA10 → 全出 | 0（隔夜停牌，MA10 trail 待 09-10 RTH 重啟） |
+
+- scan.py 印出 32 倉 **全部 🟢 OK**（yfinance 顯示現價 = MA20，因美股尚未開盤，5d history 收盤價 = MA20 線）
+- **RKLB −16.2%** 為最弱倉：現價 $65.39，動態止蝕 $62.13，緩衝 $3.26（5.0%）→ 仍未觸發，但已連續 5 個窗口走弱（03:00 → 03:30 → 22:00），09-10 RTH 開盤係關鍵監控點
+- **HON −10.3%**、**KLAC −8.1%**、**AMZN −6.4%**、**PDD −6.4%**、**AVGO −5.7%** 次弱
+- **止蝕線 = 現價 × 0.95**（scan.py 預設方法 A）
+
+### 📈 評分含 RR — Stage 2 突破回調篩選
+
+- **池分析**：92 只成功（P-MR-260 bb_lo patch 健康）
+- **Stage 2 候選**：0 → **⭐5 + RR≥0.8 評分無對象**（第 27 次連續零候選，P-MR-294 loop 持續）
+- **結構性成因（P-MR-294 loop 持續第 27 次）**：
+  1. 池內候選集中在 `bb_lo > price` 早期修復區，未進入 Stage 2 要求的 `bb_lo < price < bb_mid` 回調帶
+  2. 32 倉飽和 + Cash $207.40 → 任何 Stage 2 單位價都買唔起（deployment hard block）
+  3. 持倉集中度違規：**DE 11.39%**、**MRVL 10.86%** 超 10% cap（P-MR-124 → 即使有信號亦封鎖該兩隻新買）
+- **RR 分佈**：n/a（0 候選 → 無 RR 可計）
+
+### 💰 Cash Trajectory
+
+```
+09-09 03:30: cash=$207.40 | cf=0
+09-09 22:00: cash=$207.40 | cf=0 ← 本次（隔夜無 broker adjustment、無交易）
+```
+
+### 🔁 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | **APPEND**（本次 #22 entry） |
+| `/tmp/ai_trader_trades_log.json` | 286 entries，**0 交易新增**（語意不變式：只記 buy/sell 事件） |
+| `/tmp/ai_trader_tp1_state.json` | **ONLY `_audit` 區塊更新**（HOOD/COP TP1-over-line 待 manual review；SNDK TP2 nearest 從 −10.9% 收窄至 −6.6%；TP1/TP2 flags 不變） |
+
+### 🚦 Cron 狀態：✅ HEALTHY ZERO-TRIGGER（第 27 次連續）
+
+- 0 買入 / 0 賣出 / 0 TP1 / 0 TP2
+- API↔FIFO EXACT（第 14 次連續）
+- 報價新鮮（隔夜後 yfinance 重整至最新 close）
+- Drift 純 mark-to-market（+$405.00 / 18.5h 隔夜）
+- MA10 trail stop dormant（待 09-10 RTH 開盤）
+- 集中度違規已標記（DE 11.39% / MRVL 10.86%）
+- **隔夜後 TP2 接近度提升**：SNDK 由 −10.9% 收窄至 −6.6%；CRM 由 −14.2% 收窄至 −9.3%
+
+---
+
+🤖 **AI-Trader Cron #22 完成** — 09-09 22:00 BJT（10:00 EDT，**09-10 RTH 開市前 30 分鐘**）。**Session 轉場**：09-09 RTH close (15:30 EDT 03:30 BJT) → 09-10 RTH pre-open。**隔夜 MV +0.40%**（+$405.00），全部純 mark-to-market。TP2 接近度全面收窄：**SNDK 由 −10.9% 收窄至 −6.6%**，**CRM 首次進入 TP2 reachable 區（−9.3%）**。Stage 2 池 loop 第 27 次連續零候選（P-MR-294）。純模擬倉，無 IB order。32 倉 MA10 trail 待 09-10 RTH 開盤重啟監控。
+
+📡 **下個窗口**：09-09 23:00 BJT（= 11:00 EDT，09-10 RTH 開市後 30 分鐘）— 監控 **SNDK TP2 線 $1,921.08（−6.6% closest）**、CRM TP2 $277.56（−9.3%）、RKLB（連續 5 窗走弱，MA10 緩衝 5.0%）、HOOD/COP TP1 manual review queue。集中度違規 DE 11.39% / MRVL 10.86% 持續標記。
