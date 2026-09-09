@@ -1,0 +1,47 @@
+{
+  "AMD": true,
+  "AVAV": false,
+  "CIFR": false,
+  "HOOD": {
+    "closure_date": "2026-07-14T01:00:00+08:00",
+    "closure_method": "MA10_stop",
+    "entry_price": 83.73,
+    "note": "Original lot TP1+TP2 fired 2026-06-29. 22:30 MA10 stop sold 26 @ $110.26. 01:00 MA10 stop sold 13 @ $110.21 (new lot from 23:00 cron). All HOOD lots fully closed.",
+    "qty_sold": 117,
+    "remaining_qty": 0,
+    "status": "FULLY_CLOSED",
+    "tp1_hit_at": "2026-06-29T14:03:38Z",
+    "tp1_price": 101.39
+  },
+  "NBIS": true,
+  "ONDS": true,
+  "PYPL": true,
+  "SMCI": true,
+  "SYM": false,
+  "DHR": true,
+  "ADBE": true,
+  "MSFT": true,
+  "JD": true,
+  "ANET": true,
+  "PATH": true,
+  "CRWV": true,
+  "IREN": true,
+  "SNDK": true,
+  "_audit": {
+    "last_checked_bjt": "2026-09-10T01:02:17+08:00",
+    "cron": "#24 (RTH mid-session follow-through)",
+    "session": "09-10 RTH open +3h (13:00 EDT)",
+    "tp1_fires": 0,
+    "tp2_fires": 0,
+    "tp2_nearest": "SNDK -7.6% (cur $1774.90 vs TP2 $1921.08)",
+    "tp1_over_line_unmarked": [
+      "CRM (manual queue, +24.9%)",
+      "HOOD (fresh lot, +21.9%)",
+      "COP (manual queue, +24.4%)",
+      "MRK (TP1=true ✅)",
+      "SNDK (TP1=true ✅)"
+    ],
+    "ma10_trail": "active (RTH mid-session); 32 positions MA10/MA20 OK, no breach",
+    "session_status": "RTH mid-session, between 23:00 +1.5h and 01:00 +3h"
+  }
+}
