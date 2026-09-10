@@ -28,20 +28,19 @@
   "IREN": true,
   "SNDK": true,
   "_audit": {
-    "last_checked_bjt": "2026-09-10T23:00:00+08:00",
-    "cron": "#28 (RTH mid-session, same-day carry P-MR-201)",
-    "session": "RTH mid-session (2026-09-10T11:00:00-04:00) — 09-10 RTH +1.5h, pre-market follow-through",
+    "last_checked_bjt": "2026-09-11T03:02:34+08:00",
+    "cron": "#30 (RTH late (TP2 check window))",
+    "session": "RTH late (TP2 check window) (2026-09-10T15:00:00-04:00)",
     "tp1_fires": 0,
     "tp2_fires": 0,
-    "tp2_nearest": "SNDK +13.4% (cur $1694.36 vs TP2 $1921.08)",
+    "tp2_nearest": "COP -11.9% (cur $137.21 vs TP2 $153.55)",
     "tp1_over_line_unmarked": [
-      "CRM (manual queue, +23.8%)",
-      "HOOD (fresh lot, +20.5%)",
-      "COP (manual queue, +23.8%)",
-      "MRK (TP1=true ✅)",
+      "CRM (manual queue, +22.8%)",
+      "COP (manual queue, +25.1%)",
+      "MRK (manual queue, +22.6%)",
       "SNDK (TP1=true ✅)"
     ],
-    "ma10_trail": "active (RTH mid-session); 32 positions MA10/MA20 OK, no breach; RKLB -18.1% weakest (10-window streak, deteriorated 0.2pp from #27 -17.9%, streak NOT bottomed)",
-    "session_status": "RTH mid-session, 09-10 23:00 BJT = 11:00 EDT = same-day carry (P-MR-201: zt 2 → 3). MV +169.06 (+0.17%) pure mark-to-market. 5 TP1-over-line all widened TP2 gap (RTH mid-session profit-taking pattern)."
+    "ma10_trail": "active (RTH late TP2 check window); 32 positions MA10/MA20 OK, no breach; RKLB -20.1% weakest (12-window streak, deteriorated 0.8pp from #29 -19.3%)",
+    "session_status": "RTH late (TP2 check window)"
   }
 }
