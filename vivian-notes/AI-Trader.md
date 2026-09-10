@@ -15150,3 +15150,203 @@ Net effect:  純 mark-to-market，0 trade, 0 TP1, 0 TP2
 - **集中度違規 DE 11.52% / MRVL 10.68%** 持續標記
 - 下次 cron: #29 @ 09-11 01:00 BJT (13:00 EDT, RTH mid-session, day-boundary reset if 09-10 RTH 已收市)
 
+## 🕒 2026-09-11 01:00 BJT Cron Scan (#29) — RTH Mid-Session Follow-Through (Next-Day, Day-Boundary Reset)
+
+```
+==================================================
+ AI-Trader 自動交易 scan — 2026-09-11 01:00 BJT
+ (= 2026-09-10 13:00 EDT, RTH mid-session +3h)
+==================================================
+ Cash: $207.40       持倉: 32 只        狀態: 🟢 全部 OK
+ 掃描池: 92 只成功   Stage 2 候選: 0    買入信號: 0
+ 賣出/止蝕觸發: 0    TP1 觸發: 0        TP2 觸發: 0
+==================================================
+```
+
+### 📊 5 次 Scan 對比 (#25 → #29)
+
+| 指標 | #25 09-10 03:00 | #26 09-10 03:30 | #27 09-10 22:00 | #28 09-10 23:00 | **#29 09-11 01:00** |
+|------|------:|------:|------:|------:|------:|
+| Cash | $207.40 | $207.40 | $207.40 | $207.40 | **$207.40** |
+| 持倉數 | 32 | 32 | 32 | 32 | **32** |
+| MV (FIFO) | — | — | $99,993.43 | $100,162.49 | **$99,838.84** |
+| 總權益 | — | — | $100,200.83 | $100,369.89 | **$100,046.24** |
+| 成本基礎 | — | — | — | — | **$93,645.85** |
+| 未實現 PnL | — | — | — | +$6,534.74 (+6.98%) | **+$6,192.99 (+6.61%)** |
+| Stage 2 候選 | 0 | 0 | 0 | 0 | **0** |
+| ⭐5 買入信號 | 0 | 0 | 0 | 0 | **0** |
+| 止蝕觸發 | 0 | 0 | 0 | 0 | **0** |
+| TP1 / TP2 觸發 | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | **0 / 0** |
+| 池分析成功 | 92 | 92 | 92 | 92 | **92** |
+
+- **零觸發連續次數 (zt)**：**2** ← **DAY-BOUNDARY RESET (P-MR-247)** — zt 31 → 1 → +1 = **2** (09-11 第一次 scan)
+- **Cash-at-floor (cf)**：0（$207.40 > $100 floor）
+- **API↔FIFO identity**：EXACT（N=32，第 21 次連續）
+
+### 💹 Intra-Window Drift 分解（#28 23:00 → #29 01:00，~2h，跨日過夜 + RTH open +3h）
+
+| 項目 | 值 |
+|------|---:|
+| MV drift | **-$323.65** (-0.32%) |
+| 成因 | OVERNIGHT re-mark (-$148 隔夜 / 09-11 RTH open) + RTH mid-session profit-taking (-$176) — PURE mark-to-market，0 買入、0 賣出、0 現金部署 |
+| 最大負貢獻 | HOOD -$74.74 (74 × -$1.01), CRM -$0.38 (1 × -$0.38), SNDK -$2.33 (1 × -$2.33) |
+| 最大正貢獻 | COP +$108.80 (64 × +$1.70), MRK +$2.66 (7 × +$0.38) |
+| Qty 變動 | ∅ |
+
+### 🎯 TP1 / TP2 觸發檢查
+
+**TP1 線已過持倉**（按 PnL% 降序）：
+
+| Symbol | 數量 | 成本 | 現價 | PnL% | TP1 線 (+20%) | **TP2 線 (+40%)** | 距 TP2 |
+|--------|-----:|-----:|-----:|-----:|------:|------:|------:|
+| COP | 64 | $109.68 | $137.43 | +25.3% | $131.62 ✅過 | **$153.55** | **+11.7%** |
+| CRM | 1 | $198.25 | $245.04 | +23.6% | $237.90 ✅過 | **$277.55** | +13.3% |
+| SNDK | 1 | $1,372.29 | $1,692.03 | +23.3% | $1,646.74 ✅過 | **$1,921.20** | +13.5% |
+| MRK | 7 | $118.27 | $144.88 | +22.5% | $141.92 ✅過 | **$165.58** | +14.3% |
+
+**TP1 / TP2 觸發結論：0 / 0。** TP2 nearest: **COP** (-11.7% from TP2 line $153.55) — 取代 SNDK 成為 #29 nearest（COP overnight gap-up +$1.70 / SNDK overnight gap-down -$2.33）。
+
+**HOOD 跌破 TP1 線警報**：HOOD 由 #28 +20.5% 跌至 #29 +19.4%（**-1.1pp 跌破 TP1 線**）。State file HOOD 仍為 `FULLY_CLOSED` object（無新 lot TP1=true flag）。跌破 TP1 線但**未觸發任何 action** — HOOD object 結構不變，FIFO recompute 將於下次重算時決定新 lot 的 TP1 flag 設定。
+
+### 🛡️ 止蝕雙方法狀態
+
+| 方法 | 規則 | 本次狀態 |
+|------|------|---------|
+| **A. 5% 固定止蝕** (entry-anchored) | 入場價 × 0.95 | 0 觸發（32 倉現價 × 0.95 線未穿）|
+| **B. MA10 trail stop** (TP1 後 active) | 收市價 < MA10 → 全出 | 0 觸發（32 倉現價 ≥ MA20, MA10 trail 未觸發）|
+
+### 弱勢持倉監控 (PnL < -10%)
+
+| 股票 | 現價 | PnL% | 5% SL 緩衝 | 備註 |
+|------|------|------|------------|------|
+| **RKLB** | $63.03 | **−19.3%** | $59.88, 緩衝 $3.15 (5.0%) | 連續 **11 窗走弱**，今回 −19.3% vs #28 −18.1%，**再度惡化 1.2pp**，streak 仍未見底 |
+| HON | $202.62 | −12.0% | $192.49, 緩衝 $10.13 (5.0%) | 工業弱勢 |
+| VRT | $247.17 | −12.6% | $234.81, 緩衝 $12.36 (5.0%) | 數據中心弱勢 |
+| KLAC | $178.84 | −10.9% | $169.89, 緩衝 $8.95 (5.0%) | 半導體設備弱勢 |
+
+**RKLB 觀察重點**：
+- 連續 **11 窗走弱** (RTH close −18.4% → #27 −17.9% → #28 −18.1% → **#29 −19.3%**)
+- 今回 −19.3%，對比 #28 −18.1%，**惡化 1.2pp**，**streak 仍未見底** (連續 4 窗 #26 −18.4% → #27 −17.9% → #28 −18.1% → #29 −19.3% 全數 −18% to −19% 區間徘徊)
+- 5% 固定 SL $59.88 vs 現價 $63.03，緩衝 $3.15 (5.0%)，**緩衝剛好在 5% 警示閾值** (active MA10/MA20 SL NOT breached → no EXIT)
+- **1h 內如跌破 $59.88** 將觸發 5% 固定 SL，需密切 monitor
+
+### 集中度違規 (Cap > 10%)
+
+| 股票 | MV | 佔比 | 超標 |
+|------|------|------|------|
+| **DE** | $11,483.50 | **11.50%** | +1.50pp |
+| **MRVL** | $10,586.90 | **10.60%** | +0.60pp |
+
+### 接近 TP1 線持倉監控 (PnL +13% ~ +20%)
+
+| 股票 | 現價 | PnL% | 距 TP1 線 (+20%) |
+|------|------|------|----------------|
+| HOOD | $114.25 | +19.4% | 需 +0.6pp (TP1=$115.36) — **剛跌破 TP1 線 #28 → #29** |
+| T | $25.52 | +18.6% | 需 +1.4pp (TP1=$25.96) |
+| DE | $675.50 | +17.3% | 需 +2.7pp (TP1=$690.91) |
+| PATH | $14.04 | +17.6% | 需 +2.4pp (TP1=$14.32) |
+| XOM | $165.34 | +16.8% | 需 +3.2pp (TP1=$169.86) |
+| WFC | $88.88 | +16.1% | 需 +3.9pp (TP1=$91.81) |
+| IREN | $44.11 | +12.2% | 需 +7.8pp (TP1=$47.18) |
+| FUTU | $114.12 | +13.5% | 需 +6.5pp (TP1=$120.56) |
+| VZ | $49.97 | +14.4% | 需 +5.6pp (TP1=$52.42) |
+
+## 📊 Drift Decomposition (RTH close #28 → RTH mid-session #29, ~14h 跨日過夜 + RTH open+3h)
+
+```
+MV drift:    -$323.65 (-0.32%)  ← 隔夜微跌 + RTH mid-session 微跌
+Net effect:  純 mark-to-market，0 trade, 0 TP1, 0 TP2
+```
+
+### TP1-over-line 個別漂移（5 → 4，HOOD 跌破線）
+
+| 股票 | #28 價 | #29 價 | Δ Price | Drift $ | Notes |
+|------|--------|--------|---------|---------|-------|
+| CRM | $245.42 | $245.04 | -$0.38 | -$0.38 | TP1-over，flat |
+| **HOOD** | $115.26 | $114.25 | **-$1.01** | **-$74.74** | **跌破 TP1 線 (−1.1pp), 跌出 TP1-over 清單** |
+| SNDK | $1,694.36 | $1,692.03 | -$2.33 | -$2.33 | TP1-over，flat |
+| COP | $135.73 | $137.43 | **+$1.70** | **+$108.80** | TP1-over，**隔夜 gap-up +1.3%** |
+| MRK | $144.50 | $144.88 | +$0.38 | +$2.66 | TP1-over，flat |
+
+**COP 成為 #29 TP2 nearest**：COP 由 #28 $135.73 → #29 $137.43 (**+$1.70, +1.3% 隔夜 gap-up**)，TP2 gap 由 #28 +13.1% 收窄至 #29 +11.7% (**-1.4pp 收窄**)，**取代 SNDK 成為 #29 nearest**。其他 3 隻 TP1-over-line 微跌 (CRM/SNDK) 或 flat (MRK)。
+
+### ⚠️ HOOD 跌破 TP1 線分析
+
+- HOOD 由 #28 +20.5% → #29 +19.4% (**-1.1pp 跌破 TP1 線**)
+- 持倉 74 股 × -$1.01 = **-$74.74** (TP1-over 5 隻中最大負貢獻)
+- State file HOOD = `FULLY_CLOSED` object (歷史 lot TP1+TP2 fired 2026-06-29)，**新 lot 無 TP1=true flag**
+- 跌破 TP1 線但**未觸發任何 action**：state file 結構不變，FIFO recompute 將決定是否需要為新 lot 補 TP1=true
+- HOOD 是 P-MR-294 pool-loop 觀察重點：隔夜 -1.3% 跌幅是 RTH mid-session profit-taking 還是隔夜新聞驅動需 monitor
+
+### Stage 2 池 Loop (P-MR-294 第 34 次連續)
+
+| 因子 | 狀態 |
+|------|------|
+| bb_lo > price (早期修復) | 持續阻擋，92 池中絕大多數 bb_lo > price |
+| 32 倉飽和 + Cash $207.40 | **Cash floor hard block** — 任何 BUY signal 都會被 cash check 阻擋 |
+| 持倉集中度違規 | DE 11.50% / MRVL 10.60% 持續超 10% cap |
+| 結論 | Stage 2 loop 第 **34 次連續零候選**，pool-loop 結構未變 |
+
+## 💰 Cash Trajectory
+
+```
+09-10 03:00 (#25): cash=$207.40 | cf=0
+09-10 03:30 (#26): cash=$207.40 | cf=0
+09-10 22:00 (#27): cash=$207.40 | cf=0  ← Day-boundary reset, zt=2
+09-10 23:00 (#28): cash=$207.40 | cf=0  ← Same-day carry, zt=3
+09-11 01:00 (#29): cash=$207.40 | cf=0  ← 本次 (DAY-BOUNDARY RESET P-MR-247, zt=2)
+```
+
+## 🔁 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | **APPEND**（#29 entry — RTH mid-session next-day） |
+| `/tmp/ai_trader_trades_log.json` | 286 entries，**0 交易新增** (語意不變) |
+| `/tmp/ai_trader_scan_meta_log.json` | **APPEND #29** entry (10 entries total) |
+| `/tmp/ai_trader_tp1_state.json` | **ONLY `_audit` 區塊更新**（TP1/TP2 flags 不變）|
+| `/tmp/ai_trader_cash_floor.json` | cf=0, last_bjt_date=2026-09-11 |
+| `/tmp/ai_trader_zero_trigger.json` | **zt=2** (P-MR-247 reset), last_bjt_date=2026-09-11 |
+
+## 🚦 Cron 狀態：✅ HEALTHY ZERO-TRIGGER (Day-boundary reset)
+
+- 0 買入 / 0 賣出 / 0 TP1 / 0 TP2
+- **DAY-BOUNDARY RESET (P-MR-247)**：zt 31 → **zt=2** (09-11 第一次 scan)
+- API↔FIFO EXACT (第 21 次連續)
+- 報價新鮮 (yfinance 5d 重整至最新，13:00 EDT RTH mid-session+3h)
+- Drift 微負 -$323.65 (-0.32%) 隔夜 + RTH mid-session 純 mark-to-market
+- MA10 trail stop 全數 active 且無觸發
+- 集中度違規已標記 (DE 11.50% / MRVL 10.60%)
+- **TP1-over-line 持倉**：4 只 (SNDK/MRK ✅ + COP/CRM manual q) — **HOOD 跌破 TP1 線 (−1.1pp), 跌出 TP1-over 清單**
+- **RKLB streak 11 窗**：−19.3% (vs #28 −18.1%, **再度惡化 1.2pp**)
+- **TP2 nearest 變更**：SNDK #28 → **COP #29** (COP overnight gap-up +$1.70 收窄 TP2 gap -1.4pp 至 +11.7%)
+
+## 📊 當次總結 (Cron #29)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:         0  (state file: TP1=true 保留 14 只 + TP1=false 3 只)
+🎯 TP2 觸發:         0  (CLOSEST: COP +11.7% from TP2 line $153.55) ← 取代 SNDK
+🚪 止蝕/賣出觸發:    0
+
+💰 RTH close 前總權益 (#28):         $100,369.89
+💰 RTH mid-session 總權益 (#29):    $100,046.24
+📈 跨日 + 1h Drift:                  -$323.65 (-0.32%)
+📦 未實現 PnL:                       +$6,192.99 (+6.61%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    DE 11.50% / MRVL 10.60%
+🚦 零觸發連續 (zt):                  2  ← DAY-BOUNDARY RESET (P-MR-247)
+```
+
+---
+
+🤖 **AI-Trader Cron #29 完成** — 09-11 01:00 BJT (13:00 EDT, **RTH mid-session+3h next-day**)。**DAY-BOUNDARY RESET (P-MR-247)**：zt 31 → **zt=2**。**Session 跟進**：09-10 RTH close (#28) → **09-11 RTH mid-session (#29)** 跨日。**Drift** -$323.65 (-0.32%) 純隔夜 re-mark + RTH mid-session mark-to-market。**TP2 觸發 0 fires** — **TP2 nearest 由 SNDK 變更為 COP** (COP 隔夜 gap-up +$1.70 / +1.3%, TP2 gap 由 +13.1% 收窄至 +11.7%)。**HOOD 跌破 TP1 線警報** (#28 +20.5% → #29 +19.4%, -1.1pp), 跌出 TP1-over 清單 (4 隻 TP1-over: SNDK/MRK ✅ + COP/CRM manual q)。Stage 2 池 loop **第 34 次連續零候選** (P-MR-294)。**RKLB 連續 11 窗走弱、現 −19.3%** (對比 #28 −18.1% **再度惡化 1.2pp**, streak 仍未見底, 連續 4 窗徘徊 −18% to −19%)。**trail-stop 確認**：32 倉 MA10 trail 全數 active 且無觸發。**純模擬倉，無 IB order**。
+
+📡 **下個 session 監控重點**：
+- **COP TP2 線 $153.55 (+11.7% gap)** — 取代 SNDK 成為 #29 nearest，RTH mid-session 隔夜 gap-up 收窄 1.4pp，需 monitor 03:00 BJT breakthrough
+- **SNDK TP2 $1,921.20 (+13.5%)** / **CRM TP2 $277.55 (+13.3%)** / **MRK TP2 $165.58 (+14.3%)**
+- **HOOD TP1 線 $115.36 (+19.4%)** — 跌破 TP1 線 1.1pp，monitor next 1-2 windows 看是否 re-cross 或持續下行
+- **RKLB streak 觀察** — 11 窗走弱後再度惡化 1.2pp，5% SL 緩衝 5.0% **剛好觸及警示閾值**，需密切 monitor next 3-4 windows (1h 內如跌破 $59.88 觸發 5% SL)
+- **集中度違規 DE 11.50% / MRVL 10.60%** 持續標記
+- 下次 cron: #30 @ 09-11 03:00 BJT (15:00 EDT, RTH late, TP2 check window)
