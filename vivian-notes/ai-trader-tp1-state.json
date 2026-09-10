@@ -28,20 +28,20 @@
   "IREN": true,
   "SNDK": true,
   "_audit": {
-    "last_checked_bjt": "2026-09-10T22:00:00+08:00",
-    "cron": "#27 (RTH open +30min, day-boundary reset P-MR-247)",
-    "session": "RTH open +30min (2026-09-10T10:00:00-04:00) — 09-10 RTH open +30min, post-overnight re-mark",
+    "last_checked_bjt": "2026-09-10T23:00:00+08:00",
+    "cron": "#28 (RTH mid-session, same-day carry P-MR-201)",
+    "session": "RTH mid-session (2026-09-10T11:00:00-04:00) — 09-10 RTH +1.5h, pre-market follow-through",
     "tp1_fires": 0,
     "tp2_fires": 0,
-    "tp2_nearest": "SNDK +13.2% (cur $1696.38 vs TP2 $1920.42)",
+    "tp2_nearest": "SNDK +13.4% (cur $1694.36 vs TP2 $1921.08)",
     "tp1_over_line_unmarked": [
-      "CRM (manual queue, +24.6%)",
-      "HOOD (fresh lot, +20.6%)",
-      "COP (manual queue, +24.3%)",
+      "CRM (manual queue, +23.8%)",
+      "HOOD (fresh lot, +20.5%)",
+      "COP (manual queue, +23.8%)",
       "MRK (TP1=true ✅)",
       "SNDK (TP1=true ✅)"
     ],
-    "ma10_trail": "active (RTH open +30min, 10:00 EDT); 32 positions MA10/MA20 OK, no breach; RKLB -17.9% weakest (improved from -18.4% RTH close, streak potentially ended)",
-    "session_status": "RTH open +30min, 09-10 22:00 BJT = 10:00 EDT = day-boundary reset (P-MR-247 → zt=2). MV -887.97 (-0.88%) overnight drift pure mark-to-market."
+    "ma10_trail": "active (RTH mid-session); 32 positions MA10/MA20 OK, no breach; RKLB -18.1% weakest (10-window streak, deteriorated 0.2pp from #27 -17.9%, streak NOT bottomed)",
+    "session_status": "RTH mid-session, 09-10 23:00 BJT = 11:00 EDT = same-day carry (P-MR-201: zt 2 → 3). MV +169.06 (+0.17%) pure mark-to-market. 5 TP1-over-line all widened TP2 gap (RTH mid-session profit-taking pattern)."
   }
 }
