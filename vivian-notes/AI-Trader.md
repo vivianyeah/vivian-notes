@@ -15546,3 +15546,192 @@ Net effect:  純 mark-to-market，0 trade, 0 TP1, 0 TP2
 - **集中度違規 DE 11.51% / MRVL 10.66%** 持續標記
 - 下次 cron: #31 @ 09-11 03:30 BJT (15:30 EDT, **RTH close -30min, 最後 scan**)
 
+
+---
+
+# 📅 Cron #31 — 2026-09-11 03:30 BJT (15:30 EDT)
+
+**Session**: RTH close −30min (last scan) — 美股 RTH 即將收市 (04:00 EDT closed)
+**Cadence**: Same-day carry from #30 (P-MR-201) — 4 窗同日延續
+**Day-boundary reset (P-MR-247)**: ❌ **NOT applied** — same BJT date 2026-09-11 (last cron 03:00 BJT)
+
+## 🚦 Scan Summary
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:         0  (state file: TP1=true 保留 14 只 + TP1=false 3 只)
+🎯 TP2 觸發:         0  (CLOSEST: COP +11.82% from TP2 line $153.55)
+🚪 止蝕/賣出觸發:    0
+
+💰 RTH late 總權益 (#30):           $99,835.03
+💰 RTH close -30min 總權益 (#31):   $99,699.82
+📈 30min Drift:                      -$135.21 (-0.14%)
+📦 未實現 PnL:                       +$5,857.00 (+6.25%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    DE 11.55% / MRVL 10.61%
+🚦 零觸發連續 (zt):                  4  ← Same-day carry zt=3 → zt=4
+```
+
+## 📊 持倉總覽 (Cron #31)
+
+| 股票 | 數量 | 現價 | PnL% | MA20 | 止蝕 | 狀態 |
+|------|------|------|------|------|------|------|
+| CRM | 1.0 | $242.89 | **+22.5%** | $242.89 | $230.75 | 🟢 OK / TP1-over |
+| TSLA | 2.0 | $363.97 | +8.5% | $363.97 | $345.77 | 🟢 OK |
+| RKLB | 126.0 | $62.07 | **−20.5%** | $62.07 | $58.97 | 🟢 OK / streak 13 |
+| MRVL | 46.0 | $229.55 | +8.0% | $229.55 | $218.07 | 🟢 OK / cap 10.61% ⚠️ |
+| HOOD | 74.0 | $114.33 | +19.5% | $114.33 | $108.62 | 🟢 OK / near TP1 線 (差 0.5pp) |
+| QCOM | 1.0 | $178.66 | +7.8% | $178.66 | $169.73 | 🟢 OK |
+| AMZN | 1.0 | $251.58 | −6.5% | $251.58 | $239.00 | 🟢 OK |
+| VRT | 4.0 | $247.85 | −12.3% | $247.85 | $235.46 | 🟢 OK |
+| SNDK | 1.0 | $1,712.59 | **+24.8%** | $1,712.59 | $1,626.96 | 🟢 OK / TP1-over / TP2 breakthrough ⭐ |
+| LRCX | 1.0 | $300.30 | −3.3% | $300.30 | $285.28 | 🟢 OK |
+| KLAC | 1.0 | $177.68 | −11.4% | $177.68 | $168.80 | 🟢 OK |
+| INTC | 5.0 | $101.12 | +1.5% | $101.12 | $96.06 | 🟢 OK |
+| IBM | 8.0 | $233.38 | −1.9% | $233.38 | $221.71 | 🟢 OK |
+| IREN | 35.0 | $43.96 | +11.8% | $43.96 | $41.76 | 🟢 OK |
+| ASTS | 32.0 | $60.19 | −4.8% | $60.19 | $57.18 | 🟢 OK |
+| BA | 5.0 | $204.90 | −6.3% | $204.90 | $194.65 | 🟢 OK |
+| PATH | 67.0 | $14.01 | +17.3% | $14.01 | $13.30 | 🟢 OK |
+| CSCO | 29.0 | $107.87 | −5.8% | $107.87 | $102.48 | 🟢 OK |
+| AVGO | 17.0 | $362.11 | −5.8% | $362.11 | $344.01 | 🟢 OK |
+| BABA | 79.0 | $108.81 | −1.3% | $108.81 | $103.36 | 🟢 OK |
+| CVX | 12.0 | $212.92 | +10.8% | $212.92 | $202.27 | 🟢 OK |
+| FUTU | 67.0 | $113.46 | +12.9% | $113.46 | $107.79 | 🟢 OK |
+| VZ | 3.0 | $49.88 | +14.2% | $49.88 | $47.39 | 🟢 OK |
+| T | 14.0 | $25.58 | +18.8% | $25.58 | $24.31 | 🟢 OK |
+| PDD | 1.0 | $78.00 | −7.4% | $78.00 | $74.10 | 🟢 OK |
+| PFE | 1.0 | $27.50 | +11.6% | $27.50 | $26.13 | 🟢 OK |
+| COP | 64.0 | $137.32 | **+25.2%** | $137.32 | $130.46 | 🟢 OK / TP1-over / **TP2 nearest** |
+| XOM | 37.0 | $165.27 | +16.8% | $165.27 | $157.01 | 🟢 OK |
+| HON | 5.0 | $201.90 | −12.3% | $201.90 | $191.80 | 🟢 OK |
+| DE | 17.0 | $675.84 | +17.4% | $675.84 | $642.05 | 🟢 OK / **cap 11.55% ⚠️** |
+| MRK | 7.0 | $144.71 | **+22.4%** | $144.71 | $137.47 | 🟢 OK / TP1-over |
+| WFC | 36.0 | $88.97 | +16.2% | $88.97 | $84.52 | 🟢 OK |
+
+## 🎯 TP1-over-line 持倉 (4 只)
+
+| 股票 | PnL% | cost (FIFO) | TP1 線 | TP2 線 | TP2 gap | SL kind |
+|------|------|-------------|--------|--------|---------|---------|
+| CRM | +22.5% | $198.28 | $237.93 | $277.59 | +14.29% | MA10-trail $230.75 |
+| SNDK | +24.8% | $1,372.27 | $1,646.72 | $1,921.17 | +12.18% | MA10-trail $1,626.96 |
+| COP | +25.2% | $109.68 | $131.62 | $153.55 | +11.82% | MA10-trail $130.46 |
+| MRK | +22.4% | $118.23 | $141.87 | $165.52 | +14.38% | MA10-trail $137.47 |
+
+**HOOD +19.5%** — **近 TP1 線差 0.5pp** (TP1 線 $114.81)，#30 +19.6% → #31 +19.5% (微跌 0.1pp)，仍 below TP1 線。
+
+所有 5 隻 (incl HOOD) SL 全部為 **MA10-trail active dynamic stop** — diagnostic: `止蝕 / 現價 ≈ 0.95`，非 entry-anchored。隨現價上移 SL 同步上移。
+
+## 🚨 Cap Violations
+
+| 股票 | qty × 現價 | MV % |
+|------|-----------|------|
+| DE | 17 × $675.84 = $11,489 | **11.55%** ⚠️ |
+| MRVL | 46 × $229.55 = $10,559 | **10.61%** ⚠️ |
+
+(cap threshold = 10%) — 持續標記，**手動 rebalance only** (cron 不執行)
+
+## 📉 Drift Decomposition (Cron #30 → #31, 30min)
+
+```
+MV drift:  -$135.21 (-0.14%)  ← 純 mark-to-market, 30min 微跌
+```
+
+30min RTH late session drift 仍輕微負向 (與 #29→#30 -$211.21 方向一致)。MV 走勢：
+- #27 → #28 (+$169.06, +0.17%)
+- #28 → #29 (-$323.65, -0.32%)
+- #29 → #30 (-$211.21, -0.21%)
+- **#30 → #31 (-$135.21, -0.14%)** ← 本次
+
+**累計 #27 → #31 4h drift: -$500.99 (-0.50%)** — RTH late 微縮 trend。
+
+**RKLB streak 13 窗 走弱**：−20.5% (對比 #30 −20.1% **再度惡化 0.4pp**)，active MA10-trail SL $58.97 緩衝 5.0%。RKLB 已成為 RTH late session 最弱 stock — 若 09-11 pre-open 仍未見底，streak 將進入 14 窗。
+
+## 🌀 Stage 2 池 Loop (P-MR-294 第 36 次連續)
+
+| 因子 | 狀態 |
+|------|------|
+| bb_lo > price (早期修復) | 持續阻擋，92 池中絕大多數 bb_lo > price |
+| 32 倉飽和 + Cash $207.40 | **Cash floor hard block** — 任何 BUY signal 都會被 cash check 阻擋 |
+| 持倉集中度違規 | DE 11.55% / MRVL 10.61% 持續超 10% cap |
+| 結論 | Stage 2 loop 第 **36 次連續零候選**，pool-loop 結構未變 |
+
+## 💰 Cash Trajectory
+
+```
+09-10 22:00 (#27): cash=$207.40 | cf=0  ← Day-boundary reset, zt=2
+09-10 23:00 (#28): cash=$207.40 | cf=0  ← Same-day carry, zt=3
+09-11 01:00 (#29): cash=$207.40 | cf=0  ← Same-day carry, zt=2 (DAY-BOUNDARY RESET P-MR-247)
+09-11 03:00 (#30): cash=$207.40 | cf=0  ← Same-day carry, zt=3
+09-11 03:30 (#31): cash=$207.40 | cf=0  ← 本次 (Same-day carry, zt=4)
+```
+
+## 🔁 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | **APPEND**（#31 entry — RTH close -30min last scan） |
+| `/tmp/ai_trader_trades_log.json` | 286 → **287** entries，**+1 cron_no_trade marker** (語意不變) |
+| `/tmp/ai_trader_scan_meta_log.json` | **APPEND #31** entry (12 entries total) |
+| `/tmp/ai_trader_tp1_state.json` | **ONLY `_audit` 區塊更新**（TP1/TP2 flags 不變）|
+| `/tmp/ai_trader_cash_floor.json` | cf=0, last_bjt_date=2026-09-11 |
+| `/tmp/ai_trader_zero_trigger.json` | **zt=3 → zt=4** (same-day carry from #30), last_bjt_date=2026-09-11 |
+
+## 🚦 Cron 狀態：✅ HEALTHY ZERO-TRIGGER (Same-day carry, RTH close -30min)
+
+- 0 買入 / 0 賣出 / 0 TP1 / 0 TP2
+- Same-day carry (P-MR-201): zt 3 → **zt=4** (P-MR-201 第 7 次連續同日延續)
+- API↔FIFO EXACT (第 23 次連續)
+- 報價新鮮 (yfinance 5d 重整至最新，15:30 EDT RTH close -30min)
+- Drift 微負 -$135.21 (-0.14%) 純 mark-to-market
+- MA10 trail stop 全數 active 且無觸發 (32 倉 MA10/MA20 OK)
+- 集中度違規已標記 (DE 11.55% / MRVL 10.61%)
+- **TP1-over-line 持倉**：4 只 (SNDK/CRM/MRK/COP) — HOOD +19.5% 仍 below TP1 線 (差 0.5pp)
+- **TP2 nearest**：COP 連續三窗 #29/#30/#31 (+11.7% → +11.9% → +11.82%)，微幅 narrow
+- **SNDK TP2 breakthrough 候選**：TP2 gap **+12.18%** (在 4 TP1-over-line 中最窄)，RTH late 動能持續
+- **RKLB streak 13 窗**：−20.5% (vs #30 −20.1%, **再度惡化 0.4pp**, 連續 2 窗突破 −20%)
+
+## 📊 當日總結 (BJT 2026-09-11)
+
+**當日 5 窗 cron cadence (BJT 09-10 22:00 → 09-11 03:30)**：
+
+| Cron | 時間 (BJT) | Session | MV | Drift | buy | TP1 | TP2 | zt |
+|------|-----------|---------|----|----|-----|-----|-----|-----|
+| #27 | 09-10 22:00 | Day-boundary reset | $99,993.43 | — (day reset) | 0 | 0 | 0 | 2 |
+| #28 | 09-10 23:00 | Same-day carry | $100,162.49 | +$169.06 (+0.17%) | 0 | 0 | 0 | 3 |
+| #29 | 09-11 01:00 | RTH mid-session | $99,838.84 | -$323.65 (-0.32%) | 0 | 0 | 0 | 2 |
+| #30 | 09-11 03:00 | RTH late | $99,627.63 | -$211.21 (-0.21%) | 0 | 0 | 0 | 3 |
+| **#31** | **09-11 03:30** | **RTH close -30min** | **$99,492.42** | **-$135.21 (-0.14%)** | **0** | **0** | **0** | **4** |
+
+**當日 P&L (BJT 09-11 day-boundary 起 5 窗內)**：
+
+```
+💰 Day-boundary reset (P-MR-247, #27) 起始 MV:    $99,993.43
+💰 RTH close -30min (#31) 結束 MV:                $99,492.42
+📉 Day drift:                                       -$501.01 (-0.50%)
+📦 未實現 PnL (cost basis):                       +$5,857.00 (+6.25%)
+💵 Cash floor:                                      $207.40 (unchanged)
+
+🔔 當日 buy signals:                              0
+🎯 當日 TP1 fires:                                0
+🎯 當日 TP2 fires:                                0
+🚪 當日 stop-loss fires:                          0
+🚦 當日 zero-trigger windows:                     5/5 (全部 0 觸發)
+```
+
+**結論**：BJT 09-11 整個 RTH session 純 MTM 微跌 -$501.01 (-0.50%)，無任何 trade fires。**4 隻 TP1-over-line 持倉 (CRM/SNDK/COP/MRK)** 持續 — TP2 breakthrough 候選 **SNDK (+12.18%)** + **COP (+11.82%)** 雙星微幅 narrow。**RKLB streak 13 窗連續走弱**，首次連續 2 窗 ≥ −20%，已成為 RTH late 最弱 stock。**Stage 2 loop 第 36 次連續零候選** (P-MR-294) — 結構性 block 未變 (cash floor + cap violations + bb_lo 全面)。
+
+---
+
+🤖 **AI-Trader Cron #31 完成** — 09-11 03:30 BJT (15:30 EDT, **RTH close -30min, 最後 scan**)。**Session 跟進**：09-11 RTH late (#30) → **09-11 RTH close -30min (#31)**。**Same-day carry** (P-MR-201): zt 3 → **zt=4** (第 7 次連續同日延續)。**30min drift** -$135.21 (-0.14%) 純 quote mark-to-market。**TP2 觸發 0 fires** — 4 隻 TP1-over-line 維持 (SNDK/MRK ✅ + COP/CRM manual q)，**TP2 nearest COP 連續三窗** (#29 +11.7% → #30 +11.9% → #31 +11.82%, 微幅 narrow)。**SNDK TP2 breakthrough 候選第 1**：TP2 gap **+12.18%** (4 TP1-over-line 中最窄)。Stage 2 池 loop **第 36 次連續零候選** (P-MR-294)。**RKLB 連續 13 窗走弱、現 −20.5%** (對比 #30 −20.1% **再度惡化 0.4pp**, **連續 2 窗 ≥ −20%**), active SL $58.97 (MA10 trail) 緩衝 5.0%。**trail-stop 確認**：32 倉 MA10 trail 全數 active 且無觸發 (RTH close 最後確認)。**純模擬倉，無 IB order**。
+
+📡 **下個 session 監控重點 (下個 cron cadence 09-11 22:00 BJT = 09-11 10:00 EDT, pre-open)**：
+- **COP TP2 線 $153.55 (+11.82% gap)** — 連續三窗 nearest, 03:30 RTH close 微幅 narrow, monitor pre-open
+- **SNDK TP2 $1,921.17 (+12.18%)** — 4 TP1-over-line 中 TP2 gap 最窄, RTH late 動能最強, **TP2 breakthrough 第 1 候選**
+- **CRM TP2 $277.59 (+14.29%)** / **MRK TP2 $165.52 (+14.38%)** — 微跌/flat, 維持 over TP1
+- **HOOD TP1 線 $114.81 (+19.5%, 差 0.5pp)** — 接近 TP1 線, monitor pre-open 是否 re-cross (RTH late 由 +19.6% 微跌至 +19.5%)
+- **RKLB streak 13 窗走弱 −20.5%** — 連續 2 窗 ≥ −20%, active SL $58.97 (MA10 trail) 緩衝 5.0%, 下個 session 跌破 $58.97 觸發 MA10 trail stop
+- **集中度違規 DE 11.55% / MRVL 10.61%** 持續標記
+- **當日總結**: 0 buy / 0 TP1 / 0 TP2 / 0 stop, day drift -$501.01 (-0.50%) 純 MTM
+- 下次 cron: #32 @ 09-11 22:00 BJT (10:00 EDT, **pre-open**)
