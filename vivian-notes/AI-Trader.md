@@ -16057,3 +16057,148 @@ Stage 2 候選:     0 只
 - RKLB streak 14-window test: 若 −20% 以下 → streak continues, alert level
 
 ---
+## Cron #35 — 2026-09-14 03:00 BJT (Monday 15:00 EDT — Labor Day, US market closed)
+
+> ⚠️ **Holiday artifact**: 2026-09-14 = Labor Day (US federal holiday). yfinance `period="5d"` returns Fri 09-11 RTH close for all 32 positions — identical to cron #34 (weekend frozen) since the holiday stacks on top of the weekend.
+> **MV drift vs #34 = $0.00 (literal flat)** — no real trading occurred. This cron is archival continuity, NOT a live RTH scan.
+
+### 🎯 Cron #35 summary
+
+```
+Cron:           #35 (BJT 03:00, RTH late slot)
+Date BJT:       2026-09-14 (Monday)
+Date EDT:       2026-09-14 (Monday — Labor Day, US market CLOSED)
+Session:        RTH late (holiday artifact, same as #34 weekend frozen)
+Prior cron:     #34 (2026-09-14 01:00 BJT, Sun EDT 13:00, weekend)
+Drift window:   ~2h BJT gap but US market closed entire period (Fri 23:00 → Fri RTH close mark)
+Stage 2 候選:   0
+買入信號:        0
+賣出/止蝕觸發:  0
+TP1 fires:     0  (state file unchanged — FIFO owns mutation)
+TP2 fires:     0
+```
+
+### 💰 FIFO totals
+
+```
+Cash:                $207.40
+Total MV:            $100,037.86  (identical to #34 — Fri close == Fri close)
+Total Cost:          $93,610.47   (cost basis, scan-reconstructed)
+Total Equity:        $100,245.26
+Unrealized PnL:      +$6,427.39  (+6.87%)
+Drift vs #34:        $+0.00      (+0.0000%)  ← Labor Day artifact
+```
+
+### 📊 Drift decomposition (vs cron #34, 2026-09-14 01:00 BJT)
+
+```
+ΔMV = $+0.00 across 32 positions (literal flat — holiday + weekend stacked)
+  All positions: identical to #34 (Fri Sept 11 RTH close)
+  Top 5 contributors: N/A (zero drift)
+```
+
+**Drift signal**:
+- **Labor Day holiday**: NYSE closed Mon Sept 14 → yfinance returns Fri close for all positions, identical to #34 (which was Sun EDT = weekend frozen Fri close)
+- **Stacked artifact**: weekend (Sat/Sun no-trade) + holiday (Mon no-trade) = 3-day gap with zero real price action
+- **No live RTH data** — this cron is archival continuity only
+- **Next real RTH scan**: cron #36 at 03:30 BJT (15:30 EDT Mon) — still Labor Day, still artifact. **First real RTH scan will be Tue 09-15 cron #27 pre-open (22:00 BJT = 10:00 EDT)**
+
+### 🎯 TP1 / TP2 lines
+
+```
+TP1-over-line (pnl≥+20%, FIFO mutation pending):
+  COP     +25.2%  tp1=$131.65  tp2=$153.59  gap=+11.8%  (TP2 NEAREST)
+  CRM     +24.9%  tp1=$238.00  tp2=$277.67  gap=+12.1%
+  MRK     +21.7%  tp1=$141.92  tp2=$165.57  gap=+15.0%
+  T       +21.0%  tp1=$25.84   tp2=$30.15   gap=+15.7%
+
+TP2 nearest (smallest positive gap, price-space):
+  COP  gap=+11.8%  cur=$137.35  tp2=$153.59  (unchanged from #34)
+
+TP1/TP2 fires this cron: 0 (no price movement — holiday artifact)
+```
+
+### 🚨 Cap violations (P-MR-124 block)
+
+```
+🚨 Cap violations (positions > 10% of total MV):
+  MRVL  qty=46  px=$236.10  pos_mv=$10,860.60  cap_pct=10.86%  ← BLOCK
+  DE    qty=17  px=$675.74  pos_mv=$11,487.58  cap_pct=11.48%  ← BLOCK
+
+Both unchanged from #34 — same Fri close prices, same quantities.
+Cap-violation block applies: no new buys on these symbols until concentration drops below 10%.
+No exit signal fires (active MA10/MA20 trail not breached, just concentration limit).
+```
+
+### ⚠️ MA10/MA20 trail status
+
+```
+- **Labor Day frozen**: Mon 15:00 EDT = US market CLOSED holiday
+- yfinance returns Fri Sept 11 RTH close for all 32 positions → MA20 == price trivially
+- No breach (trivially) 🟢 — BUT this is holiday artifact, NOT a live MA10/MA20 confirmation
+- RKLB streak status: −19.3% (Fri close, unchanged from #34 13-window streak)
+- Real trail test will resume Tue 09-15 cron #27 (22:00 BJT pre-open)
+```
+
+### 📊 Stage 2 池 Loop (P-MR-294 第 38 次連續)
+
+```
+掃描股票池:        92 只
+Stage 2 候選:     0 只
+買入信號:          0 只
+```
+
+- Pool 維持 bb_lo > price 結構性阻塞
+- 32-position saturation 無新增空間
+- Cash $207.40 仍 near floor (cf=0)
+- Holiday scan: Stage 2 candidates list is from Fri data, unchanged
+
+### 📋 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_scan_meta_log.json         — appended cron #35 entry (16 total)
+✅ /tmp/ai_trader_tp1_state.json             — _audit refreshed, NO TP1/TP2 mutation (FIFO owns)
+✅ /tmp/ai_trader_zero_trigger.json          — zt=3 (Mon BJT same-day carry from #34 zt=2)
+✅ /tmp/ai_trader_cash_floor.json            — cf=0 (cash $207.40 above floor)
+✅ /tmp/ai_trader_trades_log.json            — UNCHANGED (0 trades, 287 entries, semantic invariant preserved)
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below
+```
+
+### 🔮 預期 (next crons)
+
+```
+#36 (Mon 03:30 BJT = Mon 15:30 EDT) — STILL Labor Day, still holiday artifact
+  → Expect another identical Fri-close scan, MV $0 drift
+  → zt=4 same-day carry
+
+#27 (Tue 09-15 22:00 BJT = Tue 10:00 EDT) — FIRST REAL post-holiday RTH scan
+  → Tue RTH pre-open, post-Labor-Day re-mark
+  → TP1-over-line 待重新 scan: COP/CRM/MRK/T likely 持續 over-line if Mon gap-up held
+  → HOOD/DE inverse pattern test: did they rebound Mon RTH? — Mon was closed, so Tue RTH first chance
+  → RKLB streak 15-window test at Tue RTH open
+  → zt reset (Tue BJT ≠ Mon BJT) → P-MR-247 day-boundary reset → zt=2
+
+Cap violations expected to persist:
+  MRVL 10.86% — needs ≥+1.4% price gain OR lot reduction to drop below 10%
+  DE 11.48%   — needs ≥+1.5% price gain OR lot reduction to drop below 10%
+```
+
+### 📊 當日總結 (2026-09-14 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: X 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP −11.8% from TP2 line $153.59)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00):   $101,116.48  (cron #32)
+💰 收市前總權益 (今日 03:30): $100,245.26  (cron #35, Labor Day artifact)
+📈 日內 MTM:                   $-871.22    (-0.86%)   ← weekend+holiday Fri→Fri mark drift
+📦 未實現 PnL:                +$6,427.39   (+6.87%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 10.86% / DE 11.48%
+🚦 零觸發連續 (zt):            3
+```
+
+---
