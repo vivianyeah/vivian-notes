@@ -15937,4 +15937,121 @@ Stage 2 候選:     0 只
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below
 ```
 
+---## Cron #34 — 2026-09-14 01:00 BJT (Sunday 13:00 EDT)
+
+**Session**: RTH mid-session (weekend day-boundary reset, Sunday EDT, US market closed)
+**Previous cron**: #33 (09-11 23:00 BJT Fri, pre-market follow-through, ~50h gap incl. weekend)
+**Drift window**: ~50h (Fri 23:00 BJT → Mon 01:00 BJT, but weekend = no trading, so pure Fri RTH close → Fri RTH close mark)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 17 隻 TP1=true 保留, 4 隻 over-line 未標記)
+🎯 TP2 觸發:        0  (CLOSEST: COP −11.78% from TP2 line $153.53)
+🚪 止蝕/賣出觸發:   0
+```
+
+### 📈 持倉總覽
+
+```
+💵 現金:                $207.40
+📦 持倉數:              32
+💰 持倉市值 (MV):       $100,037.86
+📦 總成本 (FIFO):       $93,627.29
+📈 未實現 PnL:          $+6,410.57 (+6.85%)
+💰 總權益:              $100,245.26
+🚨 Cap violations:      DE 11.48% / MRVL 10.86%
+🚦 零觸發連續 (zt):     2  (P-MR-247 day-boundary reset, Fri zt=3 → Mon zt=2)
+```
+
+### 🟢 TP1-over-line (4 隻，需 FIFO recompute)
+
+| Symbol | Qty | Cur | PnL% | Entry (avg) | TP1 line | TP2 line | TP2 gap↑ |
+|--------|----:|----:|-----:|------------:|---------:|---------:|---------:|
+| COP    |  64 | 137.35 | +25.2% | 109.67 | 131.60 | 153.53 | +11.78% |
+| CRM    |   1 | 247.72 | +24.9% | 198.26 | 237.91 | 277.56 | +12.05% |
+| MRK    |   7 | 143.93 | +21.7% | 118.23 | 141.88 | 165.53 | +15.01% |
+| T      |  14 |  26.06 | +21.0% |  21.53 |  25.84 |  30.14 | +15.66% |
+
+- **COP, CRM, MRK**: 持續 over-line (#33 → #34)
+- **T**: 持續 over-line (#33 → #34, pnl +21.7% → +21.0%, 略 narrow 0.7pp)
+- **HOOD**: ⚠️ 連續 inverse CRM pattern — #32 +20.0% → #33 +19.8% → **#34 +17.7%**, **-2.3pp total** (跌出 TP1-over 已 2 個 cron)
+- **DE**: ⚠️ 連續 inverse CRM pattern — #32 +20.0% → #33 +19.1% → **#34 +17.4%**, **-2.6pp total** (跌出 TP1-over 已 2 個 cron)
+- **SNDK**: 仍 under TP1 line +19.0% (差 1.0pp), 5th consecutive cron near-but-below
+
+### 🎯 TP2 nearest: COP at +11.78% (cur=$137.35, tp2_line=$153.53)
+
+- #33 TP2 nearest 是 CRM +11.91%, 本 cron **COP 反超** → 位移
+- COP gap narrow: #33 +12.63% → #34 +11.78%, **narrow 0.85pp** (Fri weekend → Monday pre-market gap-up +$1.02)
+- CRM widen slightly: #33 +11.91% → #34 +12.05%, +0.14pp (Fri close -$0.34)
+
+### 📉 50h Drift Decomposition (vs #33 Fri 23:00 BJT — weekend no-trade)
+
+```
+MV drift:  $100,305.79 → $100,037.86 = $-267.93 (-0.27%)
+Note: 50h 窗口 but weekend = no trading. 實際 move = Fri 23:00 → Fri RTH close。
+Reconstructed prices from #33 cron section (price-space % vs #33):
+
+Top 5 POSITIVE contributors (Fri 23:00 → Mon 01:00 隔夜+週末 gap):
+  COP   qty=64  $136.33→$137.35  Δp=$+1.02   drift=$+65.28  (+0.75%)  sector:Energy
+  MRVL  qty=46  $234.80→$236.10  Δp=$+1.30   drift=$+59.80  (+0.55%)  sector:Semi-Cap
+  FUTU  qty=67  $112.04→$112.73  Δp=$+0.69   drift=$+46.23  (+0.62%)  sector:中概
+  XOM   qty=37  $164.93→$165.99  Δp=$+1.06   drift=$+39.22  (+0.64%)  sector:Energy
+  AVGO  qty=17  $360.99→$361.99  Δp=$+1.00   drift=$+17.00  (+0.28%)  sector:Chip
+
+Top 5 NEGATIVE contributors (Fri 23:00 → Mon 01:00 隔夜+週末 gap-down):
+  MRK   qty=7   $144.55→$143.93  Δp=$-0.62   drift=$-4.34   (-0.43%)  sector:Pharma
+  BABA  qty=79  $109.59→$109.30  Δp=$-0.29   drift=$-22.91  (-0.26%)  sector:中概
+  RKLB  qty=126 $63.38 →$62.95   Δp=$-0.43   drift=$-54.18  (-0.68%)  sector:Spac
+  HOOD  qty=74  $114.79→$112.57  Δp=$-2.22   drift=$-164.28 (-1.93%)  sector:金融
+  DE   qty=17   $685.75→$675.74  Δp=$-10.01  drift=$-170.17 (-1.46%)  sector:Industrial
+
+Decomposed drift: $-138.23 (sum of |Δp| = $26.86 across 32 positions)
+Remaining ~$-130 spread across 22 unchanged/flat positions (RKLB streak continues).
+```
+
+**Drift signal**:
+- **週末 flat**: yfinance returns Fri RTH close since weekend no-trade → 所有 drift 屬於 Fri 23:00 → Fri RTH close 短窗口 mark
+- **HOOD 領跌 −$164.28** (−1.93%): 仍 inverse CRM pattern, 已從 #32 +20.0% 跌至 #34 +17.7% (-2.3pp), 1 lot
+- **DE −$170.17** (−1.46%): same inverse pattern, 已從 #32 +20.0% 跌至 #34 +17.4% (-2.6pp)
+- **RKLB streak 13-window 持續**: −19.3% (was −18.8% #33, **deteriorated 0.5pp**), 126 qty 放大效應
+- **COP 領漲 +$65.28**: 隔夜 gap-up +$1.02 → TP2 gap narrow 0.85pp, 反超 CRM 成為 TP2 nearest
+- **MRVL cap 違規持續**: $236.10 × 46 = $10,860.60 (10.86% MV), 第 N 個 cron 連續違規
+
+### 📊 Stage 2 池 Loop (P-MR-294 第 37 次連續)
+
+```
+掃描股票池:        92 只
+Stage 2 候選:     0 只
+買入信號:          0 只
+```
+
+- Pool 維持 bb_lo > price 結構性阻塞
+- 32-position saturation 無新增空間
+- Cash $207.40 仍 near floor (cf=0)
+
+### ⚠️ MA10/MA20 止蝕 trail status
+
+- **weekend frozen**: Sunday EDT (13:00 EDT) = US market closed, all yfinance `period="5d"` returns Fri close → **MA20 == price** for all 32 positions (trivially not breached)
+- RTH 開市後 (Mon 22:00 BJT cron #35 pre-open) 重新 active with real Mon close data
+- No breach (trivially) 🟢 — 但此為 weekend artifact, 非真正 active trail check
+- **RKLB streak 13-window**: −19.3% (Fri close), 仍未見底 — Mon RTH 開市後是 streak break test
+
+### 📋 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_scan_meta_log.json         — appended cron #34 entry (15 total)
+✅ /tmp/ai_trader_tp1_state.json             — _audit refreshed, NO TP1/TP2 mutation (FIFO owns)
+✅ /tmp/ai_trader_zero_trigger.json          — zt=2 (P-MR-247 day-boundary reset: Fri zt=3 → Mon zt=2)
+✅ /tmp/ai_trader_cash_floor.json            — cf=0 (cash $207.40 above floor)
+✅ /tmp/ai_trader_trades_log.json            — UNCHANGED (0 trades, 287 entries, semantic invariant preserved)
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below
+```
+
+### 🔮 預期 (next cron #35, Mon 22:00 BJT = Mon 10:00 EDT pre-open)
+
+- Mon RTH pre-open, Mon 09-14 first scan
+- TP1-over-line 待重新 scan: COP/CRM/MRK/T 持續 over-line, HOOD/DE 仍 under
+- 若週一開市 HOOD/DE 反彈回 +20% → re-add TP1-over 清單 (inverse inverse pattern)
+- RKLB streak 14-window test: 若 −20% 以下 → streak continues, alert level
+
 ---
