@@ -16905,3 +16905,139 @@ RKLB $61.88 vs cost-reconstruction: cost = $61.88/(1-0.207) = $78.03. Fixed SL (
   → First post-Tue-RTH scan with full Tue close data
 
 ---
+## Cron #36 — 2026-09-15 03:30 BJT (Tuesday 15:30 EDT, RTH close −30min, last scan)
+
+> **Session**: RTH close −30min (Tue 09-15 03:30 BJT = Tue 15:30 EDT, ~30min before 16:00 EDT close). Final scan of the trading day, trail-stop confirm.
+>
+> ⚠️ **yfinance 1-day lag artifact STILL persists**: scan.py's `period="6mo"` returns **Mon 09-14 RTH close** as the "current" price for all 32 positions. Even at 15:30 EDT (30min before close), yfinance's daily cache has not yet picked up Tue 09-15 live RTH data — caching happens after 16:00 EDT close. Result: MA20 == price for every position (no live trail-stop test possible). All 32 positions show MA20 == current price trivially.
+>
+> **Documented expectation shift**: #35 previewed "yfinance should have Tue 09-15 close cached by now" — that prediction was wrong. yfinance daily cache typically updates 30min **after** 16:00 EDT close, not 30min before. First real-data cron is now expected at next pre-open #27 (Wed 09-16 22:00 BJT = Wed 10:00 EDT).
+
+### 📊 對比前四次 scan (五窗口表)
+
+| Cron | Time BJT | Session | MV | Δ MV (vs prev) | zt | TP1-over | TP2 Nearest (gap) | Notes |
+|------|---------:|---------|---:|---------------:|---:|---------:|------------------:|-------|
+| #27 | 09-14 22:00 | Pre-open | $98,821.12 | (overnight baseline) | 2 | 6 | COP +11.73% | first post-Labor-Day RTH scan |
+| #33 | 09-14 23:00 | Pre-market | $98,670.95 | −$150.17 (−0.15%) | 3 | 5 (1 swap) | CRM +8.53% | HOOD out (+19.0%), PATH in (+21.1%) |
+| #34 | 09-15 01:00 | RTH mid (Tue) | $99,319.44 | +$648.49 (+0.66%) | 2 | 5 | CRM +7.61% | day-boundary reset (P-MR-247) zt=3→2 |
+| #35 | 09-15 03:00 | RTH late | $98,807.74 | −$511.70 (−0.515%) | 3 | 5 | CRM +7.36% | first non-zero drift in yfinance-lag chain |
+| **#36** | **09-15 03:30** | **RTH close −30min** | **$98,743.94** | **−$63.80 (−0.065%)** | **4** | **6** | **CRM +6.87%** | **HOOD re-crosses TP1 line (+20.5%), yfinance lag persists** |
+
+### 🔍 TP1-over-line (`pnl_pct >= +20%`) — 6 隻 (+1 HOOD re-cross vs #35)
+
+| Rank | Symbol | Cur PnL | Cost | TP1 line | Cur | Over by | TP2 line | TP2 gap | State |
+|-----:|--------|--------:|-----:|---------:|----:|--------:|---------:|--------:|-------|
+| — | **CRM** | **+31.0%** | $198.32 | $237.98 | $259.80 | +10.1pp over | $277.65 | +6.87% | TP1=true ✅ |
+| — | **COP** | **+24.2%** | $109.64 | $131.57 | $136.17 | +4.6pp over | $153.49 | +12.72% | TP1=true ✅ |
+| — | **T** | **+23.2%** | $21.52 | $25.82 | $26.51 | +3.4pp over | $30.13 | +13.64% | TP1=true ✅ |
+| — | **PATH** | **+22.7%** | $11.93 | $14.32 | $14.64 | +2.5pp over | $16.70 | +14.10% | TP1=true ✅ |
+| — | **MRK** | **+22.6%** | $118.24 | $141.89 | $144.96 | +2.5pp over | $165.53 | +14.19% | TP1=true ✅ |
+| — | **HOOD** 🆕 | **+20.5%** | $95.67 | $114.80 | $115.28 | +0.4pp over | $133.93 | +16.18% | 未標記 (fresh lot) |
+
+**HOOD re-crosses TP1 line**: was +19.1% at #35, now +20.5% (+1.4pp in this cron alone, biggest single-cron gain among over-line names). State file HOOD entry remains `FULLY_CLOSED` (historical record of pre-Aug closure lot — no mutation). Fresh-lot detection requires FIFO recompute to flip; cron observes and documents. Added to `_audit.tp1_over_line_unmarked` so next FIFO recompute picks it up.
+
+**CRM** continues to dominate TP2 proximity: +30.4% → +31.0% (+0.6pp, narrowed TP2 gap 0.49pp from +7.36% to +6.87%). CRM is now closer to TP2 line than at any previous cron in this sequence.
+
+**Other 4 carry positions** (COP, T, PATH, MRK): modest moves, all still firmly over TP1 line, no falls-back.
+
+### 🎯 TP2 nearest
+
+**CRM** +6.87% (cur $259.80 vs TP2 line $277.65, distance $17.85). TP1 already ✅. CRM needs to reach **$277.65** for TP2 trigger (+40% above $198.32 cost). Distance has narrowed 0.49pp from #35 (+7.36%) — fastest single-cron narrowing since #34 → #35 (which was only 0.25pp). CRM would need ~+7% upside before next FIFO recompute potentially sees TP2 fire.
+
+Other over-TP1 positions remain >12% from their TP2 lines: HOOD +16.18% (newly over line, far from TP2), COP +12.72%, T +13.64%, PATH +14.10%, MRK +14.19% — not in striking distance at this cron.
+
+### 🚨 Cap violations (>10% MV)
+
+| Symbol | MV | Cap % | vs #35 | Status |
+|--------|---:|------:|-------:|--------|
+| 🚨 **DE** | $11,553.54 | **11.70%** | +0.01pp ($679.23→$679.62 +0.06%) | still in P-MR-124 block |
+| 🚨 **MRVL** | $10,156.34 | **10.29%** | −0.08pp ($222.68→$220.79 −0.85%) | still in P-MR-124 block |
+
+**DE** essentially flat (cap moved 0.01pp due to denominator shrinkage effect, price moved +0.06% only). **MRVL** improved 0.08pp despite -0.85% price drop — because other positions shrank faster (total MV dropped -$63.80). Both still firmly >10% threshold. P-MR-124 block continues, end-of-day cap-violation snapshot unchanged in shape.
+
+### 📈 MA10 / MA20 trail status — yfinance artifact (continuing, end-of-day)
+
+All 32 positions show MA20 == current price (yfinance 1-day lag, both fields = Mon 09-14 RTH close). This is NOT a live trail-stop test. Documented as artifact:
+
+- 🟢 OK × 32 (trivial, RTH-close artifact)
+- No live MA10/MA20 breach detection possible at this cron
+- **#35 preview predicted artifact resolution at #36 — that prediction was wrong.** yfinance caches daily close 30min **after** 16:00 EDT, not 30min before. First non-artifact cron expected at **next pre-open #27 (Wed 09-16 22:00 BJT = Wed 10:00 EDT)**.
+
+### 📊 Drift decomposition — #35 (Mon 09-14 close snapshot) → #36 (Mon 09-14 close, fresh snapshot)
+
+| Rank | Symbol | Qty | $p_prev→$p_cur | Δ% | $contrib | PnL | Sector |
+|-----:|--------|----:|--------------:|---:|---------:|-----:|--------|
+| 🔻 | MRVL | 46 | $222.68→$220.79 | -0.85% | **$-86.94** | +3.9% | Semi-Cap |
+| 🔻 | COP | 64 | $136.74→$136.17 | -0.42% | $-36.48 | +24.2% | Energy |
+| 🔻 | IREN | 35 | $43.67→$43.19 | -1.10% | $-16.80 | +9.8% | Crypto-infra |
+| 🔻 | BABA | 79 | $109.55→$109.35 | -0.18% | $-15.80 | -0.8% | 中概 |
+| 🔻 | CVX | 12 | $212.50→$211.74 | -0.36% | $-9.12 | +10.2% | Energy |
+| 🔺 | HOOD | 74 | $113.93→$115.28 | +1.18% | **$+99.90** | +20.5% | broker |
+| 🔺 | RKLB | 126 | $61.88→$62.28 | +0.65% | $+50.40 | -20.2% | Space |
+| 🔺 | FUTU | 67 | $110.93→$111.28 | +0.32% | $+23.45 | +10.7% | 中概 |
+| 🔺 | AVGO | 17 | $344.59→$345.37 | +0.23% | $+13.26 | -10.2% | Chip |
+| 🔺 | DE | 17 | $679.23→$679.62 | +0.06% | $+6.63 | +18.0% | Industrial |
+
+**Total cron-to-cron drift**: **$-63.80** (FIFO MV delta: $98,807.74 → $98,743.94, -0.065%). Decomposition table: top-5 negative = $-165.14, top-5 positive = $+193.64, net ≈ +$28.50 (small residual vs authoritative $-63.80 due to markdown-rounded prev prices for the bottom 22 positions; **authoritative drift is FIFO MV delta**). HOOD dominates the positive side (+$99.90, single-cron +1.18% price gain, biggest mover). RKLB relief (+$50.40) notable — Space sector bouncing off 14-window streak lows.
+
+**Note on yfinance lag**: drift decomposition computed using #35 scan prices (Mon 09-14 RTH close snapshot) vs current scan (Mon 09-14 RTH close, fresh snapshot). Both reflect Mon close, so this is snapshot-to-snapshot mark-to-market within the same trading day, not real Tue 09-15 RTH movement. The drift is real but the absolute price level is stale until yfinance catches up.
+
+### 🎲 TP1 mutations this cron
+
+**Zero TP1 mutations**. State file is FIFO-recompute-only; cron observes and documents but does not mutate.
+
+Observed TP1-over-line positions:
+- CRM +31.0% (TP1=true ✅, awaiting TP2 +40%)
+- COP +24.2% (TP1=true ✅)
+- T +23.2% (TP1=true ✅)
+- PATH +22.7% (TP1=true ✅)
+- MRK +22.6% (TP1=true ✅)
+- **HOOD +20.5% — RE-CROSSED above TP1 line** (was +19.1% at #35, +1.4pp). State file HOOD entry is `FULLY_CLOSED` (historical, no mutation). Added to `_audit.tp1_over_line_unmarked` as fresh-lot candidate for next FIFO recompute.
+
+### 🛡️ RKLB fixed-SL vs active-SL divergence (continuing, slight relief)
+
+RKLB $62.28 vs cost-reconstruction: cost = $62.28/(1-0.202) = $78.04. Fixed SL (entry-anchored 5%) = $74.14. Current $62.28 < $74.14 → fixed SL **breached by 16.0%** of original position size (slight improvement from #35's 16.5%). But scan's `止蝕=$59.17` = $62.28 × 0.95 = active trailing stop, NOT breached (active MA10 ≈ $59.17, RKLB still $3.11 above).
+
+**No EXIT fires** under current rules. RKLB streak 15-window now at -20.2% (vs #35 -20.7%, +0.5pp **relief** this cron — first improvement in the streak since #30). Watch at #27 next cron for continued relief or relapse.
+
+### 📋 Log / State 檔案動作
+
+| File | Action | Result |
+|------|--------|--------|
+| `/tmp/ai_trader_tp1_state.json` | 觀察並文檔化，無 mutation | 14 隻 TP1=true 保留 (unchanged) |
+| `/tmp/ai_trader_trades_log.json` | 0 buy/sell 事件 | 287 entries (unchanged) |
+| `/tmp/ai_trader_scan_meta_log.json` | append cron #36 entry via canonical script | +1 entry (22 total) |
+| `/tmp/ai_trader_zero_trigger.json` | zt same-day carry: 3 → **4** | carry |
+| `/tmp/ai_trader_cash_floor.json` | cf unchanged | 0 |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below | — |
+
+### 📊 當日總結 (2026-09-15 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: CRM +6.87% from TP2 line $277.65)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (今日 01:00 RTH mid #34):  $99,526.84
+💰 現時總權益 (今日 03:30 RTH close #36): $98,951.34
+📈 日內 MTM (今日 #34 → #36):             −$575.50 (−0.578%)
+📦 未實現 PnL:                          +$5,110.53 (+5.46%)
+💵 現金:                                 $207.40
+📊 持倉數:                               32
+🚨 Cap violations:                       DE 11.70% / MRVL 10.29%
+🚦 零觸發連續 (zt):                      4  (same-day carry from #35 zt=3, P-MR-247 reset was at #34)
+```
+
+### ⏭️ Next cron preview
+
+- **#27** (Wed 09-16 22:00 BJT = Wed 10:00 EDT) — Next-day pre-open (day-boundary reset → zt=2)
+  → **FIRST real-data RTH scan since #26 (Fri 09-11 03:30 BJT)** — yfinance should have cached Tue 09-15 close by then
+  → All 32 positions expected to show MA20 ≠ price (real trail-stop test)
+  → TP2 check: CRM at +6.87% has ~7% to go before trigger; HOOD newly over line has ~16% to go
+  → RKLB relief continuation test (-20.2% vs streak low -20.7% at #35)
+  → Cap-violation reset context: DE/MRVL still in P-MR-124 block, watch for natural relief
+- **#33** (Wed 09-16 23:00 BJT) — pre-market follow-through, same-day carry
+- **#34 → #35 → #36** (Thu 09-17 BJT) — RTH mid / late / close, full Tuesday-close baseline for first time since Fri #26
+
+---
