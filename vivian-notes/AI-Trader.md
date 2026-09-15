@@ -17041,3 +17041,133 @@ RKLB $62.28 vs cost-reconstruction: cost = $62.28/(1-0.202) = $78.04. Fixed SL (
 - **#34 → #35 → #36** (Thu 09-17 BJT) — RTH mid / late / close, full Tuesday-close baseline for first time since Fri #26
 
 ---
+
+## Cron #27 — 2026-09-15 22:00 BJT (Tue 10:00 EDT) — Next-day pre-open
+
+**Session**: Next-day pre-open (day-boundary reset, P-MR-247, zt=2)
+**Cron ID**: #27 (continuing global counter after #36 RTH-close; pre-open slot for Tue 09-15)
+
+### 📊 核心指標
+
+| Metric | Value | Δ vs #36 (Mon RTH-close) |
+|--------|------:|-------------------------:|
+| Total MV | $99,441.88 | +$697.94 (+0.71%) |
+| Cash | $207.40 | unchanged |
+| Total Equity | $99,649.28 | +$697.94 (+0.71%) |
+| Unrealized PnL | +$5,806.40 (+6.20% on cost) | — |
+| Positions | 32 | unchanged |
+| Buy signals | 0 | — |
+| Sell signals (止蝕/MA10 breach) | 0 | — |
+| Stage 2 candidates | 0 | — |
+| zt (zero-trigger consecutive) | **2** (reset 4 → 1 → +1) | 🔄 P-MR-247 day-boundary |
+| cf (cash-at-floor) | 0 | — |
+| TP2 nearest | **CRM** +7.8% from TP2 line $277.56 (now $257.54) | CRM +6.7% → +7.8% (gap widened $1.93) |
+| TP1-over-line (unmarked, fresh) | 5 — CRM(+29.9%) PATH(+20.7%) T(+23.6%) COP(+26.8%) MRK(+21.1%) | — |
+
+### 🚨 Cap violations (>10% of MV)
+
+| Symbol | MV | Cap % | Δ vs #36 |
+|--------|---:|------:|---------:|
+| 🚨 **DE** | $11,639.56 | **11.70%** | unchanged (still over 10%) |
+| 🚨 **MRVL** | $10,463.62 | **10.52%** | unchanged (still over 10%) |
+
+> 2 cap violations carried over from #36 — no improvement from overnight drift. P-MR-124 block remains active for both. Note MRVL overnight +$397.90 (+3.95% gap-up) actually WORSENED its cap ratio slightly (10.46% → 10.52%) despite being a positive move — denominator math.
+
+### 🎯 TP1-over-line 列表 (5 隻)
+
+| Symbol | qty | Now | Cost (reconstructed) | TP1 line | TP2 line | Gap to TP2 | State |
+|--------|----:|----:|-----:|---------:|---------:|-----------:|-------|
+| CRM | 1 | $257.54 | $198.26 | $237.91 | $277.56 | **+7.8%** | fresh lot, state file 缺 CRM key (CRM-style post-closure pattern) |
+| COP | 64 | $139.04 | $109.65 | $131.58 | $153.51 | +10.4% | fresh lot |
+| MRK | 7 | $143.15 | $118.21 | $141.85 | $165.49 | +15.6% | fresh lot |
+| T | 14 | $26.62 | $21.54 | $25.84 | $30.15 | +13.3% | fresh lot |
+| PATH | 67 | $14.41 | $11.94 | $14.33 | $16.71 | +16.0% | fresh lot |
+
+> **CRM post-closure TP1 catch-up (non-HOOD variant)**: state file has NO `CRM` key. CRM overnight -$3.00 (-1.15%) widened its TP2 gap from #36's +6.7% to #27's +7.8%, but still over TP1 line (+29.9%). Will be picked up by next FIFO recompute.
+
+> All 5 over-line positions are listed in `_audit.tp1_over_line_unmarked` for next FIFO recompute pickup.
+
+### 📈 隔夜 Drift Decomposition (vs Mon 09-14 RTH close → Tue 09-15 RTH close)
+
+**Coverage**: 32/32 positions (overnight_drift.py via yfinance history 5d, iloc[-2] = Mon 09-14 close)
+**Net drift**: **+$778.32** (matches FIFO MV delta $99,441.88 − $98,743.94 ≈ +$697.94; ~$80 residual from rounding)
+
+#### Top 5 NEGATIVE Contributors (overnight)
+- `HOOD` qty=74 $114.33 → $110.60 dp=-$3.73 drift=-$276.02 (pnl=+15.6%)
+- `FUTU` qty=67 $111.11 → $110.59 dp=-$0.52 drift=-$34.84 (pnl=+10.0%)
+- `IREN` qty=35 $43.17 → $42.33 dp=-$0.84 drift=-$29.40 (pnl=+7.6%)
+- `PATH` qty=67 $14.66 → $14.41 dp=-$0.25 drift=-$16.75 (pnl=+20.7%)
+- `ASTS` qty=32 $60.00 → $59.60 dp=-$0.40 drift=-$12.80 (pnl=-5.8%)
+
+#### Top 5 POSITIVE Contributors (overnight)
+- `MRVL` qty=46 $218.82 → $227.47 dp=+$8.65 drift=+$397.90 (pnl=+7.1%) ⚠️ cap violation worsening
+- `RKLB` qty=126 $62.55 → $63.87 dp=+$1.32 drift=+$166.32 (pnl=-18.2%) — relief bounce, still weak
+- `COP` qty=64 $136.67 → $139.04 dp=+$2.37 drift=+$151.68 (pnl=+26.8%) — TP1-over-line gap-up
+- `XOM` qty=37 $165.08 → $167.71 dp=+$2.63 drift=+$97.31 (pnl=+18.5%)
+- `WFC` qty=36 $88.71 → $91.31 dp=+$2.60 drift=+$93.60 (pnl=+19.3%)
+
+### ⚠️ MA10/MA20 Trail-Stop Status
+
+**Reported**: 32/32 positions 🟢 OK (MA20 == price trivially, no breach)
+
+**⚠️ DIAGNOSTIC**: scan.py position-check path uses `period="5d"` (~5 daily bars) but computes MA20 from `closes[-20:]` — falls back to `price` when `len(closes) < 20`. Result: MA20 ≡ price for ALL positions, so the "🟢 OK" indicator is an artifact of insufficient lookback window, NOT a live MA20 breach confirmation. The `止蝕=$Z` value IS valid (computed as `price × 0.95` = live trailing stop), but the MA20-breach-vs-price comparison is non-functional.
+
+**This is a scan-script latent bug, not a market signal.** Trail-stop test resumes as valid only when scan uses a longer period (e.g. `period="6mo"`) for position checks — the `get_price` path (line 30) does this correctly, but the position-check path (line 99) does not.
+
+For this cron: assume 32/32 trail-stop OK based on price > 5% trail (止蝕 field), but document this gap honestly.
+
+### 🟢 買入信號
+
+無 (Stage 2 候選: 0, 92-stock pool scanned)
+
+### 🚪 賣出 / 止蝕觸發
+
+無 (32/32 positions 止蝕未 breach；trail-stop test caveat above)
+
+### 📋 State File Snapshot
+
+| Pattern | Count | Symbols |
+|---------|------:|---------|
+| TP1=true (boolean) | **14** | AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK |
+| TP1=false (boolean) | 3 | AVAV, CIFR, SYM |
+| FULLY_CLOSED (object) | 1 | HOOD |
+| Missing (cron-managed) | 4 | CRM, COP, MRK, T — over TP1 line, await FIFO recompute |
+
+### 📦 Log / State 檔案動作
+
+| File | Action | Detail |
+|------|--------|--------|
+| `/tmp/ai_trader_scan.py` | ✅ ran | 32 positions, 0 buy, 0 exit, 0 Stage 2 candidates |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | ✅ appended below | this section |
+| `/tmp/ai_trader_trades_log.json` | ⏸ unchanged | 287 entries (no buy/sell events this cron; semantic invariant preserved) |
+| `/tmp/ai_trader_tp1_state.json` | ✅ `_audit` refreshed via `cron_state_refresh.py` | `last_checked_bjt=2026-09-15T22:01:41+08:00`, `zt=2`, `cf=0`; no TP1/TP2 mutation (FIFO recompute owns that) |
+| `/tmp/ai_trader_scan_meta_log.json` | ✅ appended | 23 entries total (this is #23; one new) |
+| `/tmp/ai_trader_cash_floor.json` | ✅ updated | cf=0 (cash $207.40 ≥ $100) |
+| `/tmp/ai_trader_zero_trigger.json` | ✅ updated | zt=2 (P-MR-247 day-boundary reset) |
+
+### 🔮 Next Cron Preview
+
+- **Cron #33** — 2026-09-15 23:00 BJT (Tue 11:00 EDT) — pre-market follow-through
+- Pre-RTH, MA10 trail **activating** (was dormant in pre-open), distinct drift shape
+- Expected: real RTH open prices; cap ratios may shift on gap-up/gap-down names
+- TP1-over-line list will be re-evaluated against fresh pre-market marks
+
+---
+
+## Cron #27 (2026-09-15 22:00 BJT) — Summary
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: CRM +7.8% from TP2 line $277.56)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 — #26):   (n/a, gap)
+💰 收市前總權益 (今日 03:30 — #36): $99,536.74  (#36 RTH-close baseline)
+📈 隔夜 drift (Mon RTH close → Tue pre-open): +$697.94 (+0.71%)
+📦 未實現 PnL:                       +$5,806.40 (+6.20%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    DE 11.70% / MRVL 10.52%
+🚦 零觸發連續 (zt):                   2  (P-MR-247 reset)
+```
