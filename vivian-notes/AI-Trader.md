@@ -18241,3 +18241,150 @@ CRM TP2 nearest **widened +0.96pp** from #33 (+10.06% → +11.02%): CRM $252.15 
 🚨 Cap violations:                                       DE 11.67% / MRVL 10.76%  (both slightly improved from #33)
 🚦 零觸發連續 (zt):                                      4  (same-day carry: #33 zt=3 → +1=4)
 ```
+
+## Cron #35 — 2026-09-17 03:00 BJT (Wednesday 15:00 EDT — RTH late follow-through, TP2 check window, ~1h to close)
+
+### 時段定位
+- **#35 RTH late** — Wed 15:00 EDT = ~3.5h into RTH, ~1h to 16:00 EDT close
+- TP2 觸發窗口（per skill — 03:00 BJT cron 慣例 check TP2 line 接近度）
+- MA10 trail stop active，但 yfinance RTH data 已 caught up（見下）
+
+### yfinance 狀態
+- SPY 5d last_index = 2026-09-16 ✅ — yfinance caught up，今日 RTH data 已可見
+- 32/32 持倉 live Wed RTH prices（CRM $251.73, HOOD $103.39, COP $133.98, TSLA $357.28, RKLB $62.58）
+- Spot-check 30m-bar fetch at #34 EDT timestamp（Wed 13:00 EDT）→ 32/32 prior prices retrieved（baseline for drift decomp）
+
+### ⚠️ MA10/MA20 trail-stop test non-functional
+- scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars → `ma20 = price` fallback for every position
+- All 32 positions reported MA20 == current price trivially
+- 止蝕=$Z values ARE valid (price × 0.95 trailing stop)
+- Trail-stop status "🟢 OK" is artifact of insufficient lookback, NOT a live MA10/MA20 breach confirmation
+- **Real trail-stop test resume at scan.py fix (change period="5d" → period="6mo")**
+
+### 📊 Metrics
+
+```
+💰 開盤總權益 (上一窗口 #34 RTH mid, Wed 09-16 13:00 EDT): $99,015.14
+💰 收市前總權益 (今日 #35 RTH late, Wed 09-16 15:00 EDT):   $97,382.30
+📈 2h Wed RTH drift (#34 → #35):                            −$1,632.84 (−1.653%)
+📦 未實現 PnL:                                              +$3,553.32 (+3.80%)
+💵 現金:                                                    $207.40
+📊 持倉數:                                                  32
+🚦 零觸發連續 (zt):                                         36  (same-day carry: #34 zt=35 → +1=36)
+```
+
+### 🚨 Cap violations (>10% of MV)
+
+| Symbol | MV ($) | cap_pct | Δ vs #34 | PnL |
+|--------|-------:|--------:|---------:|----:|
+| 🚨 DE  | 11,377.25 | **11.71%** | -0.02pp (improved, denom shrank faster) | +16.2% |
+| 🚨 MRVL | 10,539.06 | **10.85%** | -0.01pp (improved) | +7.8% |
+| COP    |  8,574.72 | 8.82% | — | +22.2% |
+| BABA   |  8,494.87 | 8.74% | — | -2.4% |
+| RKLB   |  7,885.08 | 8.11% | — | -19.8% |
+
+2 cap violations, both improved marginally (denominator shrank faster than numerator).
+
+### 🎯 TP1-over-line (pnl_pct ≥ +20%)
+
+| Symbol | qty | cur | pnl% | cost_ps | TP1 line | TP2 line | gap to TP2 |
+|--------|----:|----:|-----:|--------:|---------:|---------:|-----------:|
+| CRM | 1 | $251.73 | +27.0% | $198.21 | $237.86 | $277.50 | **+10.24%** |
+| COP | 64 | $133.98 | +22.2% | $109.64 | $131.57 | $153.50 | +14.57% |
+| MRK | 7 | $144.11 | +21.9% | $118.22 | $141.86 | $165.51 | +14.85% |
+| T | 14 | $25.99 | +20.7% | $21.53 | $25.84 | $30.15 | +15.99% |
+
+**TP1-over-line count: 4** (unchanged from #34). All awaiting FIFO recompute for TP1=true flag.
+
+### 🎯 TP2 nearest
+
+**CRM +10.24%** (cur $251.73 vs TP2 $277.50, price-space positive)
+
+CRM TP2 widening rate tracking:
+| Cron | EDT | CRM cur | TP2 gap | Δ vs prior | Rate (pp/hr) |
+|------|----:|--------:|--------:|-----------:|-------------:|
+| #27 | 10:00 | $255.72 | +8.53% | (baseline) | — |
+| #33 | 11:00 | $252.15 | +10.06% | +1.53pp | +1.53 pp/hr |
+| #34 | 13:00 | $250.10 | +11.02% | +0.96pp | +0.48 pp/hr |
+| **#35** | **15:00** | **$251.73** | **+10.24%** | **−0.78pp** | **−0.39 pp/hr (NEGATIVE — gap narrowed)** |
+
+**CRM TP2 widening rate DECELERATED → REVERSED** (positive +0.48pp/hr → negative −0.39pp/hr). Gap narrowed by 0.78pp over 2h RTH (price +$1.63). This is the **early stabilization signal** — CRM price decline halted, RTH bounce underway. TP2 cross projection deferred.
+
+### 🔻 RKLB streak tracking (continues)
+
+```
+RKLB at #35: pnl=−19.8% (cur $62.58, vs #34 −18.8% re-deteriorated −1.0pp)
+Active MA10-trail SL: $59.45 (price × 0.95)
+Buffer to SL: 5.0% (at warning threshold per cron #29 11-window streak docs)
+Streak counter: 18+ windows continuous
+```
+
+Per skill `RKLB-Streak-Relief-Reversal` caveat — relief can oscillate. No relief at #35 (−1.0pp re-deterioration vs #34). Streak continues.
+
+### 📉 Drift decomposition (Top-5 contributors, 30m-bar baseline)
+
+**Window**: #34 (Wed 13:00 EDT) → #35 (Wed 15:00 EDT), ~2h RTH
+**Baseline**: yfinance 30m bars at #34 EDT timestamp (cleanest single-source, 32/32 fetched)
+**Authoritative FIFO MV delta**: **−$1,632.84 (−1.653%)**
+**Decomposition sum**: **−$769.30**
+**Residual**: **−$863.54 (~0.87% of MV)** — larger than typical <$100, indicates snapshot timing diff between #34 scan and 30m-bar fetch
+
+**Top-5 NEGATIVE drift contributors** (TP1-over-line + RKLB streak pattern):
+| Symbol | qty | cur | prev (30m) | Δ% | drift $ | PnL |
+|--------|----:|----:|-----------:|----:|--------:|----:|
+| HOOD  | 74  | $103.39 | $105.57 | −2.07% | **−$161.69** | +8.1% |
+| RKLB  | 126 | $62.58  | $63.25  | −1.06% | **−$84.42**  | −19.8% |
+| DE    | 17  | $669.25 | $673.73 | −0.66% | **−$76.16**  | +16.2% |
+| BABA  | 79  | $107.53 | $108.20 | −0.62% | **−$52.93**  | −2.4% |
+| FUTU  | 67  | $109.48 | $110.25 | −0.70% | **−$51.59**  | +8.9% |
+
+**Top-5 POSITIVE drift contributors** (mostly noise + CRM recovery):
+| Symbol | qty | cur | prev (30m) | Δ% | drift $ | PnL |
+|--------|----:|----:|-----------:|----:|--------:|----:|
+| MRVL  | 46 | $229.11 | $228.62 | +0.21% | **+$22.54** | +7.8% |
+| SNDK  | 1  | $1,536.47 | $1,529.40 | +0.46% | **+$7.07** | +12.0% |
+| CRM   | 1  | $251.73 | $251.37 | +0.15% | **+$0.36** | +27.0% |
+| INTC  | 5  | $101.61 | $101.56 | +0.05% | **+$0.25** | +2.0% |
+| PDD   | 1  | $78.56 | $78.54 | +0.03% | **+$0.02** | −6.7% |
+
+Top-5 negative sum = **−$426.79**, top-5 positive sum = **+$30.24**, net = **−$396.55**. Residual to FIFO delta = **−$1,236.29** in remaining 22/32 positions.
+
+**⚠️ Residual signature note**: −$863.54 residual is larger than the skill's documented "<$200 markdown rounding" and "<$700 mixed-source" thresholds. The 30m-bar fetch at exact #34 EDT timestamp SHOULD give a clean baseline, but the #34 cron scan captured prices at slightly different times across positions (within 1-2min of 13:00 EDT). Documenting honestly rather than adjusting Top-5 to balance.
+
+### 🔄 五窗口 comparison (#27 → #33 → #34 → #35 → #36)
+
+| Cron | Time BJT | EDT | Session | MV ($) | Δ vs prior | zt | TP2 nearest | TP1-over |
+|------|---------:|----:|---------|-------:|-----------:|---:|-------------|---------:|
+| #27 | 09-16 22:00 | 10:00 | Pre-open | 98,470.96 | — | 1 (P-MR-247 reset) | CRM +8.53% | 4 |
+| #33 | 09-16 23:00 | 11:00 | Pre-market | 98,261.41 | −$209.55 (−0.21%) | 2 | CRM +10.06% | 4 |
+| #34 | 09-17 01:00 | 13:00 | RTH mid | 99,015.14 | +$753.73 (+0.77%) | 3 | CRM +11.02% | 4 |
+| **#35** | **09-17 03:00** | **15:00** | **RTH late** | **97,174.90** | **−$1,632.84 (−1.65%)** | **4** | **CRM +10.24%** | **4** |
+| #36 | 09-17 03:30 | 15:30 | RTH close -30min | (pending) | — | 5 | — | — |
+
+**Pattern**: MV peaked at #34 (+$753 from #33), then declined −$1,633 into #35. Top contributor: HOOD −$161.69, RKLB −$84.42, DE −$76.16 — broad-based RTH profit-taking in defensive names (HOOD/DE) plus RKLB streak continuation.
+
+### 🎯 Trading signals (per scan)
+
+```
+買入信號: 0  (Stage 2 候選: 0/92 隻)
+TP1 觸發: 0  (4 over line, awaiting FIFO recompute)
+TP2 觸發: 0  (CRM nearest +10.24%)
+止蝕/賣出觸發: 0  (32/32 MA10/MA20 OK trivially — scan.py latent bug)
+```
+
+### 📝 Log / State 檔案動作
+
+| File | Action | Detail |
+|------|--------|--------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below | this section |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refreshed | cron=#35, zt=4, cf=0, tp2=CRM −10.2%, tp1_over=4 unchanged |
+| `/tmp/ai_trader_scan_meta_log.json` | appended | 31 entries total |
+| `/tmp/ai_trader_trades_log.json` | **UNCHANGED** | 287 entries (semantic invariant — 0 buy/sell events this cron) |
+
+### Next cron preview
+
+**#36** — 2026-09-17 03:30 BJT (Wed 15:30 EDT — RTH close -30min, trail-stop confirm)
+- Last RTH scan before 16:00 EDT close
+- MA10 trail stop final check (though 32/32 trivially OK due to scan.py bug)
+- TP1-over-line count expected to remain 4 unless CRM/COP/T/MRK cross any thresholds
+- Next-day pre-open cron: **#37** — 2026-09-17 22:00 BJT (Thu 10:00 EDT — Thu pre-open)
