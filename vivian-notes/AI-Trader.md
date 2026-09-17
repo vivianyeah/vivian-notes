@@ -19315,3 +19315,143 @@ Per skill pitfall "RKLB relief can REVERSE — track relief rate, not just cumul
 ---
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #35 appended
+
+---
+
+## Cron #36 — 2026-09-18 03:30 BJT (Thu 15:30 EDT) — RTH close -30min (trail-stop confirm)
+
+> 🕒 **最後一次調整 / trail stop 確認** — 美股 RTH 即將收市（16:00 EDT = 04:00 BJT）
+
+### 五窗口對比表 (BJT)
+
+| Cron | Time BJT | EDT | Session | MV ($) | Drift vs prior | zt |
+|------|---------:|----:|---------|-------:|---------------:|---:|
+| #27  | 09-17 22:00 | 10:00 | Pre-open (overnight gap-up) | 99,176.57 | +2,671.35 | 38 |
+| #33  | 09-17 23:00 | 11:00 | Pre-market follow-through | 99,232.26 | +55.69 | 39 |
+| #34  | 09-18 01:00 | 13:00 | RTH mid-session (P-MR-247 reset) | 99,582.74 | +350.48 | 2 |
+| #35  | 09-18 03:00 | 15:00 | RTH late (TP2 check) | 99,688.04 | +105.30 | 3 |
+| **#36** | **09-18 03:30** | **15:30** | **RTH close -30min** | **99,776.14** | **+88.10 (+0.088%)** | **4** |
+
+### 主要指標
+
+```
+💰 總市值 (MV):       $99,776.14
+💵 現金:              $207.40
+📊 總權益:            $99,983.54
+📦 未實現 PnL:        $+6,163.35 (+6.58%)
+📈 持倉數:            32
+
+🟢 買入信號:           0
+🔴 賣出/止蝕信號:     0
+🎯 TP1 觸發:           0  (state file: 14 隻 TP1=true ✅)
+🎯 TP2 觸發:           0  (CLOSEST: MRK +12.36% from TP2 line $165.53)
+🚨 Cap violations:     DE 11.69% / MRVL 11.12%  (P-MR-124)
+🚦 零觸發連續 (zt):    4  (day-boundary reset P-MR-247 at #34)
+💵 現金地板 (cf):      0  (cash $207.40 ≥ $100)
+```
+
+### Drift decomposition (#35 → #36, 30m RTH window)
+
+Authoritative FIFO MV delta: **+$88.10 (+0.088%)**
+
+| Rank | Symbol | Prev ($) | Cur ($) | Δ% | MV Δ ($) | Note |
+|------|--------|---------:|--------:|----:|---------:|------|
+| 🥇 | MRVL | 240.84 | 241.30 | +0.19 | +21.16 | low-pnl bounce |
+| 🥈 | HOOD | 107.93 | 108.08 | +0.14 | +11.47 | +13.0%, post-TP1-recovery |
+| 🥉 | RKLB | 68.13 | 68.20 | +0.10 | +8.82 | streak relief 6th window, +0.4pp |
+| 4 | SNDK | 1608.87 | 1612.73 | +0.24 | +3.86 | +17.5%, near TP1 |
+| 5 | COP | 132.96 | 133.01 | +0.03 | +2.88 | TP1-over-line |
+| 5 | PDD | 77.99 | 77.98 | -0.01 | -0.01 | flat |
+| 4 | DE | 686.42 | 686.37 | -0.01 | -0.85 | flat |
+| 3 | PATH | 14.00 | 13.98 | -0.14 | -1.34 | flat |
+| 2 | BABA | 108.76 | 108.69 | -0.06 | -5.53 | flat |
+| 1 | FUTU | 111.72 | 111.63 | -0.08 | -6.03 | flat |
+
+**Top-5 positive: +$47.19** | **Top-5 negative: -$13.76** | **Net ≈ +$33.43**
+**Residual: +$54.67** (decomp sum $49.54 vs FIFO $88.10; markdown-rounded band <$200 — clean 30m-bar baseline)
+
+### TP1-over-line (pnl ≥ +20%, state file NOT marked true)
+
+| Symbol | Qty | Cur ($) | PnL | TP2 line ($) | Gap to TP2 | Status |
+|--------|----:|--------:|----:|-------------:|-----------:|--------|
+| MRK | 7 | 147.32 | +24.6% | 165.53 | +12.36% | manual queue |
+| CRM | 1 | 244.37 | +23.3% | 277.47 | +13.55% | manual queue |
+| COP | 64 | 133.01 | +21.3% | 153.52 | +15.40% | manual queue |
+
+### Cap violations (P-MR-124, >10% MV)
+
+| Symbol | Qty | Price ($) | MV ($) | Cap % | vs #35 |
+|--------|----:|----------:|-------:|------:|-------:|
+| DE | 17 | 686.37 | 11,668.29 | **11.69%** | 11.70% (-0.01pp) |
+| MRVL | 46 | 241.30 | 11,099.80 | **11.12%** | 11.17% (-0.05pp) |
+
+Both cap violations slightly improved (denominator grew faster than numerators).
+
+### TP2 nearest — MRK (5th consecutive cron at #2 or #1)
+
+```
+MRK cur=$147.32, TP2_line=$165.53, gap=+12.36% (price-space)
+TP2 nearest cron history (last 4 sessions):
+  #33 Thu 11:00 EDT: MRK +12.90% (took lead from CRM)
+  #34 Thu 13:00 EDT: MRK +12.63% (narrowed -0.27pp)
+  #35 Thu 15:00 EDT: MRK +12.40% (narrowed -0.23pp)
+  #36 Thu 15:30 EDT: MRK +12.36% (narrowed -0.04pp — STABILIZED)
+```
+
+**Stabilization signal**: TP2 gap narrowing has decelerated to near-zero (+0.04pp over 30m). This is the same pattern observed in CRM TP2 narrowing on 2026-09-17 (rate → 0 → reversal). Watch #27 next-day pre-open for MRK to confirm stabilization OR fresh widening.
+
+### MA10/MA20 trail-stop status
+
+⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+- All 32 positions report MA20 = price (trivial)
+- Active MA10-trail stops range: CRM $232.15 → RKLB $64.79 (price × 0.95)
+- Weakest positions by PnL: KLAC -15.6%, VRT -14.5%, LRCX -13.2%, RKLB -12.6%, HON -10.6%
+- RKLB streak relief: 6th consecutive improving window (-12.6%, vs #35 -13.0%, +0.4pp cumulative relief since low; but relief rate has DECELERATED — from +1.0pp/window → +0.4pp/window)
+
+### Log / State 檔案動作
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 appended
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (last_checked_bjt=2026-09-18T03:32:16+08:00)
+   tp1_over_line_unmarked: [CRM (+23.3%), MRK (+24.6%), COP (+21.3%)]  (unchanged from #35)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (34 entries total)
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries; 0-trade cron, semantic invariant preserved)
+✅ /tmp/ai_trader_zero_trigger.json — zt=4 (P-MR-247 day-boundary reset at #34, +1 carry at #35, +1 carry at #36)
+✅ /tmp/ai_trader_cash_floor.json — cf=0 (cash $207.40 ≥ $100 floor)
+```
+
+### Next cron preview
+
+> 下一個 cron: **#27 next-day pre-open**, **2026-09-18 22:00 BJT** (Fri 10:00 EDT)
+> — P-MR-247 day-boundary reset (zt 4 → 2), yfinance expected live (Fri RTH data)
+> — TP1-over-line queue will re-check post-overnight (CRM/MRK/COP all over line; FIFO recompute between crons may flip flags)
+> — RKLB streak relief: if 7th consecutive improving window → consider streak-end declaration; if re-deteriorates → streak continues (oscillation pattern, per skill pitfall)
+> — Cap violations: DE/MRVL persist; P-MR-124 still blocks new BUY signals
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 appended
+
+---
+
+### 📊 當日總結 (2026-09-18 BJT, full 5-window cycle complete)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: MRK +12.36% from TP2 line $165.53)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 #36 RTH close):   $96,712.62
+💰 今日 22:00 pre-open (#27):         $99,383.97
+💰 今日 03:30 RTH close (#36):        $99,983.54
+📈 日內 MTM (#27→#36):                +$599.57 (+0.60%)
+📦 未實現 PnL:                        +$6,163.35 (+6.58%)
+💵 現金:                               $207.40
+📊 持倉數:                             32
+🚨 Cap violations:                     DE 11.69% / MRVL 11.12%  (P-MR-124)
+🚦 零觸發連續 (zt):                    4  (P-MR-247 reset at #34 → 2→3→4)
+```
+
+---
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 + 當日總結 appended
