@@ -19455,3 +19455,137 @@ TP2 nearest cron history (last 4 sessions):
 ---
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 + 當日總結 appended
+
+## Cron #27 — 2026-09-18 22:01 BJT (Friday 10:01 EDT — Next-day pre-open, 31 min into Fri RTH)
+
+> ⚠️ **zt semantics note**: Per skill P-MR-247 day-boundary reset rule (BJT-based), prior cron was #36 Fri 09-18 03:30 BJT and current is Fri 09-18 22:01 BJT — **same BJT date**, so zt carry 4→5. The canonical "NEW DAY" framing for #27 describes the next US trading day, but the literal BJT-date rule says no reset fires here. Documented honestly. If prior cron had been Wed 09-17 → #27 Fri 09-18, the reset WOULD fire (different BJT date).
+
+### Headline metrics
+
+| Metric | #36 (prior, Fri 03:30 BJT) | #27 (this, Fri 22:01 BJT) | Δ |
+|---|---:|---:|---:|
+| Total MV | $99,776.14 | $100,262.60 | **+$486.46 (+0.487%)** |
+| Cash | $207.40 | $207.40 | unchanged |
+| Total Equity | $99,983.54 | $100,470.00 | +$486.46 |
+| Unrealized PnL | +$6,316.41 (+6.76% on cost) | **+$6,636.02 (+7.09%)** | +$319.61 |
+| Positions | 32 | 32 | unchanged |
+| Buy signals | 0 | 0 | — |
+| Sell signals | 0 | 0 | — |
+| zt | 4 | **5** | carry (no reset, same BJT date) |
+| cf | 0 | 0 | cash $207.40 ≥ $100 floor |
+| TP2 nearest | MRK +12.36% | **MRK +13.36%** | **WIDENED +1.00pp** (stabilization reversed) |
+
+**MV drift context**: This is overnight gap-up rally (Thu 09-17 16:00 EDT RTH close → Fri 09-18 10:01 EDT = ~18h). yfinance has caught up (Fri 09-18 close cached; HOOD 6mo last $115.29 vs scan $115.80 = $0.51 intraday tick).
+
+### Overnight drift (Thu 09-17 RTH close → Fri 09-18 10:01 EDT scan)
+
+Coverage: **32/32 positions** via yfinance `history(period="5d").iloc[-2]` = Thu 09-17 close. Net decomposition drift: **+$508.25**. Authoritative FIFO MV delta: **+$486.46**. **Residual: −$21.79** (markdown-rounding band <$200 — clean single-source baseline).
+
+#### Top 5 POSITIVE (overnight gain)
+| # | Symbol | Qty | Prev ($) | Cur ($) | Δ$ | Δ% | Drift ($) | Sector |
+|--:|--------|----:|---------:|--------:|----:|----:|----------:|--------|
+| 🥇 | HOOD | 74 | 109.81 | 115.80 | +5.99 | +5.45% | **+443.26** | broker, post-TP1-recovery + gap-up |
+| 🥈 | BABA | 79 | 108.54 | 113.01 | +4.47 | +4.12% | **+353.13** | China tech, broad rebound |
+| 🥉 | AVGO | 17 | 347.30 | 359.27 | +11.97 | +3.45% | **+203.49** | semis, AI momentum |
+| 4 | FUTU | 67 | 111.36 | 112.56 | +1.20 | +1.08% | +80.40 | China broker |
+| 5 | SNDK | 1 | 1614.39 | 1693.17 | +78.78 | +4.88% | +78.78 | storage, TP1-over-line gap-up |
+
+#### Top 5 NEGATIVE (overnight loss)
+| # | Symbol | Qty | Prev ($) | Cur ($) | Δ$ | Δ% | Drift ($) | Sector |
+|--:|--------|----:|---------:|--------:|----:|----:|----------:|--------|
+| 1 | RKLB | 126 | 67.82 | 64.84 | −2.98 | −4.39% | **−375.48** | spacetech, post-relief pullback |
+| 2 | ASTS | 32 | 62.71 | 59.26 | −3.45 | −5.50% | **−110.40** | spacetech (sister to RKLB) |
+| 3 | IBM | 8 | 237.75 | 231.36 | −6.39 | −2.69% | −51.12 | enterprise tech |
+| 4 | DE | 17 | 685.63 | 682.91 | −2.72 | −0.40% | −46.24 | industrial (cap violation) |
+| 5 | COP | 64 | 133.19 | 132.78 | −0.41 | −0.31% | −26.24 | energy, TP1-over-line drift |
+
+**Net top-5: +$1,158.06 vs −$609.48 = +$548.58** (rest 22 positions net −$40.33). Spacetech duo (RKLB+ASTS) drove $485.88 of the negative side; HOOD alone drove 91% of positive.
+
+### TP1-over-line (pnl ≥ +20%, state file NOT marked true)
+
+| Symbol | Qty | Cur ($) | PnL | TP2 line ($) | Gap to TP2 | Status |
+|--------|----:|--------:|----:|-------------:|-----------:|--------|
+| MRK | 7 | 146.01 | **+23.5%** | 165.52 | +13.36% | manual queue (state MISSING, non-HOOD post-closure) |
+| SNDK | 1 | 1693.17 | +23.4% | 1920.94 | +13.45% | TP1=true ✅ (state file) |
+| COP | 64 | 132.78 | +21.1% | 153.50 | +15.61% | manual queue (state MISSING) |
+| HOOD | 74 | 115.80 | +21.0% | 133.98 | +15.70% | FULLY_CLOSED historical; new lot may exist |
+| CRM | 1 | 239.51 | +20.8% | 277.58 | +15.89% | manual queue (state MISSING) |
+
+**TP1-over-line queue = 4** (MRK/COP/HOOD/CRM; SNDK already TP1=true). All 4 will need FIFO recompute to set TP1=true boolean on next run.
+
+### Cap violations (P-MR-124, >10% MV)
+
+| Symbol | Qty | Price ($) | MV ($) | Cap % | vs #36 |
+|--------|----:|----------:|-------:|------:|-------:|
+| DE | 17 | 682.91 | 11,609.47 | **11.58%** | 11.69% (-0.11pp) |
+| MRVL | 46 | 240.83 | 11,078.18 | **11.05%** | 11.12% (-0.07pp) |
+
+Both marginally improved — DE cap_pct moved 11bp even though DE price barely moved (−$2.72, −0.40%) because BABA gap-up (+$353) inflated denominator faster than DE numerator shrunk. **Cap_pct is a ratio, not a price level** (skill pitfall: "Cap-violation ratio can move <0.1pp even when position price moves several percent").
+
+### TP2 nearest — MRK (6th consecutive cron at #1)
+
+```
+MRK cur=$146.01, TP2_line=$165.52, gap=+13.36% (price-space)
+TP2 nearest cron history (last 5 sessions):
+  #34 Thu 13:00 EDT: MRK +12.63%
+  #35 Thu 15:00 EDT: MRK +12.40% (narrowed -0.23pp)
+  #36 Thu 15:30 EDT: MRK +12.36% (narrowed -0.04pp — stabilization suspected)
+  #27 Fri 10:01 EDT: MRK +13.36% (WIDENED +1.00pp — stabilization REVERSED overnight)
+```
+
+**🔄 Stabilization reversal**: The "MRK TP2 narrowing" streak that ran 5 cron windows (#33 +12.90% → #36 +12.36%, total narrowing −0.54pp) was BROKEN by this cron. MRK's overnight drift was only −$0.73 (−0.50%, cur $146.01 vs prev $146.74 from yfinance iloc[-2]), but TP2 gap WIDENED because TP2 line moved with cost reconstruction. Actually wait — TP2 line is computed from per-share cost, which doesn't change unless a lot closed. Let me re-verify:
+
+Per-share cost = price / (1 + pnl/100). #36: cost = 147.32 / 1.246 = $118.24, TP2 = $165.53. #27: cost = 146.01 / 1.235 = $118.23, TP2 = $165.52. (Same to within $0.01, no lot changes.) Gap = (165.52 − 146.01) / 146.01 = +13.36%. Gap = (165.53 − 147.32) / 147.32 = +12.36%. So the gap widened by $1.00 pp purely from MRK price action (−0.89% overnight). The "stabilization" at #36 was noise within a wider range — single-cron narrowing of 0.04pp was within rounding tolerance.
+
+**Real case lesson**: When gap-narrowing decelerates to <0.05pp/cron, it's likely noise, not stabilization. Skill says "Rate <0.5pp/hr: stabilization — TP2 cross projection may extend". MRK at 0.04pp/30min (= 0.08pp/hr) was borderline; the reversal confirms it wasn't true stabilization. MRK TP2 cross remains on track per linear extrapolation.
+
+### MA10/MA20 trail-stop status
+
+⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+- All 32 positions report MA20 = price (trivial)
+- Spot-check: HOOD scan-MA20 = $115.80 vs real MA20 (6mo) = $111.07 → $4.73 gap
+- Active MA10-trail stops range: CRM $227.53 → RKLB $61.60 (price × 0.95)
+- Weakest positions by PnL: RKLB -16.9%, KLAC -14.9%, VRT -14.0%, LRCX -10.7%, HON -10.8%
+- RKLB streak relief: **7th consecutive improving window** since #34 low −19.3% (this cron −16.9%, +2.4pp cumulative relief). Per skill "RKLB streak relief" pitfall: "Relief > 2pp: major relief, treat as reversal signal — review lot for potential exit (manual review only, no auto-exit on relief alone)". **MANUAL REVIEW FLAGGED** — RKLB at −16.9% with active MA10-trail $61.60 = 5.0% buffer vs current $64.84 (right at warning threshold per cron #29 docs).
+
+### State file snapshot
+
+| Pattern | Count | Symbols |
+|---|---:|---|
+| TP1=true (boolean) | 14 | AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK |
+| TP1=false (boolean) | 3 | AVAV, CIFR, SYM |
+| FULLY_CLOSED (object) | 1 | HOOD |
+| Missing (cron-managed) | 3 | MRK, COP, CRM |
+
+### Log / State 檔案動作
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #27 appended (this file)
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (last_checked_bjt=2026-09-18T22:03:16+08:00)
+   tp1_over_line_unmarked: [MRK (+23.5%), COP (+21.1%), HOOD (+21.0% FULLY_CLOSED), CRM (+20.8%)]
+✅ /tmp/ai_trader_scan_meta_log.json — appended (35 entries total)
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries; 0-trade cron, semantic invariant preserved)
+✅ /tmp/ai_trader_zero_trigger.json — zt=5 (carry from #36, same BJT date, NO day-boundary reset)
+✅ /tmp/ai_trader_cash_floor.json — cf=0 (cash $207.40 ≥ $100 floor)
+```
+
+### Anomalies & skill-validation notes
+
+1. **scan.py `period="5d"` MA20 latent bug** — fires on this cron too (independent of yfinance state). HOOD real MA20 = $111.07 vs scan-reported $115.80 (diff $4.73). Every cron documents this caveat until `/tmp/ai_trader_scan.py` line ~99 patched.
+2. **zt semantics** — same BJT date → no reset, zt=5 carry. The canonical table's "NEW DAY, day-boundary reset" applies only when BJT date changes (e.g., Wed 22:00 → Thu 22:00). Documented honestly to prevent future agent confusion.
+3. **MRK "stabilization" was noise** — the 5-cron narrowing streak (#33 +12.90% → #36 +12.36%, −0.54pp total) was within rounding tolerance at the final window. Reversal at #27 confirms it wasn't a real deceleration. Skill pattern: rate <0.05pp/cron = likely noise, not signal.
+4. **RKLB streak-end reversal threshold reached** — +2.4pp cumulative relief exceeds skill's "Relief > 2pp: major relief, treat as reversal signal". Manual review flagged; no auto-exit. Streak counter resumes 0 if next cron shows further improvement, or continues if re-deteriorates.
+5. **CRM, MRK, COP state file MISSING entries** — non-HOOD post-closure pattern. The TP1=true flag will be set on next FIFO recompute. Without flagging, FIFO wouldn't see these positions' TP1-over-line state.
+
+### Next cron preview
+
+> 下一個 cron: **#33 — 2026-09-18 23:00 BJT (Fri 11:00 EDT)** pre-market follow-through
+> — Same BJT date → zt carry 5→6
+> — yfinance has live Fri 09-18 data; ~1h into RTH
+> — MA10 trail fully active; positions that gapped overnight will start intraday drift
+> — TP1-over-line queue check (CRM/MRK/COP/HOOD all still over line; FIFO recompute between crons may flip flags)
+> — Cap violations: DE/MRVL persist; P-MR-124 still blocks new BUY signals
+> — RKLB: monitor if streak continues (relief reverses) or resumes deterioration
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #27 appended
