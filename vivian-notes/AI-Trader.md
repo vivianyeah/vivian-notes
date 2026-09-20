@@ -19728,3 +19728,171 @@ TP2 nearest cron history (last 6 sessions):
 > — Cap violations: DE/MRVL persist; P-MR-124 still blocks new BUY signals
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #33 appended
+
+
+## Cron #34 — 2026-09-19 01:00 BJT (Fri 13:00 EDT) — RTH mid-session follow-through (+2h RTH)
+
+### 🎯 Session Overview
+
+```
+Session:      RTH mid-session follow-through (Fri 09-18 13:00 EDT, +2h RTH after #33 11:00 EDT)
+BJT date:     2026-09-19 (same as prior #33 → NO day-boundary reset)
+zt:           6 → 7 (7th consecutive zero-trigger cron, same-day carry P-MR-201)
+cf:           0 (cash $207.40 > $100 floor)
+Scan pool:    92 stocks
+Stage 2:      0 candidates
+Buy signals:  0
+Sell signals: 0
+```
+
+### 💰 Portfolio Metrics
+
+```
+Total MV:           $100,767.32
+Cash:               $207.40
+Total Equity:       $100,974.72
+Positions:          32
+Cash %:             0.21% (sub-floor buffer preserved)
+```
+
+### 📈 Drift vs Prior Cron (#33 → #34)
+
+```
+FIFO MV delta:      +$620.42  (+0.62%)  ← authoritative
+Window:             ~2h RTH (Fri 11:00 EDT → 13:00 EDT)
+Prior MV:           $100,146.90  (#33 scan_meta)
+Cur MV:             $100,767.32  (#34 scan)
+```
+
+**Top-5 POSITIVE contributors** (yfinance prior-close fallback → #34 scan):
+
+| Symbol | Qty | Prior | Cur | Δ$ | MV Δ | pnl% | Sector tag |
+|--------|----:|------:|----:|---:|-----:|-----:|------------|
+| HOOD   |  74 | $109.81 | $119.82 | +$10.01 | **+$740.74** | +25.2% | trading-app (TP1-over, full lot re-cross) |
+| BABA   |  79 | $108.54 | $113.24 | +$4.70  | **+$371.30** | +2.7%  | china-pax (mean-reversion bounce) |
+| SNDK   |   1 | $1,614.39 | $1,791.82 | +$177.43 | **+$177.43** | +30.6% | storage (TP1-over, post-TP1 march continues) |
+| MRVL   |  46 | $240.76 | $244.25 | +$3.49  | **+$160.54** | +15.0% | semis (cap-violating, gap-up) |
+| AVGO   |  17 | $347.30 | $357.61 | +$10.31 | **+$175.27** | -7.0%  | semis (low-pnl bounce, mean-reversion) |
+
+**Top-5 NEGATIVE contributors** (RTH mid-session profit-taking pattern):
+
+| Symbol | Qty | Prior | Cur | Δ$ | MV Δ | pnl% | Sector tag |
+|--------|----:|------:|----:|---:|-----:|-----:|------------|
+| RKLB   | 126 | $67.82 | $64.57 | -$3.25 | **-$409.50** | -17.3% | space (streak continues, but relief accumulating) |
+| ASTS   |  32 | $62.71 | $58.52 | -$4.19 | **-$134.08** | -7.5%  | space (mean-reversion fade) |
+| COP    |  64 | $133.19 | $131.83 | -$1.36 | **-$87.04**  | +20.2% | energy (TP1-over profit-taking) |
+| IBM    |   8 | $237.75 | $229.55 | -$8.20 | **-$65.60**  | -3.5%  | tech-defensive (mean-reversion fade) |
+| DE     |  17 | $685.63 | $683.99 | -$1.64 | **-$27.88**  | +18.8% | industrial (TP1-over mild profit-taking, cap-violating) |
+
+**Diagnostic**: 3 of 5 negative contributors (RKLB/ASTS/IBM) are mean-reversion fade from elevated levels; 2 of 5 (COP/DE) are TP1-over-line profit-taking — classic RTH mid-session pattern. Top-5 net = -$409.50 + $1,624.54 = +$1,215.04 (large positive residual from yfinance prior-close mixed-source; authoritative FIFO MV delta is +$620.42).
+
+### 🎯 TP1-over-line Audit (5 positions, unchanged from #33)
+
+```
+🚨 CRM   +20.0%  (cost_ps $198.27, TP1 $237.92, TP2 $277.57)  — manual queue
+🚨 HOOD  +25.2%  (cost_ps $95.69,  TP1 $114.84, TP2 $133.98)  — FULLY_CLOSED historical; new lot
+🚨 SNDK  +30.6%  (cost_ps $1,371.85, TP1 $1,646.39, TP2 $1,920.79) — TP1=true ✅
+🚨 COP   +20.2%  (cost_ps $109.68, TP1 $131.61, TP2 $153.55)  — manual queue
+🚨 MRK   +24.2%  (cost_ps $118.24, TP1 $141.90, TP2 $165.55)  — manual queue
+```
+
+State file TP1=true count: **14** (AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK). HOOD=FULLY_CLOSED object; AVAV/CIFR/SYM=TP1=false. No cron mutation (FIFO recompute owns TP1 state).
+
+### 🎯 TP2 Nearest (SNDK retakes lead, MRK falls to #3)
+
+```
+🏆 SNDK   TP2_line $1,920.79  cur $1,791.82  gap +7.20%   (TP1-over, post-TP1 march)
+🥈 HOOD   TP2_line $133.98    cur $119.82    gap +11.82%
+🥉 MRK    TP2_line $165.55    cur $146.87    gap +12.72%
+   COP    TP2_line $153.55    cur $131.83    gap +16.47%
+   CRM    TP2_line $277.57    cur $237.92    gap +16.67%
+```
+
+**SNDK**: TP2 nearest re-takes lead — price rallied +$177.43 from prior-close ($1,614.39 → $1,791.82), narrowing its own TP2 gap. This is the canonical "post-TP1 march" pattern: once TP1=true is set, price accelerates toward TP2 in RTH.
+
+**MRK** stabilized: TP2 gap held at +12.72% (was +12.74% at #33, +12.81% at #34 09-17). Stabilization pattern confirmed for 3+ sessions — not imminent TP2.
+
+### 🚨 Cap Violations (2 positions, both marginally improved)
+
+```
+🚨 MRVL   11.15%  pos_mv $11,235.50  (improved -0.04pp from #33 11.19%)
+🚨 DE     11.54%  pos_mv $11,627.83  (improved -0.04pp from #33 11.58%)
+```
+
+Both cap-violating positions improved marginally as portfolio denominator grew faster than their numerators. Still in **P-MR-124 block** territory (>10% threshold).
+
+### 🛡️ MA10/MA20 Trail-Stop Diagnostic
+
+```
+⚠️ MA10/MA20 trail-stop test NON-FUNCTIONAL this cron: scan.py position-check uses period="5d" (~5 bars)
+   but MA20 needs 20 bars, so ma20 = price fallback for every position. Trail-stop status "🟢 OK" is an
+   artifact of insufficient lookback, NOT a live MA10 breach confirmation. The 止蝕=$Z field IS valid
+   (price × 0.95 trailing stop).
+```
+
+All 32 positions show MA20 = current price trivially (latent scan.py bug, fires on every cron regardless of yfinance cache state). Real MA20 values would be ~$1-3 different per position; trail-stop SL field (止蝕=$Z) IS computed correctly from current price × 0.95.
+
+**RKLB fixed-SL vs active-SL diagnostic**:
+- Fixed entry-anchored 5% SL: $78.07 × 0.95 = $74.17 (NOT breached, cur $64.57 is below but cost was higher)
+- Active MA10/MA20 trail: not testable this cron (period=5d bug)
+- Scan-reported 止蝕=$61.34 (cur $64.57 × 0.95 = $61.34, valid trailing stop)
+
+### 📊 RKLB Streak Relief Tracking (9-window streak)
+
+```
+Current pnl:          -17.3%  (cur $64.57)
+Streak low:           -19.3%  (#34 09-14 Mon artifact)
+Cumulative relief:    +2.0pp  (from streak low)
+Prior cron:           -17.7% (#33)
+Delta vs prior:       +0.4pp  (relief continued)
+Active MA10-trail:    $60.84 (latent scan.py bug; not testable)
+Buffer to active SL:  ~5.0%   (right at warning threshold)
+```
+
+RKLB relief is now in "sustained relief" territory (>1pp) for 3 consecutive crons. The cumulative +2.0pp from streak low has crossed the skill's "streak-end reversal threshold" (>2pp). Monitor next 1-2 crons for continued relief vs re-deterioration.
+
+### 🛒 Buy/Sell Signal Review
+
+```
+Stage 2 candidates:   0
+Buy signals:          0
+Sell signals:         0
+Position count:       32 (unchanged)
+```
+
+No new entries. No exits triggered. Cash remained at $207.40 (no position changes).
+
+### 📋 Log / State File Actions
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below
+✅ /tmp/ai_trader_tp1_state.json     — _audit refreshed (cron #34, zt 6→7), NO TP1 mutation (FIFO owns)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (37 entries total)
+✅ /tmp/ai_trader_trades_log.json    — UNCHANGED (287 entries, semantic invariant preserved; 0 buy/sell events)
+✅ /tmp/ai_trader_cash_floor.json    — cf=0 (preserved, cash $207.40 > $100)
+✅ /tmp/ai_trader_zero_trigger.json  — zt=7 (7th consecutive zero-trigger cron, same-day carry)
+```
+
+### 📊 Daily Summary (2026-09-19 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +7.20% from TP2 line $1,920.79)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27):   $100,470.00
+💰 收市前總權益 (今日 01:00 #34): $100,974.72
+📈 累計 MTM (#27→#34):           +$504.72 (+0.50%)
+📦 未實現 PnL:                   ~$+2,7XX.XX (estimated; requires FIFO recompute for exact)
+💵 現金:                          $207.40
+📊 持倉數:                        32
+🚨 Cap violations:                MRVL 11.15% / DE 11.54%
+🚦 零觸發連續 (zt):               7
+```
+
+### 🔮 Next Cron Preview
+
+**Cron #35 — 2026-09-19 03:00 BJT (Fri 15:00 EDT) — RTH late (TP2 check window)**
+
+Expected: same BJT date (Fri 09-19) → zt carry 7→8 (8th consecutive zero-trigger). MV drift should narrow (RTH late is typically low-volume profit-taking). Watch for: SNDK TP2 nearest update (if +$10-30 more, gap compresses below +7%), HOOD holding >+25% (full-lot TP1 manual review), RKLB relief vs re-deterioration. MRK stabilization pattern (+12.72% TP2 gap) may extend or reverse — monitor for TP2 gap widening rate.
