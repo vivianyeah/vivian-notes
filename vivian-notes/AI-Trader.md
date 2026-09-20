@@ -20056,3 +20056,167 @@ No new entries. No exits triggered. Cash remained at $207.40 (no position change
 > — Watch for: SNDK TP2 nearest (if Mon gap-up continues +$20-30, gap compresses below +5% — possible TP2 imminent), HOOD holding >+25% (full-lot TP1 manual review if FIFO recompute catches up), RKLB relief vs re-deterioration (real Mon RTH data needed).
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #35 appended
+
+
+## Cron #36 — 2026-09-21 03:30 BJT (Sun 15:30 EDT) — RTH close -30min (WEEKEND ARTIFACT)
+
+### 🎯 Session Overview
+
+```
+Session:      RTH close -30min (trail-stop confirm) — WEEKEND ARTIFACT (Sun 09-20 EDT, US market closed)
+BJT date:     2026-09-21 (SAME as #35 → zt carry 2→3, no day-boundary reset)
+zt:           2 → 3  (same BJT date carry, +1 for this cron's 0-BUY count)
+cf:           0 (cash $207.40 > $100 floor)
+Scan pool:    92 stocks
+Stage 2:      0 candidates
+Buy signals:  0
+Sell signals: 0
+Artifact:     STACKED WEEKEND — yfinance frozen at Fri 09-18 RTH close (last trading day)
+```
+
+> ⚠️ **This cron is a weekend artifact — 5th consecutive stacked weekend cron in the 09-21 BJT stack.** Sun 09-20 EDT = 03:30 BJT Mon 09-21. US market closed Sat/Sun. yfinance `period="6mo"` returns Fri 09-18 RTH close as the "current" price for all 32 positions. MV drift vs #35 = **$0.00** (identical snapshot). All TP1/TP2/cap diagnostics frozen at Fri 09-18 levels. **No live trail-stop test possible.** Real post-weekend RTH data arrives at next pre-open **#27 (Mon 09-21 22:00 BJT = Mon 09-21 10:00 EDT)**, which will then have live Mon RTH open data.
+
+### 💰 Portfolio Metrics (frozen at Fri 09-18 RTH close)
+
+```
+Total MV:           $100,767.32
+Cash:               $207.40
+Total Equity:       $100,974.72
+Total Cost:         $93,639.44
+Unrealized PnL:     +$7,127.88 (+7.61%)
+Positions:          32
+Cash %:             0.21% (sub-floor buffer preserved)
+```
+
+**All metrics IDENTICAL to cron #35** (which itself was identical to #34, Fri 09-18 RTH close). Confirms yfinance weekend freeze across the entire BJT 09-21 stack (#34 → #35 → #36 all $100,767.32).
+
+### 📈 Drift vs Prior Cron (#35 → #36)
+
+```
+FIFO MV delta:      $0.00  (0.00%)  ← authoritative
+Window:             ~30min BJT gap (Mon 09-21 03:00 BJT → Mon 09-21 03:30 BJT = Sun 15:30 EDT)
+Prior MV:           $100,767.32  (#35 scan, identical Fri 09-18 RTH close snapshot)
+Cur MV:             $100,767.32  (#36 scan, identical Fri 09-18 RTH close snapshot)
+Real RTH window:    0h (weekend, no trading)
+```
+
+**Drift decomposition: NULL.** All 32 positions frozen at Fri 09-18 RTH close. yfinance returned identical snapshot for HOOD $119.82, SNDK $1,791.82, COP $131.83, MRK $146.87, CRM $237.92 — every price matches Fri 09-18 RTH close to the cent. No Top-5 table fabricated (3rd consecutive artifact cron, all $0.00 drift).
+
+### 🎯 TP1-over-line Audit (5 positions, FROZEN at #34/#35 levels)
+
+```
+🚨 SNDK   +30.6%  (cost_ps $1,371.99, TP1 $1,646.39, TP2 $1,920.79) — TP1=true ✅
+🚨 HOOD   +25.2%  (cost_ps $95.70,    TP1 $114.84,   TP2 $133.98)    — FULLY_CLOSED historical; new lot
+🚨 MRK    +24.2%  (cost_ps $118.25,   TP1 $141.90,   TP2 $165.55)    — manual queue
+🚨 COP    +20.2%  (cost_ps $109.68,   TP1 $131.61,   TP2 $153.55)    — manual queue
+🚨 CRM    +20.0%  (cost_ps $198.27,   TP1 $237.92,   TP2 $277.57)    — manual queue
+```
+
+State file TP1=true count: **14** (AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK). HOOD=FULLY_CLOSED object; AVAV/CIFR/SYM=TP1=false. **No cron mutation** (FIFO recompute owns TP1 state). 5 TP1-over-line unchanged from #34/#35 — pure weekend artifact.
+
+### 🎯 TP2 Nearest (SNDK holds lead, all frozen at Fri 09-18 levels)
+
+```
+🥇 SNDK   TP2_line $1,920.79  cur $1,791.82  gap +7.20%   (TP1-over, post-TP1 march frozen)
+🥈 HOOD   TP2_line $133.98    cur $119.82    gap +11.82%
+🥉 MRK    TP2_line $165.55    cur $146.87    gap +12.72%
+    COP    TP2_line $153.55    cur $131.83    gap +16.47%
+    CRM    TP2_line $277.57    cur $237.92    gap +16.67%
+```
+
+**All gaps IDENTICAL to crons #34 and #35** — confirms weekend freeze across the stack. SNDK's lead unchanged; no widening/narrowing to track. Per-share TP1/TP2 lines (reconstructed from cost_ps) are mathematically derived from frozen prices, so they too are identical.
+
+### 🚨 Cap Violations (2 positions, FROZEN)
+
+```
+🚨 DE     11.54%  pos_mv $11,627.83  (qty 17 × $683.99)
+🚨 MRVL   11.15%  pos_mv $11,235.50  (qty 46 × $244.25)
+```
+
+Both still in **P-MR-124 block** territory (>10% threshold). Frozen at #34/#35 levels — no change to report. Cap ratios are calculated on the frozen total MV $100,767.32, so any change in denominator would only show up with live RTH data.
+
+### 🛡️ MA10/MA20 Trail-Stop Diagnostic
+
+```
+⚠️ WEEKEND ARTIFACT + scan.py period="5d" latent bug:
+   32 positions MA10/MA20 trivially OK (yfinance frozen at Fri 09-18 RTH close).
+   MA20 == price for every position (32/32). Two compounding causes:
+     (a) weekend frozen data (yfinance returns last trading day's close as "current")
+     (b) scan.py position-check uses period="5d" (~5 bars) but MA20 needs 20 bars
+         → ma20 = price fallback (latent bug, fires on EVERY cron)
+   The "🟢 OK" indicator is an artifact of insufficient lookback AND weekend freeze,
+   NOT a live MA10/MA20 confirmation. The 止蝕=$Z field IS valid (price × 0.95 trailing).
+
+   Real trail-stop test resumes at next pre-open cron #27 (Mon 09-21 22:00 BJT = 10:00 EDT).
+```
+
+**RKLB fixed-SL vs active-SL diagnostic** (frozen):
+- Fixed entry-anchored 5% SL: $78.07 × 0.95 = $74.17 (NOT breached, cur $64.57 well below but cost was higher; under fixed-SL rules, EXIT would have fired)
+- Active MA10/MA20 trail: not testable (period=5d + weekend frozen)
+- Scan-reported 止蝕=$61.34 (cur $64.57 × 0.95 = $61.34, valid trailing stop)
+
+### 📊 RKLB Streak Relief Tracking (frozen at Fri 09-18 levels)
+
+```
+Current pnl:          -17.3%  (cur $64.57, frozen)
+Streak low:           -19.3%  (#34 09-14 Mon artifact, deeper was #35 09-15 -20.7%)
+Cumulative relief:    +2.0pp  (from streak low #34, frozen)
+Prior cron:           -17.3%  (#35, same value — artifact)
+Delta vs prior:       $0.00   (frozen)
+Active MA10-trail:    $61.34  (latent scan.py bug; not testable)
+Buffer to active SL:  ~5.0%   (right at warning threshold, frozen)
+```
+
+No new data to track this cron — RKLB frozen at Fri 09-18 levels. Streak counter continues at ~17+ windows (no reset; relief signal at #34 still holds). Real relief update arrives at next pre-open #27.
+
+### 🛒 Buy/Sell Signal Review
+
+```
+Stage 2 candidates:   0
+Buy signals:          0
+Sell signals:         0
+Position count:       32 (unchanged)
+```
+
+No new entries. No exits triggered. Cash remained at $207.40 (no position changes). Weekend artifact.
+
+### 📋 Log / State File Actions
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 appended (this file)
+✅ /tmp/ai_trader_tp1_state.json     — _audit refreshed (cron #36, zt 2→3 same-day carry), NO TP1 mutation (FIFO owns)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (39 entries total)
+✅ /tmp/ai_trader_trades_log.json    — UNCHANGED (287 entries, semantic invariant preserved; 0 buy/sell events)
+✅ /tmp/ai_trader_cash_floor.json    — cf=0 (preserved, cash $207.40 > $100)
+✅ /tmp/ai_trader_zero_trigger.json  — zt=3 (same-day carry from #35 zt=2; BJT 09-21 unchanged)
+```
+
+### 📊 Daily Summary (2026-09-21 BJT — weekend artifact, end of 5-cron weekend stack)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +7.20% from TP2 line $1,920.79)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27 — prior BJT day Fri 09-18): $100,470.00
+💰 收市前總權益 (今日 03:30 #36 — weekend artifact):     $100,974.72
+📈 累計 MTM (跨週末 2-day window):                       +$504.72 (+0.50%)
+📦 未實現 PnL:                                            +$7,127.88 (+7.61%)
+💵 現金:                                                   $207.40
+📊 持倉數:                                                 32
+🚨 Cap violations:                                         DE 11.54% / MRVL 11.15%
+🚦 零觸發連續 (zt):                                        3  (same-day carry from #35 zt=2)
+```
+
+### 🔮 Next Cron Preview
+
+**Cron #27 — 2026-09-21 22:00 BJT (Mon 10:00 EDT) — Next-day pre-open (FIRST REAL post-weekend RTH data, P-MR-247 day-boundary reset)**
+
+> — BJT rolls 09-21 → 09-22 → **P-MR-247 day-boundary reset** (zt 3→2).
+> — **FIRST REAL post-weekend RTH data**: Mon 09-22 RTH open captured at ~10:00 EDT (live yfinance data, no weekend artifact).
+> — MV drift will reflect Fri 09-18 RTH close → Mon 09-22 RTH open (~3.5-day window including weekend). Expect larger-than-usual drift ($1000-$2000 typical for post-weekend gap decomposition).
+> — Watch for: **SNDK TP2 nearest** (if Mon gap-up +$20-30, gap compresses below +5% — possible TP2 imminent), **HOOD holding >+25%** (full-lot TP1 manual review if FIFO recompute catches up), **RKLB relief vs re-deterioration** (real Mon RTH data needed), **CRM TP2 gap narrowing** (was +16.67% frozen; Mon gap-up could compress to <+10%), **TP1 mutations** (FIFO recompute may flip a few positions to TP1=true once live data is available).
+> — Stage 2 candidates: re-evaluated against live Mon open prices — may surface real entries (last few crons have been 0 candidates due to artifact freeze).
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 appended
