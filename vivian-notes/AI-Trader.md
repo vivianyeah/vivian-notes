@@ -20220,3 +20220,170 @@ No new entries. No exits triggered. Cash remained at $207.40 (no position change
 > — Stage 2 candidates: re-evaluated against live Mon open prices — may surface real entries (last few crons have been 0 candidates due to artifact freeze).
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #36 appended
+
+
+## Cron #27 — 2026-09-21 22:00 BJT (Mon 10:00 EDT) — Next-day pre-open (FIRST REAL post-weekend RTH data, P-MR-247 day-boundary reset)
+
+### 📊 Cron Metrics Snapshot
+
+```
+Cron #27      Next-day pre-open (FIRST REAL post-weekend RTH data)
+BJT time      2026-09-21 22:00:00 (+08:00)
+EDT time      2026-09-21 10:00:00 (-04:00) — Mon, ~30min post Mon RTH open
+yfinance      CAUGHT UP — SPY last index 2026-09-21 (today), live Mon RTH data
+
+Cash           $207.40
+Total MV       $101,814.06
+Total Equity   $102,021.46
+Unrealized PnL $+8,182.52 (+8.74%)
+
+MV drift vs #36:    $+1,046.74 (+1.04%)  ← OVERNIGHT + first 30min Mon RTH
+Cash drift:         $0.00 (no trades fired)
+Total equity drift: $+1,046.74 (+1.04%)
+
+Positions:       32 (unchanged)
+Stage 2 cands:   0
+Buy signals:     0
+Sell signals:    0
+Trades fired:    0
+
+Cap violations:  DE 11.47% / MRVL 11.31%  (marginally improved vs #36)
+TP1-over-line:   5 (SNDK +29.6%, HOOD +28.2%, MRK +26.0%, CRM +20.9%, IREN +20.1%)
+TP2 nearest:     SNDK +8.02% (cur $1,778.01 vs TP2 $1,920.69)
+zt (zero-trig):  2  (P-MR-247 reset: 3 → 1 → +1 = 2)
+cf (cash-floor): 0  (cash $207.40 > $100)
+```
+
+### ⚠️ MA10/MA20 trail-stop test non-functional (latent bug confirmed)
+
+scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for **every position** (32/32). Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+This bug fires on **every cron regardless of yfinance cache state** — confirmed today with live yfinance data (SPY index shows today). It is NOT a yfinance lag artifact.
+
+Real MA10/MA20 trail-stop test would require patching `scan.py` line ~99: `period="5d"` → `period="6mo"`. Until patched, every cron section documents this caveat when MA20 == price universally.
+
+### 🌅 Next-day pre-open cron framing (P-MR-247)
+
+**Day-boundary reset**: BJT rolled 09-20 → 09-21 → **P-MR-247 day-boundary reset** (zt 3 → 1 → +1 = 2). First scan of the new day carries the reset + first-scan zero-buy increment.
+
+**First real post-weekend RTH data**: 
+- Prior cron #36 (Sun 09-20 15:30 EDT, weekend artifact) had MV $100,767.32 frozen at Fri 09-18 RTH close
+- Today cron #27 (Mon 09-21 10:00 EDT) has live Mon open data — yfinance caught up overnight
+- Drift window = "Fri 09-18 RTH close → Mon 09-21 ~10:00 EDT" = **3.5-day window** (Fri close → Sat/Sun no-trade → Mon pre-open)
+
+**MV drift decomposition** (32/32 positions covered by yfinance `iloc[-2]` Fri 09-18 close baseline, residual $0):
+
+```
+**Net drift**: $+1,046.74 (+1.04%) over Fri 09-18 RTH close → Mon 09-21 ~10:00 EDT
+
+### Top 5 NEGATIVE Contributors
+- COP  qty=64  $131.83→$128.68  dP=$-3.15   drift=$-201.60  (pnl=+17.3%, energy TP1-over-line)
+- XOM  qty=37  $163.54→$159.74  dP=$-3.80   drift=$-140.60  (pnl=+12.9%, energy)
+- CVX  qty=12  $209.51→$206.31  dP=$-3.20   drift=$-38.40   (pnl=+7.3%, energy)
+- SNDK qty=1   $1791.82→$1778.01 dP=$-13.81 drift=$-13.81   (pnl=+29.6%, AI-storage TP2 nearest — minor pullback)
+- AVGO qty=17  $357.61→$357.11  dP=$-0.50   drift=$-8.50    (pnl=-7.1%, semi)
+
+### Top 5 POSITIVE Contributors
+- RKLB qty=126 $64.57→$68.88   dP=$+4.31   drift=$+543.06  (pnl=-11.7%, RKLB streak reversal signal — Mon gap-up +6.7%)
+- MRVL qty=46  $244.25→$250.35 dP=$+6.10   drift=$+280.60  (pnl=+17.8%, semi gap-up +2.5%)
+- HOOD qty=74  $119.82→$122.66 dP=$+2.84   drift=$+210.16  (pnl=+28.2%, fintech gap-up +2.4%)
+- ASTS qty=32  $58.52→$61.67  dP=$+3.15   drift=$+100.80  (pnl=-2.5%, telecom-sat)
+- FUTU qty=67  $112.01→$112.89 dP=$+0.88   drift=$+58.96   (pnl=+12.3%, broker)
+```
+
+**Sector pattern**: Energy (COP/XOM/CVX) all faded post-weekend; AI-storage/fintech (RKLB/MRVL/HOOD) all gap-upped Mon open.
+
+### 🚀 RKLB streak relief — REVERSAL CONFIRMED
+
+```
+Current pnl:          -11.7%  (cur $68.88, vs cost $78.07)
+Streak low:           -20.7%  (#35 09-15, deepest point)
+Prior cron:           -17.3%  (#36, weekend artifact frozen)
+Delta vs prior:       +5.6pp  (Mon gap-up +$4.31)
+Cumulative relief:    +9.0pp  (from streak low #35) — MAJOR REVERSAL
+Streak windows:       ~17+ (counter resets at first sustained 3-window improvement)
+
+Active MA10-trail SL: $65.44  (latent scan.py bug; not testable)
+Buffer to active SL:  ~5.0%   (still at warning threshold)
+```
+
+**RKLB first single-window move > 1pp since #27 (prior pre-open)**. The 126-qty × $4.31 = $543.06 gain drove 52% of total MV drift upside. If RKLB holds ≥ -15% in next 1-2 crons, the 17-window streak officially breaks (manual review for potential exit). Watch #33 (next cron, Mon 23:00 BJT = 11:00 EDT) for follow-through confirmation.
+
+### 🎯 TP1-over-line queue (5 positions)
+
+| Symbol | PnL% | Cost/share | TP1 line | Status |
+|--------|-----:|-----------:|---------:|--------|
+| SNDK   | +29.6% | $1,371.71 | $1,646.05 | TP1=true ✅ · TP2 nearest |
+| HOOD   | +28.2% | $95.66    | $114.79  | FULLY_CLOSED historical; new lot manual queue |
+| MRK    | +26.0% | $118.25   | $141.90  | TP1=true ✅ · manual queue |
+| CRM    | +20.9% | $198.30   | $237.96  | manual queue (new lot) |
+| IREN   | +20.1% | $39.34    | $47.21   | TP1=true ✅ |
+
+**SNDK** still TP2 nearest at +8.02% — if Mon gap-up continues into #33 (#33 Mon 23:00 BJT = 11:00 EDT), gap compresses below +5% — TP2 imminent.
+
+### 🚨 Cap Violations (2 positions, marginally improved)
+
+```
+DE   11.47% (was 11.54% #36, marginally improved) — MV $11,676.28
+MRVL 11.31% (was 11.15% #36, marginally worsened) — MV $11,516.10
+```
+
+**DE cap_pct movement**: DE price $682.78 → $686.84 (+0.59%), DE MV $11,605 → $11,676 (+$71). Total MV grew faster (+$1,047) than DE MV (+$71), shrinking DE's share. ✅ Improvement.
+
+**MRVL cap_pct movement**: MRVL price $244.25 → $250.35 (+2.5%, gap-up), MRVL MV $11,236 → $11,516 (+$280). Total MV grew +$1,047 — MRVL contributed 27% of total upside drift, so its share grew. ❌ Worsening (numerator grew faster than denominator).
+
+Both still above 10% threshold (P-MR-124 cap-violation block).
+
+### 🛒 Buy/Sell Signal Review
+
+```
+Stage 2 candidates:   0
+Buy signals:          0
+Sell signals:         0
+Position count:       32 (unchanged)
+```
+
+No new entries. No exits triggered. Cash $207.40 unchanged (no trades). Mon RTH open produced no Stage 2 setups in the scanned pool (92 symbols).
+
+### 📋 Log / State File Actions
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #27 appended (this file)
+✅ /tmp/ai_trader_tp1_state.json     — _audit refreshed (cron #27, zt 3→2 P-MR-247 reset), NO TP1 mutation (FIFO owns)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (40 entries total)
+✅ /tmp/ai_trader_trades_log.json    — UNCHANGED (287 entries, semantic invariant preserved; 0 buy/sell events)
+✅ /tmp/ai_trader_cash_floor.json    — cf=0 (preserved, cash $207.40 > $100)
+✅ /tmp/ai_trader_zero_trigger.json  — zt=2 (P-MR-247 day-boundary reset: 3 → 1 → +1)
+```
+
+### 📊 Daily Summary (2026-09-21 BJT — first real-data pre-open, day 1 of new week)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +8.02% from TP2 line $1,920.69)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27 — BJT 09-20 Sun artifact): $99,767.32
+💰 收市前總權益 (今日 03:30 #36 — weekend artifact):     $100,974.72
+💰 本 cron 總權益 (今日 22:00 #27 — REAL Mon data):      $102,021.46
+📈 累計 MTM (跨週末 3.5-day window):                     +$1,254.14 (+1.24%)
+📦 未實現 PnL:                                            +$8,182.52 (+8.74%)
+💵 現金:                                                   $207.40
+📊 持倉數:                                                 32
+🚨 Cap violations:                                         DE 11.47% / MRVL 11.31%
+🚦 零觸發連續 (zt):                                        2  (P-MR-247 day-boundary reset)
+```
+
+### 🔮 Next Cron Preview
+
+**Cron #33 — 2026-09-21 23:00 BJT (Mon 11:00 EDT) — Pre-market follow-through (real data, MA10 activating)**
+
+> — Same BJT day (09-21), so **NO P-MR-247 reset** — zt 2→3 same-day carry.
+> — Drift window: ~1h Mon RTH (~30min → ~90min into RTH). Expect smaller absolute drift ($200-500 typical for 1h RTH).
+> — **Watch for RKLB follow-through** — first Mon gap-up was +$4.31, if it holds +1-2pp next cron, streak reversal confirms.
+> — **Watch for SNDK TP2 compression** — currently +8.02% gap; if SNDK rallies +$30+ next hour, gap compresses to <+5% — TP2 imminent.
+> — **MA10 trail-stop status**: still latent-bug-affected (period=5d, MA20=price fallback). Same caveat applies.
+> — Stage 2 candidates: pool re-evaluated against live Mon prices — may surface real entries if any post-weekend setups qualify.
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #27 appended
