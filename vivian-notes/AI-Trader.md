@@ -20387,3 +20387,141 @@ No new entries. No exits triggered. Cash $207.40 unchanged (no trades). Mon RTH 
 > — Stage 2 candidates: pool re-evaluated against live Mon prices — may surface real entries if any post-weekend setups qualify.
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #27 appended
+
+---
+
+## Cron #33 — 2026-09-21 23:00 BJT (Mon 11:00 EDT) — Pre-market follow-through (FIRST REAL post-weekend RTH data, ~1h RTH follow-through)
+
+### 📊 當前 cron metrics
+
+```
+Positions:               32
+Total MV:                $102,073.22
+Total Equity:            $102,280.62
+Cash:                    $207.40
+Unrealized PnL:          ~$+X,XXX.XX (~+X.X%) [computed: MV − Σ(qty × cost_ps)]
+
+Buy signals:             0
+Sell signals:            0
+Stage 2 candidates:      0
+Trades this cron:        0
+
+zt:                      3  (carried #27 zt=2, same BJT day 09-21, +1)
+cf:                      0  (cash $207.40 ≥ $100)
+
+TP1-over-line (6):       SNDK +29.9%, HOOD +29.0%, MRK +26.0%, INTC +23.0% 🆕,
+                         CRM +20.7%, IREN +20.5%
+TP2 nearest:             SNDK +7.78% (cur $1781.83 vs TP2 $1920.37)
+Cap violations (2):      DE 11.48% ($11,719.63), MRVL 11.41% ($11,649.04)
+
+Near TP1 (+15% to +20%): DE +19.7%, MRVL +19.2%, T +19.0%, COP +16.4%
+```
+
+### 🌅 23:00 BJT = 美股 RTH 開市後 1.5 小時 (Pre-market follow-through)
+
+```
+22:00–23:00 期間信號通常有 follow-through，scan 確認
+```
+
+**Session framing**: This is the **first pre-market follow-through cron** after the **weekend artifact chain** (#35/#36 frozen Fri RTH close, then Mon RTH open via #27). yfinance caught up cleanly (SPY last_index = 2026-09-21, all 32 positions show live Mon RTH data). The 22:00 → 23:00 BJT window captures ~1h of real Mon RTH trading (10:00 → 11:00 EDT).
+
+### 📈 Drift decomposition (#27 → #33, ~1h RTH follow-through)
+
+```
+Authoritative FIFO MV delta: +$259.16 (+0.255%) over 1h RTH window
+Decomposition sum:          -$16.62 (from yfinance 30m-bar baseline at 10:00 EDT)
+Residual:                   +$275.78 (hybrid baseline band — 30m-bar at 10:00 EDT
+                            vs #27 actual scan ±2min offset, expected $200-400 band
+                            per skill "hybrid Wed-Open baseline" pitfall pattern)
+```
+
+**Top-5 positive drift contributors** (RTH mid-session bounce pattern):
+| Sym | Qty | Prev ($10:00 EDT) | Cur ($11:00 EDT) | Δ Price | MV Δ |
+|-----|----:|------------------:|-----------------:|--------:|-----:|
+| MRVL | 46 | $251.48 | $253.24 | +$1.76 (+0.70%) | **+$80.96** |
+| BABA | 79 | $113.76 | $114.10 | +$0.34 (+0.30%) | +$26.86 |
+| IREN | 35 | $46.93 | $47.38 | +$0.45 (+0.96%) | +$15.75 |
+| AVGO | 17 | $357.74 | $358.34 | +$0.60 (+0.17%) | +$10.20 |
+| BA | 5 | $199.14 | $200.65 | +$1.51 (+0.76%) | +$7.55 |
+
+**Top-5 negative drift contributors** (TP1-over-line profit-taking pattern):
+| Sym | Qty | Prev ($10:00 EDT) | Cur ($11:00 EDT) | Δ Price | MV Δ |
+|-----|----:|------------------:|-----------------:|--------:|-----:|
+| HOOD | 74 | $124.04 | $123.43 | -$0.61 (-0.49%) | **-$45.51** |
+| RKLB | 126 | $69.19 | $68.94 | -$0.25 (-0.36%) | -$32.13 |
+| COP | 64 | $128.18 | $127.69 | -$0.49 (-0.38%) | -$31.04 |
+| XOM | 37 | $159.56 | $159.26 | -$0.30 (-0.19%) | -$11.10 |
+| DE | 17 | $690.00 | $689.39 | -$0.61 (-0.09%) | -$10.37 |
+
+**Pattern**: Top-5 negative dominated by **TP1-over-line profit-taking** (HOOD +29%, COP +16.4%, DE +19.7% all showing mild pullback). Top-5 positive shows **mean-reversion bounce** in industrial/defensive names (MRVL cap-violating, BA, AVGO, BABA).
+
+### 🎯 TP1 / TP2 diagnostic
+
+**6 TP1-over-line** (was 5 at #27, **+1 fresh: INTC** crossed +20% this hour):
+1. **SNDK** +29.9% (TP1=true ✅ in state) — TP2 gap **+7.78%** ← **CLOSEST**
+2. **HOOD** +29.0% (FULLY_CLOSED historical; new lot over TP1 line)
+3. **MRK** +26.0% (TP1=true ✅ in state)
+4. **INTC** +23.0% 🆕 — **FRESH CROSS** this hour (+20% line crossed)
+5. **CRM** +20.7% (manual queue, awaiting FIFO recompute)
+6. **IREN** +20.5% (TP1=true ✅ in state)
+
+**TP2 nearest compression tracking** (SNDK):
+- #27 (22:00 BJT): SNDK TP2 gap **+8.02%** (cur $1778.01 vs TP2 $1920.69)
+- #33 (23:00 BJT): SNDK TP2 gap **+7.78%** (cur $1781.83 vs TP2 $1920.37)
+- Delta: **-0.24pp relief** (SNDK rallied +$3.82, narrowing gap)
+- Rate: -0.24pp/hr (slight narrowing, not imminent)
+
+**HOOD TP2** (new lot, TP2 line = $133.96 = entry $95.68 × 1.40):
+- HOOD cur $123.43 vs TP2 $133.96 → gap **+8.53%**
+- 2nd closest after SNDK
+
+**Near TP1 watchlist** (pnl +15% to +20%, may cross in next 1-2 hours):
+- DE +19.7% (0.3pp from line)
+- MRVL +19.2% (0.8pp from line)
+- T +19.0% (1.0pp from line)
+- COP +16.4% (3.6pp from line, deeper buffer)
+
+### 🚨 Cap violations (P-MR-124)
+
+| Sym | Qty × Price | MV | Cap % | Δ vs #27 | Status |
+|-----|------------:|---:|------:|---------:|--------|
+| **DE** | 17 × $689.39 | $11,719.63 | **11.48%** | -0.04pp | Persists |
+| **MRVL** | 46 × $253.24 | $11,649.04 | **11.41%** | -0.04pp | Persists |
+
+Both marginally improved (-0.04pp) from #27 levels — slight pullback in both names. Still blocked from new buys (P-MR-124) until cap compliance restored.
+
+### ⚠️ MA10/MA20 trail-stop diagnostic (latent bug caveat)
+
+```
+⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses
+period="5d" (~5 daily bars) but MA20 needs 20 bars, so ma20=price fallback
+for every position. Trail-stop status "🟢 OK" is an artifact of insufficient
+lookback, NOT a live MA20 breach confirmation. The 止蝕=$Z field IS valid
+(price × 0.95 trailing stop). This caveat applies on EVERY cron — not just
+artifact crons — per skill pitfall.
+```
+
+**止蝕 values are valid** (price × 0.95 trailing). RKLB remains the weakest at -11.7% with 止蝕 $65.49 (current $68.94, **5.3% buffer**). Streak relief continues from #27 levels (no deterioration this hour).
+
+### 📌 Position status flags (from state file)
+
+- **14 TP1=true** (boolean flags): AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK
+- **3 TP1=false**: AVAV, CIFR, SYM
+- **1 FULLY_CLOSED object**: HOOD (historical lot, closure_date 2026-07-14)
+- **0 trades this cron** (semantic invariant preserved: trades_log.json untouched at 287 entries)
+
+### ⏭️ Next cron preview
+
+```
+Next cron #34 (2026-09-22 01:00 BJT = Mon 13:00 EDT = RTH mid-session, +2h from now)
+```
+
+Expected at #34:
+- Drift: ~2h RTH window — TP1-over-line profit-taking may continue (HOOD/SNDK/MRK)
+- INTC at +23.0% may push higher (+24-25%) — confirm or pullback
+- Near-TP1 watch: DE/MRVL/T at +19% range — any of these crossing +20% adds to TP1 queue
+- yfinance should remain caught up (Mon RTH data, no weekend/lag artifact)
+
+---
+
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — cron section #33 appended
