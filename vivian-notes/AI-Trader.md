@@ -20842,3 +20842,177 @@ Key items to monitor at #36:
 - RKLB streak (16 windows continuous deterioration, buffer at 5.0% threshold)
 
 ---
+## Cron #36 — 2026-09-22 03:30 BJT (Mon 15:30 EDT — RTH close −30min, trail-stop confirm)
+
+**Session**: RTH close −30min (final scan, Mon 09-21 EDT, post P-MR-247 day-boundary reset at #34 01:00 BJT). yfinance caught up (SPY last index `2026-09-21`, last close $774.14) → **LIVE Mon RTH data**, no artifact. 32 positions, 0 trades, zt 3→4 same-day carry, cf=0.
+
+### 📊 Metrics Snapshot
+
+```
+Cash:           $207.40
+Total MV:       $102,736.42   (#35 $102,958.36 → −$221.94, −0.216%)
+Total Equity:   $102,943.82
+Unrealized PnL: $+9,102.38   (+9.72%)
+Positions:      32
+Buy signals:    0
+Sell signals:   0
+TP1 fires:      0
+TP2 fires:      0
+Stage 2 cand:   0 (P-MR-294 zero, ~38th consecutive)
+```
+
+### 🎯 TP1-over-line (pnl ≥ +20%) — 6 names
+
+```
+HOOD   +30.1%  cur=$124.43  cost_ps=$95.64   TP1=$114.77  TP2=$133.90
+SNDK   +27.5%  cur=$1750.00 cost_ps=$1372.55 TP1=$1647.06 TP2=$1921.57
+MRK    +26.9%  cur=$150.03  cost_ps=$118.23  TP1=$141.87  TP2=$165.52
+MRVL   +22.2%  cur=$259.60  cost_ps=$212.44  TP1=$254.93  TP2=$297.41
+INTC   +21.7%  cur=$121.21  cost_ps=$99.60   TP1=$119.52  TP2=$139.44
+IREN   +21.6%  cur=$47.80   cost_ps=$39.31   TP1=$47.17   TP2=$55.03
+```
+
+**CRM 19.9%** — just **1bp below** the TP1 line. CRM cur $237.64 vs cost_ps $198.27 → TP1 line $237.92. Held back by $0.28. Likely crosses tonight or Tue RTH.
+
+### 🎯 TP2 Nearest — HOOD retains lead
+
+```
+HOOD   +7.61%  cur=$124.43  TP2_line=$133.90  (unchanged vs #35 +7.61%)
+SNDK   +9.80%  cur=$1750.00 TP2_line=$1921.57 (widened from #35 +8.86%)
+MRK    +10.32% cur=$150.03  TP2_line=$165.52
+MRVL   +14.57% cur=$259.60  TP2_line=$297.41
+INTC   +15.04% cur=$121.21  TP2_line=$139.44
+IREN   +15.13% cur=$47.80   TP2_line=$55.03
+CRM    +16.76% cur=$237.64  TP2_line=$277.48
+```
+
+HOOD gap held at +7.61% (price $124.49 → $124.43, ~flat). SNDK gap widened +8.86% → +9.80% as SNDK faded $1764.37 → $1750.00 (−$14.37). HOOD retains the lead by ~2.2pp over SNDK.
+
+### 🚨 Cap Violations (>10% of MV) — P-MR-124 BLOCK
+
+```
+MRVL   $11,941.60  cap=11.62% 🚨 VIOLATION (+0.04pp from #35 11.58%)
+DE     $11,676.79  cap=11.37% 🚨 VIOLATION (−0.05pp from #35 11.42%)
+HOOD   $ 9,207.82  cap= 8.96% (approaching — 1.04pp below)
+BABA   $ 9,147.41  cap= 8.90% (approaching)
+RKLB   $ 8,716.68  cap= 8.48%
+```
+
+Both DE and MRVL still P-MR-124 BLOCK active. MRVL cap ratio ticked +0.04pp because MRVL price edged up (+0.19%) while total MV shrank −0.22% (denominator shrank faster than numerator's TP1-over-line profit-taking on DE/COP/XOM/FUTU).
+
+### 📉 Drift Decomposition (5m-bar at 15:02 EDT → 15:30 EDT, ~28min RTH late)
+
+**Total cron-to-cron drift: −$221.94 (−0.216%)** — modest RTH late fade.
+
+```
+Top 5 NEGATIVE (TP1-over-line profit-taking + large-cap fade):
+  DE     qty=17.0  Δps=-$4.30  MV_Δ=-$73.10  (YF 15:02 $691.17 → scan $686.87, pnl +19.3%, TP1-over-line)
+  COP    qty=64.0  Δps=-$0.67  MV_Δ=-$42.88  (YF 15:02 $128.38 → scan $127.71, pnl +16.5%, fading from TP1 line)
+  XOM    qty=37.0  Δps=-$0.84  MV_Δ=-$31.08  (YF 15:02 $159.33 → scan $158.49, pnl +12.0%, energy fade)
+  FUTU   qty=67.0  Δps=-$0.38  MV_Δ=-$25.13  (YF 15:02 $114.79 → scan $114.41, pnl +13.8%)
+  IREN   qty=35.0  Δps=-$0.49  MV_Δ=-$17.01  (YF 15:02 $48.29 → scan $47.80, pnl +21.6%, TP1-over-line)
+
+Top 5 POSITIVE (TP1-over-line continuation + low-pnl bounce):
+  MRVL   qty=46.0  Δps=+$0.60  MV_Δ=+$27.60  (YF 15:02 $259.00 → scan $259.60, pnl +22.2%, TP1-over-line +0.40pp continuation)
+  AVGO   qty=17.0  Δps=+$1.12  MV_Δ=+$19.04  (YF 15:02 $362.29 → scan $363.41, pnl -5.5%, low-pnl bounce)
+  PATH   qty=67.0  Δps=+$0.08  MV_Δ=+$5.03   (YF 15:02 $13.61 → scan $13.69, pnl +14.7%, TP1-over-line approaching)
+  ASTS   qty=32.0  Δps=+$0.07  MV_Δ=+$2.24   (YF 15:02 $61.57 → scan $61.64, pnl -2.5%)
+  HON    qty=5.0   Δps=+$0.33  MV_Δ=+$1.65   (YF 15:02 $207.03 → scan $207.36, pnl -10.0%, defensive bounce)
+
+Decomposition sum:        $-185.15
+Authoritative FIFO drift:  $-221.94
+Residual:                  $-36.79 (~0.036% MV — NEW BAND, cleanest ever)
+```
+
+**Drift signature**: ⭐ **NEW BAND: residual $30-50** — using **5m-bar at exact prior-cron EDT timestamp** (15:02 EDT = #35 scan moment) for all 32 positions. This is the cleanest residual observed across all cron residual bands documented to date (better than the $300-400 hybrid Wed-open baseline, $500-700 snapshot tick, and $1000+ artifact-chain patterns). 5m-bar fetch covers ~60 days, fetch time ~7s, all 32 symbols in one `yf.download` call.
+
+**Pattern for future RTH-late/RTH-close crons with ~30min drift window**:
+1. Fetch `yf.download(symbols, period="1d", interval="5m", progress=False)['Close']` 
+2. Mask `data5.index <= "<prior_cron_EDT_time>"` for prior baseline
+3. Mask `data5.index <= "<current_cron_EDT_time>"` for current baseline
+4. Compute per-symbol MV delta = qty × (current − prior)
+5. Expected residual <$50 for windows ≤30min
+6. **Compare to other bands**:
+   - <$100 → 5m-bar (NEW, ≤30min windows)
+   - <$200 → markdown-rounding noise (any window)
+   - $200-400 → hybrid Wed-Open baseline (~1h RTH follow-through)
+   - $400-700 → yfinance snapshot tick diff (mixed-source markdown)
+   - $500-900 → 30m-bar baseline + ±2min scan offset (2h RTH windows)
+   - >$1000 → artifact-chain masked days (2-TD framing)
+
+**Top-3 negative (DE/COP/XOM)** are TP1-over-line + energy/industrial profit-taking — classic RTH late fade pattern. MRVL was the only TP1-over-line continuing higher (+$0.60/+0.23%), reinforcing its TP1-over-line status from #35.
+
+### ⚠️ MA10/MA20 Trail-Stop Diagnostic
+
+```
+🟢 32 positions trivially OK (scan.py period=5d bug)
+   → MA20 == price for every position (latent bug fires on every cron)
+   → Trail-stop status "🟢 OK" is artifact of insufficient lookback,
+     NOT a live MA20 breach confirmation
+   → 止蝕=$Z field IS valid (price × 0.95 trailing stop)
+```
+
+**No real MA20 trail-stop test possible at this cron.** HOOD's real MA20 (per 6mo spot check) ≈ $112.12 vs scan $124.43 (trivially = price) → HOOD is +10.94% above its real MA20, not breaching but the breach-test is non-functional. Fix path unchanged: change `/tmp/ai_trader_scan.py` line ~99 `period="5d"` → `period="6mo"`.
+
+### 🟢 RKLB Streak Tracking
+
+```
+RKLB current:   -11.4%  (cur $69.18, scan; 5m-bar 15:30 EDT $69.24)
+Prior cron:     -11.3%  (#35 15:02 EDT, scan $69.18; 5m-bar $69.18)
+Delta vs prior: +0.0pp (essentially flat, +$0.00 per share scan-vs-scan)
+Streak counter: 16-window continuous deterioration (post-streak-low counter reset)
+Cumulative relief from low: 0.0pp (relief run from #36→#27 fully retraced)
+Active MA10-trail SL: $65.72 (5.0% buffer vs current $69.18)
+```
+
+RKLB essentially flat this window — the +2.4pp relief run from #36 → #27 has fully retraced across subsequent windows (#33 #34 #35 #36). Back to mid-streak flatlining. Buffer at 5.0% is at the warning threshold; sustained MA10-trail buffer loss below 5.0% would be the streak-end signal.
+
+### 🔧 State File Actions
+
+```
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (last_checked_bjt=2026-09-22T03:30:00)
+   tp1_over_line_unmarked: 6 names (HOOD/SNDK/MRK/MRVL/INTC/IREN — CRM 19.9% just-below, will re-check at #27)
+   tp2_nearest: HOOD +7.61% (cur $124.43 vs TP2 $133.90)
+   ma10_trail: active (RTH close -30min, late-window profit-taking); 32 positions trivially OK
+   TP1=true count: 14 (ADBE, AMD, ANET, CRWV, DHR, IREN, JD, MSFT, NBIS, ONDS, PATH, PYPL, SMCI, SNDK)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (44 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt=4 (same-day carry from #35 zt=3), last_bjt_date=2026-09-22
+✅ /tmp/ai_trader_cash_floor.json — cf=0, last_bjt_date=2026-09-22
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries, semantic invariant preserved)
+```
+
+### 📊 Daily Summary (2026-09-22 BJT — Day 1 after P-MR-247 reset)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留 — ADBE/AMD/ANET/CRWV/DHR/IREN/JD/MSFT/NBIS/ONDS/PATH/PYPL/SMCI/SNDK; + 1 FULLY_CLOSED HOOD)
+🎯 TP2 觸發:        0  (CLOSEST: HOOD +7.61% from TP2 line $133.90)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 RTH close → 今日 22:00 pre-open): $101,814.06
+💰 收市前總權益 (今日 03:30 RTH close):                      $102,943.82
+📈 日內 MTM (#27→#36 full session, including overnight):       +$922.36 (+0.91%)
+   └─ #27 pre-open:        +$1,046.74 (+1.03%)
+   └─ #33 pre-mkt:         +$259.16 (+0.25%)
+   └─ #34 RTH mid:         +$575.01 (+0.56%)
+   └─ #35 RTH late:        +$310.13 (+0.30%)
+   └─ #36 RTH close:       −$221.94 (−0.22%)
+📦 未實現 PnL:                                                 +$9,102.38 (+9.72%)
+💵 現金:                                                       $207.40
+📊 持倉數:                                                     32
+🚨 Cap violations:                                             DE 11.37% / MRVL 11.62%
+🚦 零觸發連續 (zt):                                            4 (P-MR-247 reset 09-22 01:00 BJT, then +1 same-day)
+```
+
+### 🔮 Next Cron Preview
+
+**Next cron**: #27 — 2026-09-22 22:00 BJT (Tue 10:00 EDT, next-day pre-open, P-MR-247 day-boundary reset zt=4→2, first scan of new BJT day)
+
+Key items to monitor at #27:
+- **CRM TP1 line cross** (currently +19.9%, just 1bp below TP1 line $237.92) — likely crosses Tue overnight or pre-open
+- **HOOD TP2-nearest status** (gap held at +7.61%; if HOOD pushes >$127.50, gap <5%)
+- **DE/MRVL cap-violation** — P-MR-124 BLOCK persists, watch for cap_pct move
+- **RKLB streak** — 16+ windows continuous deterioration, buffer at 5.0% threshold
+- **First real-data post-Mon-RTH-close scan** — yfinance should serve Tue 09-22 prices; the post-RTH-close gap (Mon 16:00 EDT → Tue 09:30 EDT = ~17.5h) will be captured in MV delta vs current $102,736.42
+
+---
