@@ -21777,7 +21777,9 @@ Key items to monitor at #36:
 - **DE MA10-trail buffer** at 2.79% (TIGHTEST overall — -$19 from MA10)
 - **MRVL/DE cap-violation** — P-MR-124 BLOCK persists (both essentially flat noise ±0.03pp)
 - **RKLB cap approaching threshold** (8.80%, +1.20pp from P-MR-124) — RKLB cap stable as relief continues
-- **5-window table**: 22:00 → 23:00 → 01:00 → 03:00 → 03:30 — one more cron to complete day's cadence## Cron #36 — 2026-09-23 03:30 BJT (Tue 15:30 EDT — RTH close -30min, trail-stop confirm)
+- **5-window table**: 22:00 → 23:00 → 01:00 → 03:00 → 03:30 — one more cron to complete day's cadence
+
+## Cron #36 — 2026-09-23 03:30 BJT (Tue 15:30 EDT — RTH close -30min, trail-stop confirm)
 
 ### 📊 Five-Window Daily Comparison
 
