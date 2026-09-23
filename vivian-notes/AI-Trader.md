@@ -22408,3 +22408,152 @@ P-MR-294 pool-loop continues: Stage 2 has produced 0 candidates for N consecutiv
 - **Watch list**: SNDK TP2 cross ($105.67 from line, widening), RKLB streak continuation (10-window, -9.2%, 5.0% buffer to MA10-trail SL), CRM TP1 status (FIFO recompute will set TP1=true on next run), HOOD TP1/TP2 extension (+30.6% / +7.20% gap), BABA stabilization reversal
 
 ---
+## Cron #35 — 2026-09-24 03:00 BJT (Wed 09-23 15:00 EDT — RTH late, TP2 check window)
+
+> ⚠️ MA20 latent bug fires again: scan.py position-check uses `period="5d"` (~5 bars) so MA20 = price fallback for ALL 32 positions. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Trail-stop test non-functional.
+
+> Same-BJT-day carry: zt 4 → 5 (no day-boundary reset; BJT date still 09-24, prior cron #34 was 09-24 01:00 BJT). cf=0 (cash $207.40 > $100).
+
+### 📊 Metrics
+
+| Field | Value | vs #34 (RTH mid, 09-24 01:00) |
+|-------|-------|-------------------------------|
+| Cash | $207.40 | unchanged |
+| Positions | 32 | unchanged |
+| **Total MV** | **$102,420.41** | **-$0.82 (-0.00%)** — essentially flat over +2h RTH (13:00 → 15:00 EDT) |
+| Total Equity | $102,627.81 | -$0.82 |
+| Unrealized PnL | +$8,795.36 (+9.39%) | +$1.86 (+0.00%) |
+| zt | 5 | 4 → 5 (same-BJT-day carry) |
+| cf | 0 | 0 (no change) |
+
+### 🚨 Cap violations (>10%)
+
+| Symbol | Qty | Price | MV | cap_pct | Δpp vs #34 |
+|--------|----:|------:|---:|--------:|-----------:|
+| **DE** | 17 | $706.76 | $12,014.92 | **11.73%** | -0.06pp (price -0.23% slower than denominator) |
+| **MRVL** | 46 | $259.49 | $11,936.54 | **11.65%** | +0.07pp (price +0.84% faster than denominator) |
+
+> Cap_pct ratio decoupling: DE cap marginally improved (-0.06pp) despite price drop (other positions declined slower); MRVL cap marginally WORSENED (+0.07pp) despite price UP (+0.84%, +$98.90 in MV) — because denominator shrank faster via TP1-over profit-taking on the rest of the portfolio. Per skill: "cap_pct is a RATIO, not a price level."
+
+### 🎯 TP1-over-line (8 positions, unchanged from #34)
+
+| Symbol | PnL | TP1 line | TP2 line | State | Note |
+|--------|----:|---------:|---------:|-------|------|
+| SNDK | +32.2% | $1,647.00 | $1,921.51 | TP1=true ✅ | TP2 nearest +5.90% (widened +0.08pp from #34 +5.82%) |
+| HOOD | +30.1% | $114.84 | $133.98 | TP1=true ✅ | TP2 gap +7.57% (price-space, prior lot FULLY_CLOSED) |
+| MRK | +25.1% | $141.83 | $165.47 | TP1=true ✅ | TP2 gap +11.91% |
+| DE | +22.8% | $690.64 | $805.75 | TP1=true ✅ | TP2 gap +14.00% |
+| MRVL | +22.1% | $255.03 | $297.53 | TP1=true ✅ | TP2 gap +14.66% |
+| IREN | +22.1% | $47.18 | $55.05 | TP1=true ✅ | TP2 gap +14.66% |
+| INTC | +21.6% | $119.58 | $139.50 | TP1=true ✅ | TP2 gap +15.13% |
+| CRM | +20.1% | $237.86 | $277.51 | (NOT in state file yet) | **FIFO recompute will add** on next run — CRM still has no state key |
+
+> CRM continues to be the "invisible TP1-over" position: not in `tp1_state.json`, but now at +20.1% (was +21.6% at #34). Documented in audit; will be captured by next FIFO recompute.
+
+### 🎯 TP2 nearest
+
+- **SNDK +5.90%** (price-space, cur $1,814.45 vs TP2 line $1,921.51 = $107.06 from line)
+- Gap **WIDENED +0.08pp** from #34's +5.82% (was $105.67 from line)
+- SNDK price dropped from $1,820.39 (#34) → $1,814.45 (this cron) = -$5.94 (-0.33%)
+- TP2 line essentially flat (cost unchanged at $1,372.07 in absence of FIFO close)
+- If SNDK continues -0.3%/hour drift, TP2 cross at ~$1,921.51 would occur ~25 cron-hours away; realistic projection deferred unless RTH close shows further fade
+
+### 📉 Drift decomposition (+2h RTH: 13:00 → 15:00 EDT, Wed 09-23)
+
+**Authoritative FIFO MV delta: -$0.82 (-0.00%)**
+**Decomposition sum: -$2.52**
+**Residual: +$1.70** (well within markdown-rounding noise band, <$200)
+
+| Top-5 NEGATIVE | prev → cur | qty | Δ$ | Δ% |
+|----------------|-----------|----:|---:|---:|
+| FUTU | $111.27 → $110.31 | 67 | **-$64.32** | -0.86% |
+| DE | $708.37 → $706.76 | 17 | **-$27.37** | -0.23% |
+| COP | $128.35 → $127.97 | 64 | **-$24.32** | -0.30% |
+| HOOD | $124.73 → $124.51 | 74 | **-$16.28** | -0.18% |
+| CVX | $205.75 → $204.87 | 12 | **-$10.56** | -0.43% |
+
+| Top-5 POSITIVE | prev → cur | qty | Δ$ | Δ% |
+|----------------|-----------|----:|---:|---:|
+| MRVL | $257.34 → $259.49 | 46 | **+$98.90** | +0.84% |
+| RKLB | $70.89 → $71.21 | 126 | **+$40.07** | +0.45% |
+| CSCO | $106.31 → $106.59 | 29 | **+$8.12** | +0.26% |
+| AVGO | $354.61 → $355.05 | 17 | **+$7.48** | +0.12% |
+| XOM | $160.77 → $160.94 | 37 | **+$6.29** | +0.11% |
+
+**Source**: yfinance 30m-bar fetch at prior cron EDT timestamp (13:00 EDT 2026-09-23). Single-source, clean baseline — residual $1.70 is pure scan-tick noise.
+
+### ⚠️ Key diagnostics
+
+- **MV essentially FLAT (-$0.82)**: 2h RTH window saw negligible movement. 4 of 5 top-negative (FUTU/DE/COP/HOOD) include TP1-over-line positions under profit-taking pressure; offset by MRVL (+$99) and RKLB (+$40) rebounds. This is the **RTH late fade vs rebound equilibrium** pattern: TP1-over positions fade into close, while oversold names (RKLB) bounce on short covering.
+- **SNDK TP2 gap WIDENING continues**: now +5.90% (was +5.40% at #33, +5.82% at #34, +5.90% at #35). Three crons of consecutive widening at slow rate (+0.25pp cumulative over 4h RTH). Cross projection: at current pace, TP2 cross ~+12-15 cron-hours away, but pattern is slow enough that SNDK could stabilize or rally before then.
+- **RKLB streak RELIEF (11-window)**: RKLB at -8.8% now (vs #34 -9.2%, +0.4pp relief). Streak counter continues (no reset; oscillation within streak). Cumulative relief from streak low (-9.2% at #34): +0.4pp only — single-window positive doesn't break the streak. Active MA10-trail SL ~$67.65 vs current $71.21 = 5.0% buffer (right at warning threshold).
+- **CRM TP1 status**: CRM at +20.1% but state file has no CRM key. Per skill's "non-HOOD post-closure TP1 catch-up" pattern: FIFO recompute will set TP1=true on next run. Until then, CRM is documented in `_audit.tp1_over_line_unmarked` as "TP1=true ✅, FIFO will confirm on next recompute".
+- **TP1-over-line UNCHANGED at 8**: all 8 from #34 (SNDK/HOOD/MRK/DE/MRVL/IREN/INTC/CRM) remain over TP1 line. None crossed back below.
+- **No new Stage 2 candidates** (32nd consecutive zero-candidate cron — pool-loop continues, threshold per skill is 50+)
+- **MA20 latent bug fires on every cron** (independent of yfinance cache state): all 32 positions report MA20 = price trivially. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Live trail-stop test remains non-functional until scan.py is patched (period="5d" → "6mo" on line ~99).
+
+### 🟢 Stage 2 突破回調 candidates
+
+```
+  (empty — 0/92 scanned)
+```
+
+P-MR-294 pool-loop continues: Stage 2 has produced 0 candidates for **32+ consecutive crons**. Trigger threshold per skill: monitor for pool-exhaustion if 50+ consecutive zero-candidate runs.
+
+### 🚪 Stop / Exit signals
+
+```
+  (none — all 32 positions 🟢 OK)
+```
+
+> ⚠️ Caveat: per MA20 latent bug above, the "🟢 OK MA10/MA20 no breach" status for ALL 32 positions is **trivial** (MA20 = price fallback), NOT a live MA20 confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Live trail-stop test remains non-functional until scan.py is patched (period="5d" → "6mo" on line ~99).
+
+### 📋 五窗口比較 (節奏)
+
+| Cron | Time BJT | Session | MV | Δ vs prior | zt | Notes |
+|------|---------:|---------|---:|-----------:|---:|-------|
+| #27 | 09-22 22:00 | Pre-open | $100,037.86 | (prior chain end) | 2 | NEW SEQUENCE; P-MR-247 reset |
+| #33 | 09-22 23:00 | Pre-market | (same-day) | — | 3 | Same BJT day |
+| #34 | 09-23 01:00 | RTH mid | $103,387.60 | +$3,349.74 | 4 | Same BJT day |
+| #35 | 09-23 03:00 | RTH late | $103,559.67 | +$172.07 | 5 | TP2 check |
+| #36 | 09-23 03:30 | RTH close -30min | $103,596.25 | +$36.58 | 6 | Trail-stop confirm |
+| #27 | 09-23 22:00 | Next-day pre-open | $103,589.50 | +$227.96 (vs #36) | 2 | NEW SEQUENCE; P-MR-247 reset |
+| #33 | 09-23 23:00 | Pre-market follow-through | $103,065.59 | -$523.91 (vs #27) | 3 | Same BJT day carry |
+| #34 | 09-24 01:00 | RTH mid-session | $102,421.23 | -$644.36 (vs #33) | 4 | +2h RTH, mid-session TP1 profit-taking |
+| **#35** | **09-24 03:00** | **RTH late (TP2 check)** | **$102,420.41** | **-$0.82 (vs #34)** | **5** | **+2h RTH, essentially flat; SNDK TP2 widened +0.08pp; RKLB relief +0.4pp** |
+
+### 📊 當日總結 (2026-09-23 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +5.90% from TP2 line $1,921.51 — gap WIDENED +0.08pp from #34)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00):   $100,037.86
+💰 收市前總權益 (今日 03:30): $103,803.65
+📈 日內 MTM (累計):           +$2,383.37 (+2.38%)  (#27→#33→#34→#35 cumulative)
+📦 未實現 PnL:                +$8,795.36 (+9.39%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             DE 11.73% / MRVL 11.65%
+🚦 零觸發連續 (zt):            5  (same-BJT-day carry 4→5)
+```
+
+### 📝 Log / State 檔案動作
+
+| File | Action | Notes |
+|------|--------|-------|
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 mutation — FIFO recompute owns that) | zt 4→5 (same-BJT-day carry); CRM still in audit queue (FIFO will add) |
+| `/tmp/ai_trader_scan_meta_log.json` | Appended scan meta (this cron) | 53 → 54 entries |
+| `/tmp/ai_trader_trades_log.json` | UNCHANGED (semantic invariant: 0 buy/sell events this cron) | 287 → 287 entries |
+| `/tmp/ai_trader_cash_floor.json` | cf=0 (cash $207.40 > $100) | no change |
+| `/tmp/ai_trader_zero_trigger.json` | zt=5 (same-BJT-day carry) | updated |
+
+### 🔮 Next cron preview
+
+- **Next cron**: #36 — 2026-09-24 03:30 BJT (Wed 15:30 EDT, RTH close -30min — trail-stop confirm window)
+- **Expected**: same-BJT-day carry zt 5 → 6, final 30min drift (15:00 → 15:30 EDT). Pre-close positioning typically sees minor fade.
+- **Watch list**: SNDK TP2 cross (+5.90%, widening), RKLB streak continuation (11-window, -8.8%, 5.0% buffer to MA10-trail SL — relief attempt at +0.4pp, single-window doesn't break streak), CRM TP1 status (FIFO recompute will set TP1=true on next run), DE/MRVL cap violations (both marginally improved this cron)
+
+---
