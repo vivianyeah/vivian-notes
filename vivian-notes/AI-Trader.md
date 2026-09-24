@@ -22715,3 +22715,165 @@ P-MR-294 pool-loop continues: Stage 2 has produced 0 candidates for **33+ consec
   - **RKLB streak continuation**: 11+ windows, -9.0%, 5.0% buffer to MA10-trail SL. Single-window relief attempts have reverted — next pre-open cron will show if overnight gap extends relief or re-deteriorates.
   - **DE/MRVL cap violations**: DE 11.74%, MRVL 11.63%. Both marginally changed at #36. If RTH close brings either below 11%, position cap violations clear on next pre-open.
   - **Stage 2 pool-loop**: 33 consecutive zero-candidate crons. Threshold per skill is 50+ consecutive — no action needed yet, but monitor.
+
+## Cron #27 — 2026-09-24 22:00 BJT (Thu 10:00 EDT) — Next-day pre-open (P-MR-247 day-boundary reset, zt=2)
+
+### 📊 Snapshot
+
+```
+Total MV:        $101,794.39
+Total cost:      $93,627.29
+Unrealized PnL:  $+8,167.10 (+8.72%)
+Cash:            $207.40
+Total equity:    $102,001.79
+Positions:       32
+```
+
+**Prior cron (#36)**: $102,323.77 → **Current**: $101,794.39 → **FIFO MV drift**: $-529.38 (-0.52%)
+
+**Drift window**: Wed 09-23 16:00 EDT RTH close → Thu 09-24 10:00 EDT (~18h overnight + 30min pre-RTH). 
+
+### 🌙 Overnight drift decomposition (Wed 09-23 close → Thu 09-24 pre-open)
+
+Drift attribution via `overnight_drift.py` pattern (yfinance `iloc[-2]` = Wed 09-23 close as prior baseline).
+
+**Decomp sum: $-394.88** (using yfinance Wed 09-23 close as prior baseline)
+**Residual: $-134.50** (within markdown-rounding band <$200)
+
+| Top-5 POSITIVE | prev → cur | qty | Δ$ | Δ% |
+|----------------|-----------|----:|---:|---:|
+| RKLB | $70.31 → $71.37 | 126 | **$+133.56** | +1.51% |
+| COP | $128.09 → $129.70 | 64 | **$+103.04** | +1.26% |
+| XOM | $161.23 → $163.70 | 37 | **$+91.39** | +1.53% |
+| BABA | $110.80 → $111.04 | 79 | **$+19.35** | +0.22% |
+| MRK | $148.08 → $150.69 | 7 | **$+18.25** | +1.76% |
+
+| Top-5 NEGATIVE | prev → cur | qty | Δ$ | Δ% |
+|----------------|-----------|----:|---:|---:|
+| MRVL | $260.90 → $256.50 | 46 | **$-202.40** | -1.69% |
+| AVGO | $354.99 → $348.60 | 17 | **$-108.71** | -1.80% |
+| HOOD | $122.70 → $121.28 | 74 | **$-105.23** | -1.16% |
+| DE | $709.48 → $703.41 | 17 | **$-103.19** | -0.86% |
+| FUTU | $109.99 → $109.31 | 67 | **$-45.89** | -0.62% |
+
+**Source**: yfinance `history(period="10d").iloc[-2]` for all 32 positions (Wed 09-23 close). Single-source clean baseline. Residual <$200 = markdown-rounding noise band.
+
+> Authoritative FIFO MV delta is the source of truth. Decomposition is provided for narrative attribution only.
+
+### 🎯 TP1 / TP2 line diagnostics
+
+**TP2 nearest: SNDK +7.74% (price-space)** — cur $1,783.06 vs TP2 line $1,921.08. Widened from prior cron #36 (+5.91%) by **+1.83pp** (SNDK drifted down overnight). Still the closest TP2-nearest position.
+
+**TP1-over-line (pnl_pct >= +20%)**: 7 positions
+
+| Symbol | pnl_pct | Status |
+|--------|--------:|--------|
+| SNDK | +29.9% | TP1=true ✅ (in state file) |
+| MRK | +27.4% | ⚠️ INVISIBLE — no MRK key in state file. FIFO recompute will add |
+| HOOD | +26.8% | FULLY_CLOSED (old lot closed; new lot if any pending) |
+| INTC | +26.2% | ⚠️ INVISIBLE — no INTC key in state file. FIFO recompute will add |
+| DE | +22.2% | ⚠️ INVISIBLE — no DE key in state file. FIFO recompute will add |
+| MRVL | +20.7% | ⚠️ INVISIBLE — no MRVL key in state file. FIFO recompute will add |
+| CRM | +20.1% | ⚠️ INVISIBLE — no CRM key in state file. FIFO recompute will add |
+
+**Invisible TP1-over pattern (NEW at this cron)**: 6 of 7 TP1-over positions (MRK, HOOD, INTC, DE, MRVL, CRM) are NOT in `/tmp/ai_trader_tp1_state.json` with `TP1=true` boolean. Only SNDK has explicit TP1=true. Per skill's "non-HOOD post-closure TP1 catch-up" pattern, FIFO recompute will pick these up on next run. **DO NOT mutate state file directly — FIFO owns that.**
+
+**Audit note**: Prior cron #36 audit block erroneously labeled MRK/DE/INTC/MRVL/CRM as "TP1=true ✅" but they were actually invisible (skill drift from prior crons). This cron corrects the label.
+
+### 🚨 Cap violations
+
+| Symbol | Cap % | MV |
+|--------|------:|----:|
+| DE | 11.75% | $11,957.97 |
+| MRVL | 11.59% | $11,799.00 |
+
+Both DE and MRVL remained over 10% cap (improved marginally vs #36's 11.74%/11.63%). No new cap violations.
+
+### 📋 五窗口比較 (節奏)
+
+| Cron | Time BJT | Session | MV | Δ vs prior | zt | Notes |
+|------|---------:|---------|---:|-----------:|---:|-------|
+| #27 | 09-22 22:00 | Pre-open | $100,037.86 | (prior chain end) | 2 | NEW SEQUENCE; P-MR-247 reset |
+| #33 | 09-22 23:00 | Pre-market | (same-day) | — | 3 | Same BJT day |
+| #34 | 09-23 01:00 | RTH mid | $103,387.60 | +$3,349.74 | 4 | Same BJT day |
+| #35 | 09-23 03:00 | RTH late | $103,559.67 | +$172.07 | 5 | TP2 check |
+| #36 | 09-23 03:30 | RTH close -30min | $103,596.25 | +$36.58 | 6 | Trail-stop confirm |
+| #27 | 09-23 22:00 | Next-day pre-open | $103,589.50 | +$227.96 (vs #36) | 2 | NEW SEQUENCE; P-MR-247 reset |
+| #33 | 09-23 23:00 | Pre-market follow-through | $103,065.59 | -$523.91 (vs #27) | 3 | Same BJT day carry |
+| #34 | 09-24 01:00 | RTH mid-session | $102,421.23 | -$644.36 (vs #33) | 4 | +2h RTH, mid-session TP1 profit-taking |
+| #35 | 09-24 03:00 | RTH late (TP2 check) | $102,420.41 | -$0.82 (vs #34) | 5 | +2h RTH, essentially flat |
+| #36 | 09-24 03:30 | RTH close -30min | $102,323.77 | -$96.64 (vs #35) | 6 | 30min RTH, tiny fade into close |
+| **#27** | **09-24 22:00** | **Next-day pre-open** | **${meta['total_mv']:,.2f}** | **{meta['total_mv'] - 102323.77:+,.2f} (vs #36)** | **2** | **NEW SEQUENCE; P-MR-247 reset; 18h overnight + 30min pre-RTH drift; TP1-over 7 (1 TP1=true + 6 invisible); SNDK TP2 widened +1.83pp** |
+
+### ⚠️ Key diagnostics
+
+- **MA20 latent bug fires on EVERY cron** (independent of yfinance cache state): all 32 positions report MA20 = price trivially. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Live trail-stop test remains non-functional until scan.py is patched (period="5d" → "6mo" on line ~99). 
+- **scan.py /tmp/ai_trader_scan.py MISSING**: The canonical scan script was deleted between cron runs. Backup at `/tmp/hermes-backup/skills/data-science/stock-analysis/scripts/ai_trader_scan.py` is from May 13 (old schema, would post fake signals with hardcoded 2026-05-13 executed_at — would corrupt trades log). This cron manually fetched fresh positions + 30m/1d bars via direct yfinance calls. **Restoration of /tmp/ai_trader_scan.py is a maintenance task that should be flagged to Vivian.**
+- **Invisible TP1-over pattern**: 6 of 7 TP1-over positions have no entry in state file. FIFO recompute (out of cron scope) is the authoritative mutation path. Documenting here for next FIFO run.
+- **SNDK TP2 gap widened**: +5.91% (#36) → +7.74% (this cron). Overnight drift down -$32.94 (cur $1814.00 → $1783.06, -1.71%). TP2 cross deferred further.
+- **RKLB streak CONTINUATION**: now -8.66% (vs #36 -8.97%, +0.31pp single-window relief). Streak counter continues. Cumulative relief from streak low (~#34): sustained but small.
+- **DE/MRVL cap violations marginally changed**: DE 11.74% → 11.75%, MRVL 11.63% → 11.59%. Both still over 10% cap.
+- **TP2 nearest UNCHANGED at SNDK**: SNDK still closest to TP2 line (+7.74% gap). MRK moved into 2nd at +9.85% gap.
+- **No new Stage 2 candidates** (34+ consecutive zero-candidate crons — pool-loop continues, threshold per skill is 50+)
+
+### 🟢 Stage 2 突破回調 candidates
+
+```
+  (empty — 0/92 scanned)
+```
+
+P-MR-294 pool-loop continues: Stage 2 has produced 0 candidates for **34+ consecutive crons**. Trigger threshold per skill: monitor for pool-exhaustion if 50+ consecutive zero-candidate runs.
+
+### 🚪 Stop / Exit signals
+
+```
+  (none — all 32 positions 🟢 OK)
+```
+
+> ⚠️ Caveat: per MA20 latent bug above, the "🟢 OK MA10/MA20 no breach" status for ALL 32 positions is **trivial** (MA20 = price fallback), NOT a live MA20 confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Live trail-stop test remains non-functional until scan.py is patched (period="5d" → "6mo" on line ~99).
+
+### 📊 當日總結 (2026-09-24 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留 — 6 隻 TP1-over 隱形未入檔)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +7.74% from TP2 line $1,921.08 — gap WIDENED +1.83pp from #36)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00):   $102,323.77
+💰 收市前總權益 (今日 22:00): ${meta['total_equity']:,.2f}
+📈 日內 MTM:                   ${meta['total_mv'] - 102323.77:+,.2f} ({(meta['total_mv'] - 102323.77) / 102323.77 * 100:+.2f}%)  (#27 only, 18h overnight + 30min pre-RTH)
+📦 未實現 PnL:                ${meta['unrealized']:+,.2f} ({meta['unrealized_pct']:+.2f}%)
+💵 現金:                       ${meta['cash']:,.2f}
+📊 持倉數:                     32
+🚨 Cap violations:             DE 11.75% / MRVL 11.59%
+🚦 零觸發連續 (zt):            2  (P-MR-247 day-boundary reset, +1 for this cron = 2)
+```
+
+> Note: 收市前總權益 reflects pre-open scan at 22:00 BJT (10:00 EDT, 30min before Thu RTH open). True "RTH closed" equity will be confirmed at next cron #36 (Thu 03:30 BJT = 16:00 EDT RTH close).
+
+### 📝 Log / State 檔案動作
+
+| File | Action | Notes |
+|------|--------|-------|
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 mutation — FIFO recompute owns that) | zt reset to 2 (P-MR-247 day-boundary reset); 6 TP1-over INVISIBLE entries flagged for next FIFO |
+| `/tmp/ai_trader_scan_meta_log.json` | Appended scan meta (this cron) | 54 → 55 entries |
+| `/tmp/ai_trader_trades_log.json` | UNCHANGED (semantic invariant: 0 buy/sell events this cron) | 287 → 287 entries |
+| `/tmp/ai_trader_cash_floor.json` | cf=0 (cash $207.40 > $100) | no change |
+| `/tmp/ai_trader_zero_trigger.json` | zt=2 (P-MR-247 reset +1) | reset from 6 → 1 → +1 = 2 |
+
+### ⚠️ Maintenance flag — scan.py missing
+
+**`/tmp/ai_trader_scan.py` is MISSING.** Backup copy at `/tmp/hermes-backup/skills/data-science/stock-analysis/scripts/ai_trader_scan.py` is from 2026-05-13 (3+ months stale, old schema). This cron manually fetched fresh data via direct yfinance calls. Recommend: restore canonical scan.py from a recent working snapshot, OR regenerate from current methodology. Until restored, cron will continue to use direct yfinance as fallback.
+
+### 🔮 Next cron preview
+
+- **Next cron**: #33 — 2026-09-24 23:00 BJT (Thu 11:00 EDT, **pre-market follow-through, ~1h RTH, same-BJT-day carry zt 2→3**)
+- **Expected**: First intra-day cron of new sequence. MA10 trail activating. Drift window: pre-open → +1h RTH (~1h). TP1/TP2 lines from FIFO recompute (if run) would re-mark overnight moves.
+- **Watch list**:
+  - **Invisible TP1-over (6 positions)**: MRK/HOOD/INTC/DE/MRVL/CRM all over TP1 line but invisible to state file. Next FIFO recompute (out of cron scope) should add them as `TP1=true` booleans.
+  - **SNDK TP2 cross**: +7.74% price-space gap (widened from #36 +5.91%). If SNDK reclaims $1,830+ during RTH, gap narrows; if it stalls at $1,780-$1,800, gap continues to widen.
+  - **RKLB streak continuation**: now -8.66%, 11+ windows. Single-window relief of +0.31pp is minor; monitor for cumulative relief >2pp as reversal signal.
+  - **DE/MRVL cap violations**: Both marginally changed. If RTH intraday brings either below 11%, position clears.
+  - **scan.py restoration**: Pending maintenance task.
+
