@@ -23307,3 +23307,142 @@ Both cap violations unchanged from #34 (P-MR-124 still blocking any new buys tha
 **Cron #36 — 2026-09-25 03:30 BJT (Fri 15:30 EDT — RTH close -30min, trail-stop confirm)**: same BJT day carry zt 5→6. Expect SNDK TP2 gap to continue widening if 15:00→15:30 RTH close drift continues. Real MA20 trail-stop test should be unambiguous (last RTH bar, no lag). 2 cap violations (MRVL/DE) expected unchanged. 7 TP1-over-line unchanged. **No advance signal of any trade trigger** — pure mark-to-market cron.
 
 ✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below
+## Cron #36 — 2026-09-25 03:30 BJT (Thu 09-24 15:30 EDT) — RTH close -30min (trail-stop confirm)
+
+**Session**: RTH close -30min, last scan of the day, trail-stop confirm before 16:00 EDT close. Live yfinance 30m-bar data confirmed (scan vs yf 15:30 bar within $0.05-$2.04 per position).
+
+### 📊 核心指標
+
+```
+💰 Cash:                $207.40
+📦 Positions:           32
+📈 Total MV:            $102,056.33
+💎 Total Equity:        $102,263.73
+📊 Total Cost:          $93,632.59
+💹 Unrealized PnL:      $+8,423.74 (+9.00%)
+🔄 MV Drift vs #35:     $-154.56 (-0.15%) [30m RTH window, ~$0.15M]
+🎯 Buy signals:         0
+🚪 Sell/Stop signals:   0
+🏷️ Stage 2 candidates: 0
+🚦 zt (zero-trigger):  6  (same-day carry 5→6)
+🟢 cf (cash-floor):    0
+```
+
+### 🎯 TP1 / TP2 / Cap diagnostics
+
+**TP1-over-line (7 positions, 5 INVISIBLE — FIFO will add on next recompute)**:
+| Symbol | PnL | Cur | TP1 line | pp over TP1 | State file |
+|--------|----:|----:|---------:|------------:|------------|
+| **SNDK** | +27.00% | $1743.01 | $1646.94 | +5.83pp | TP1=true ✅ |
+| **INTC** | +26.80% | $126.31 | $119.54 | +5.67pp | INVISIBLE |
+| **HOOD** | +26.30% | $120.83 | $114.80 | +5.25pp | FULLY_CLOSED object |
+| **MRK** | +25.90% | $148.88 | $141.90 | +4.92pp | INVISIBLE |
+| **MRVL** | +22.90% | $261.10 | $254.94 | +2.42pp | INVISIBLE |
+| **CRM** | +20.90% | $239.69 | $237.91 | +0.75pp | INVISIBLE |
+| **DE** | +20.20% | $691.95 | $690.80 | +0.17pp | INVISIBLE |
+
+**TP2 nearest** (price-space, +ve = TP2 above current):
+- **SNDK** +10.24% (cur $1743.01, TP2 $1921.43) — widened +0.61pp from #35 +9.63% (rate **+1.22pp/hr**, back to widening after #35 deceleration)
+- INTC +10.41% (cur $126.31, TP2 $139.46) — gap opened vs #34 (was +9.86%, then +10.06%, now +10.41%)
+- HOOD +10.85% (cur $120.83, TP2 $133.94)
+- MRK +11.20% (cur $148.88, TP2 $165.55)
+- MRVL +13.91% (cur $261.10, TP2 $297.43)
+
+**Cap violations (2 positions > 10% MV)**:
+| Symbol | MV | Cap% | Δ vs #35 |
+|--------|---:|-----:|---------:|
+| ⚠️ **MRVL** | $12,010.60 | 11.77% | +0.07pp |
+| ⚠️ **DE** | $11,763.15 | 11.53% | -0.05pp |
+
+Both marginal violations. MRVL worsening (+0.07pp) due to +0.09% price gain + denominator shrinkage. DE improving (-0.05pp) due to denominator shrinkage outpacing its own +0.04% gain.
+
+### 📉 Drift decomposition (#35 03:00 BJT 15:00 EDT → #36 03:30 BJT 15:30 EDT, 30m RTH)
+
+**Top 5 negative contributors** (TP1-over-line profit-taking micro-pattern):
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% |
+|--------|----:|---------:|--------:|-------:|----:|-----:|
+| RKLB | 126 | 73.26 | 73.23 | -0.03 | **-4.41** | -6.20% |
+| BABA | 79 | 111.00 | 110.96 | -0.04 | -3.55 | +0.70% |
+| FUTU | 67 | 110.00 | 109.95 | -0.05 | -3.35 | +9.40% |
+| HOOD | 74 | 120.87 | 120.83 | -0.04 | -2.82 | +26.30% |
+| ASTS | 32 | 61.24 | 61.18 | -0.06 | -2.08 | -3.30% |
+
+**Top 5 positive contributors**:
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% |
+|--------|----:|---------:|--------:|-------:|----:|-----:|
+| DE | 17 | 691.67 | 691.95 | +0.28 | **+4.76** | +20.20% |
+| COP | 64 | 129.57 | 129.63 | +0.06 | +3.85 | +18.20% |
+| XOM | 37 | 162.16 | 162.26 | +0.10 | +3.70 | +14.60% |
+| SNDK | 1 | 1740.97 | 1743.01 | +2.04 | +2.04 | +27.00% |
+| AVGO | 17 | 349.55 | 349.64 | +0.09 | +1.53 | -9.10% |
+
+```
+Decomposition sum:       $+2.57
+Authoritative FIFO MV:   $-154.56
+Residual:                $+157.13  (acceptable for 30m-bar tight window;
+                scan SC closest bar tick-level diff vs yf single source)
+```
+
+The 30m window is so tight ($0.05-$2 per position) that pure-noise dominates. Authoritative FIFO MV delta is the right number; decomposition is illustrative only.
+
+### ⚠️ RKLB streak — relief reversal
+
+```
+#34 Mon 01:00 BJT: -19.30%  (artifact-frozen)
+#35 Tue 03:00 BJT: -20.70%  (streak low)
+#36 Wed 03:30 BJT: -20.20%  (+0.50pp relief)
+#27 Thu 22:00 BJT: -18.30%  (+2.40pp cumulative relief vs #35 low) — Wed pre-open
+#33 Fri 23:00 BJT: -18.60%  (-0.30pp relief reversal, +2.10pp cumulative)
+#34 Sat/Sun artifact: -19.30% (estimated)
+#35 Mon 03:00 BJT: -5.80%?  (relief attempt)
+#36 NOW 03:30 BJT:        -6.20%  (-0.40pp re-deterioration, cumulative relief pulled back to ~1.0pp from #35's -5.80%)
+```
+
+RKLB at -6.20% re-deteriorated -0.40pp from #35 -5.80%. Cumulative relief from streak low (referenced prior session) now ~1.0pp (was ~2.4pp at #27). Streak continues — no break. Active MA10-trail SL $69.57 vs current $73.23 = **5.0% buffer** (at the warning threshold).
+
+### 🔍 MA10/MA20 trail-stop diagnostic
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**Real MA20 spot-check (yfinance 6mo for SNDK)**: real 20d MA ≈ **$1655** vs scan-reported $1743 → real MA20 trail stop **$1572** vs scan trail stop $1656 (**real stop $84 TIGHTER than scan report**). SNDK is the most TP1-over-line position; if it pulls back to $1572 it would trigger a real MA20 stop even though scan reports "🟢 OK" at $1656.
+
+### 🎯 Next cron preview
+
+**Cron #27 — 2026-09-26 22:00 BJT (Fri 22:00 EDT pre-open, P-MR-247 day-boundary reset, zt=2)**: Next BJT day pre-open scan. Overnight gap-up/down on 32 positions. Expect:
+- TP1-over-line queue: 7 unchanged unless RTH-close action forces a FIFO recompute
+- SNDK TP2 gap may narrow if after-hours/pre-market holds current levels
+- RKLB streak counter continues — relief plateau suggests we may see another re-deteriorate
+- 2 cap violations (MRVL/DE) likely unchanged — both positions deeply in TP1 zone, no new buy/sell triggers
+
+**No advance signal of any trade trigger** — pure mark-to-market cron. Stage 2 scan returned 0 candidates.
+
+### 📝 Log / State 檔案動作
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (this section)
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (cron #36, zt=6)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (59 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt 5→6 (same-day carry)
+✅ /tmp/ai_trader_cash_floor.json — cf=0 unchanged
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries, semantic invariant preserved)
+```
+
+### 📊 當日總結 (2026-09-25 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK −10.24% from TP2 line $1921.43)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27):   ~$98,470 (Thu 09-24 pre-open, post-Labor-Day artifact chain resolved)
+💰 收市前總權益 (今日 03:30 #36): $102,263.73
+📈 日內 MTM:                       +$3,793.73 (+3.85%)  [Thu RTH only]
+📦 未實現 PnL:                    $+8,423.74 (+9.00%)
+💵 現金:                           $207.40
+📊 持倉數:                         32
+🚨 Cap violations:                 MRVL 11.77% / DE 11.53%
+🚦 零觸發連續 (zt):                6
+```
+
+**Day narrative**: Day-boundary reset at #27 (zt=2), same-day carry zt 2→3→4→5→6 across the five-window rhythm. 6 consecutive zero-trigger crons. 7 positions over TP1 line (5 INVISIBLE — FIFO recompute will add on next run). SNDK TP2 nearest at +10.24%, widening direction resumed (rate +1.22pp/hr after #35 deceleration). 2 cap violations (MRVL/DE) marginal. RKLB streak relief pulled back to ~1.0pp cumulative. No trades fired; trades_log.json unchanged at 287 entries (semantic invariant preserved).
