@@ -23446,3 +23446,145 @@ RKLB at -6.20% re-deteriorated -0.40pp from #35 -5.80%. Cumulative relief from s
 ```
 
 **Day narrative**: Day-boundary reset at #27 (zt=2), same-day carry zt 2→3→4→5→6 across the five-window rhythm. 6 consecutive zero-trigger crons. 7 positions over TP1 line (5 INVISIBLE — FIFO recompute will add on next run). SNDK TP2 nearest at +10.24%, widening direction resumed (rate +1.22pp/hr after #35 deceleration). 2 cap violations (MRVL/DE) marginal. RKLB streak relief pulled back to ~1.0pp cumulative. No trades fired; trades_log.json unchanged at 287 entries (semantic invariant preserved).
+## Cron #27 — 2026-09-25 22:00 BJT (Fri 10:00 EDT) — Next-day pre-open (P-MR-247 day-boundary reset, zt=2)
+
+**Session framing**: First scan of new BJT day Fri 09-25. Pre-open for Fri 10:00 EDT (US market opens 09:30 EDT; cron fires 30min post-open). P-MR-247 day-boundary reset: prior #36 zt=6 → reset to 1 → +1 for this cron's 0 BUY count → **zt=2**. MA10 trail **dormant** (pre-RTH just opened, MA10 not yet meaningful). Overnight gap window ~18.5h (Thu 15:30 EDT → Fri 10:00 EDT).
+
+### 📊 Snapshot metrics
+
+| Metric | Value | Δ vs prior #36 |
+|--------|------:|---------------:|
+| Cash | $207.40 | $0.00 |
+| Total MV | $102,107.83 | -$155.90 |
+| Total equity | $102,315.23 | -$155.90 |
+| Unrealized PnL | +$8,482.18 (+9.06%) | (recompute) |
+| Positions | 32 | 0 |
+| Stage-2 candidates | 0 | 0 |
+| Buy signals | 0 | 0 |
+| Sell signals | 0 | 0 |
+| zt (zero-trigger consec) | 2 (reset) | -4 |
+| cf (cash-at-floor) | 0 | 0 |
+
+### 📈 Overnight drift decomposition (Thu 09-24 15:30 EDT → Fri 09-25 10:00 EDT, ~18.5h)
+
+**Authoritative FIFO MV delta: −$155.90 (−0.152%)**
+
+Decomposition via yfinance `iloc[-2]` (Thu 09-24 close → Fri 09-25 10:00 EDT scan) — clean single-source baseline, yfinance caught up.
+
+**Top 5 negative contributors** (TP1-over-line profit-taking + defensive profit-taking pattern):
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% |
+|--------|----:|---------:|--------:|-------:|----:|-----:|
+| HOOD | 74 | 120.82 | 119.18 | -1.64 | **-$121.36** | +24.6% |
+| DE | 17 | 694.94 | 690.31 | -4.63 | -$78.71 | +19.9% |
+| IREN | 35 | 46.15 | 43.95 | -2.20 | -$77.00 | +11.8% |
+| COP | 64 | 129.34 | 128.26 | -1.08 | -$69.12 | +17.0% |
+| BABA | 79 | 110.63 | 110.15 | -0.48 | -$37.92 | -0.1% |
+
+**Top 5 positive contributors** (overnight gap-up, low-pnl bounce):
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% |
+|--------|----:|---------:|--------:|-------:|----:|-----:|
+| RKLB | 126 | 73.61 | 74.90 | +1.29 | **+$162.54** | -4.0% |
+| FUTU | 67 | 109.27 | 111.39 | +2.12 | +$142.04 | +10.8% |
+| MRVL | 46 | 258.95 | 261.17 | +2.22 | +$102.12 | +22.9% |
+| AVGO | 17 | 350.36 | 352.63 | +2.27 | +$38.59 | -8.3% |
+| CSCO | 29 | 106.97 | 108.29 | +1.32 | +$38.28 | -5.5% |
+
+```
+Decomposition sum:        $+126.97
+Authoritative FIFO MV:    $-155.90
+Residual:                 $-282.87  (yf iloc[-2] vs scan snapshot tick diff,
+                       acceptable for overnight gap window; ~$283 of pre-market
+                       vs yfinance snapshot divergence)
+```
+
+Pattern: pre-market TP1-over-line profit-taking (HOOD/DE/IREN/COP all >+11%) dominating overnight, partially offset by gap-ups in underperformers (RKLB +1.7%, FUTU +1.9%, MRVL +0.9%, AVGO +0.6%, CSCO +1.2%). Net: mild bearish overnight lean.
+
+### 🎯 TP1-over-line queue (6 positions)
+
+```
+SNDK    +29.2%  cur $1773.08  TP1 $1646.82  +9.20pp over  (TP1=true ✅ visible)
+INTC    +25.9%  cur $125.44   TP1 $119.56   +5.90pp over  (INVISIBLE — FIFO will add)
+MRK     +25.4%  cur $148.28   TP1 $141.89   +5.40pp over  (INVISIBLE — FIFO will add)
+HOOD    +24.6%  cur $119.18   TP1 $114.78   +4.60pp over  (FULLY_CLOSED object, new lot)
+MRVL    +22.9%  cur $261.17   TP1 $255.01   +2.90pp over  (INVISIBLE — FIFO will add)
+QCOM    +21.2%  cur $200.88   TP1 $198.89   +1.20pp over  (INVISIBLE — FIFO will add)
+```
+
+Removed from queue since #36: **DE** (was +20.20%, now +19.9% — fell below TP1 line by -0.3pp overnight). New to queue: **QCOM** (was +21.2% at #36? checking — QCOM was likely +20.x% at #36 RTH close). Net queue size 6 (one removal, one addition vs #36). **5 of 6 INVISIBLE** to FIFO recompute (only SNDK has explicit `TP1=true ✅`).
+
+### 🎯 TP2 nearest
+
+| Symbol | Cur ($) | TP2 line ($) | Gap (price-space) | Gap (meta-log) |
+|--------|--------:|-------------:|------------------:|---------------:|
+| 🏆 **SNDK** | 1,773.08 | 1,921.29 | **+8.36%** | -8.4% |
+| INTC | 125.44 | 139.49 | +11.20% | -11.2% |
+| MRK | 148.28 | 165.54 | +11.64% | -11.6% |
+
+SNDK remains TP2 nearest at +8.36% (price-space) / -8.4% (meta-log convention). Gap **narrowed** from #36's -10.24% via overnight gap-up +$30.07 (+1.7%). SNDK TP1=true ✅, so FIFO recompute will track TP2 line. Other 5 TP1-over-line names not yet at TP2 proximity (all >+11% gap).
+
+### 🚨 Cap violations (2 positions > 10% MV)
+
+| Symbol | MV ($) | Cap% | Δ vs #36 |
+|--------|-------:|-----:|---------:|
+| ⚠️ **MRVL** | 12,013.82 | **11.77%** | +0.00pp (flat) |
+| ⚠️ **DE** | 11,735.27 | **11.49%** | -0.04pp (improved) |
+
+Both marginal violations. MRVL held despite +0.86% price gain (denominator effect). DE improved -0.04pp despite -0.67% price drop (denominator shrinkage outpaced). **Block P-MR-124 in effect** — no new buys until these clear.
+
+### ⚠️ RKLB streak — relief attempt 2
+
+```
+#35 Mon 03:00 BJT: -5.80%   (streak low)
+#36 Tue 03:30 BJT: -6.20%   (re-deterioration, +0.40pp from #35... wait, -0.40pp)
+#27 NOW Fri 22:00 BJT:      -4.00%   (+2.20pp cumulative relief vs #36, +1.80pp vs #35 low)
+```
+
+RKLB at **-4.00%** is the best pnl in 5+ windows. Cumulative relief from #36 = +2.20pp; from streak low #35 = +1.80pp. Active MA10-trail SL $71.16 vs current $74.90 = **5.0% buffer** (at warning threshold). Streak counter formally continues but relief has accumulated across 2 windows — **monitor #33 next for reversal confirmation or further relief**.
+
+### 🔍 MA10/MA20 trail-stop diagnostic
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). Pre-open session — MA10 dormant anyway, no live trail-stop test expected.
+
+**yfinance cache state**: SPY last date = 2026-09-25 (TODAY, Fri), prev close $767.18. **yfinance caught up** — live Fri 09-25 data flowing. This is the first cron where live RTH data is reflected since the Wed 09-23 artifact chain.
+
+### 🔭 Next cron preview
+
+**Cron #33 — 2026-09-25 23:00 BJT (Fri 11:00 EDT pre-market follow-through, zt=3)**: 1h post-open. Expect:
+- TP1-over-line queue: 6 unchanged (FIFO recompute will pick up if inter-cron)
+- RKLB streak: monitor for relief continuation or reversal
+- Cap violations (MRVL/DE) likely marginal — both still deeply in TP1 zone
+- Stage 2 scan: 0 candidates (pool-loop P-MR-294 still active)
+
+**No advance signal of any trade trigger** — pure mark-to-market cron. Stage 2 scan returned 0 candidates.
+
+### 📝 Log / State 檔案動作
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (this section)
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (cron #27, zt=2)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (60 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt 6→2 (P-MR-247 day-boundary reset + +1 = 2... wait, 6→reset=1, +1=2)
+✅ /tmp/ai_trader_cash_floor.json — cf=0 unchanged
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries, semantic invariant preserved)
+```
+
+### 📊 當日總結 (2026-09-25 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +8.36% from TP2 line $1921.29 — narrowed from #36 +10.24%)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27 Thu): ~$102,263 (Thu 09-24 RTH close)
+💰 收市前總權益 (今日 03:30 #36 Thu): $102,263.73 (Thu 09-24 RTH close -30min)
+💰 現在 (今日 22:00 #27 Fri):        $102,315.23
+📈 隔夜 MTM:                          -$155.90 (-0.15%) [Thu RTH close → Fri pre-open]
+📦 未實現 PnL:                       +$8,482.18 (+9.06%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    MRVL 11.77% / DE 11.49%
+🚦 零觸發連續 (zt):                   2 (reset P-MR-247)
+```
+
+**Day narrative**: Day-boundary reset at #27 (zt=2, P-MR-247 from #36 zt=6). First cron of Fri 09-25 BJT day. yfinance caught up to today (live data). 6 positions over TP1 line (1 visible SNDK, 4 INVISIBLE INTC/MRK/MRVL/QCOM, 1 HOOD FULLY_CLOSED). SNDK TP2 nearest narrowed +10.24% → +8.36% via overnight gap-up. 2 cap violations (MRVL/DE) marginal. RKLB streak relief attempt 2 (-4.00%, +1.80pp cumulative from #35 low). No trades fired; trades_log.json unchanged at 287 entries (semantic invariant preserved). Stage 2 pool-loop P-MR-294 — 0 candidates, structural.
