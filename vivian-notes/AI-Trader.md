@@ -23588,3 +23588,156 @@ RKLB at **-4.00%** is the best pnl in 5+ windows. Cumulative relief from #36 = +
 ```
 
 **Day narrative**: Day-boundary reset at #27 (zt=2, P-MR-247 from #36 zt=6). First cron of Fri 09-25 BJT day. yfinance caught up to today (live data). 6 positions over TP1 line (1 visible SNDK, 4 INVISIBLE INTC/MRK/MRVL/QCOM, 1 HOOD FULLY_CLOSED). SNDK TP2 nearest narrowed +10.24% → +8.36% via overnight gap-up. 2 cap violations (MRVL/DE) marginal. RKLB streak relief attempt 2 (-4.00%, +1.80pp cumulative from #35 low). No trades fired; trades_log.json unchanged at 287 entries (semantic invariant preserved). Stage 2 pool-loop P-MR-294 — 0 candidates, structural.
+
+## Cron #33 — 2026-09-25 23:00 BJT (Fri 11:00 EDT) — Pre-market follow-through (+1h RTH)
+
+**Session framing**: Pre-market follow-through ~1.5h into Fri 09-25 RTH open. Same BJT day as #27 (no day-boundary reset). MA10 trail transitioning from dormant (pre-open) → active (RTH mid-morning). Drift window: ~1h of intra-RTH trading from #27's 10:00 EDT mark. Stage 2 pool-loop P-MR-294 — still 0 candidates, structural.
+
+### 📊 Snapshot metrics
+
+| Metric | Value | Δ vs prior #27 |
+|--------|------:|---------------:|
+| Cash | $207.40 | $0.00 |
+| Total MV | $101,662.56 | -$445.27 |
+| Total equity | $101,869.96 | -$445.27 |
+| Unrealized PnL | +$8,034.41 (+8.58%) | (recompute) |
+| Positions | 32 | 0 |
+| Stage-2 candidates | 0 | 0 |
+| Buy signals | 0 | 0 |
+| Sell signals | 0 | 0 |
+| zt (zero-trigger consec) | 3 | +1 |
+| cf (cash-at-floor) | 0 | 0 |
+
+### 📈 Intra-day drift decomposition (#27 10:00 EDT → #33 11:00 EDT, ~1h RTH)
+
+**Authoritative FIFO MV delta: −$445.27 (−0.436%)**
+
+Decomposition via prior #27 markdown (10/32 positions) + yfinance `iloc[-2]` Thu 09-24 close fallback for remaining 22/32. yfinance caught up — SPY last date 2026-09-25 (TODAY, Fri).
+
+**Top 5 negative contributors** (TP1-over-line RTH profit-taking dominates, same pattern as cron #24 / #25 / #29):
+
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% | Source |
+|--------|----:|---------:|--------:|-------:|----:|-----:|--------|
+| RKLB | 126 | 74.90 | 73.06 | -1.84 | **-$231.84** | -6.4% | md |
+| DE | 17 | 690.31 | 684.37 | -5.94 | -$100.98 | +18.9% | md |
+| HOOD | 74 | 119.18 | 118.42 | -0.76 | -$56.24 | +23.8% | md |
+| XOM | 37 | 162.14 | 160.94 | -1.20 | -$44.40 | +13.7% | yf |
+| COP | 64 | 128.26 | 127.74 | -0.52 | -$33.28 | +16.5% | md |
+
+**Top 5 positive contributors** (low-pnl bounce + SNDK TP1-over-line rally):
+
+| Symbol | Qty | Prev ($) | Cur ($) | ΔPrice | ΔMV | PnL% | Source |
+|--------|----:|---------:|--------:|-------:|----:|-----:|--------|
+| FUTU | 67 | 111.39 | 111.82 | +0.43 | **+$28.81** | +11.3% | md |
+| VRT | 4 | 245.30 | 251.71 | +6.41 | +$25.64 | -11.0% | yf |
+| SNDK | 1 | 1753.62 | 1772.00 | +18.38 | +$18.38 | +29.1% | yf |
+| ASTS | 32 | 61.06 | 61.42 | +0.36 | +$11.52 | -2.9% | yf |
+| PATH | 67 | 12.60 | 12.75 | +0.15 | +$10.05 | +6.8% | yf |
+
+```
+Decomposition sum:        $-415.96
+Authoritative FIFO MV:    $-445.27
+Residual:                 $-29.31  (markdown rounding noise, mixed-source 22/32 yf
+                           fallback; clean for 1h RTH window — residual <$50)
+```
+
+**Pattern**: classic RTH mid-session TP1-over-line profit-taking dominates — RKLB re-deterioration ($231.84) is the standout negative despite pnl being −6.4% (NOT over TP1). The streak-relief reversal pattern (see RKLB section below) shows relief attempts **fade** within 1h of RTH open, consistent with the skill's `RKLB-Relief-Reversal` tag. HOOD/COP/DE continuing the overnight RTH fade pattern from #24/#25/#29 (3 of top-5 negative are TP1-over-line profit-taking).
+
+### 🎯 TP1-over-line queue (6 positions, unchanged from #27)
+
+```
+SNDK    +29.1%  cur $1772.00   TP1 line $1417.60*  +9.10pp over  (TP1=true ✅ visible)
+MRK     +25.6%  cur $148.49    TP1 line $118.79*   +5.60pp over  (INVISIBLE — FIFO will add)
+INTC    +24.8%  cur $124.35    TP1 line $99.48*    +4.80pp over  (INVISIBLE — FIFO will add)
+HOOD    +23.8%  cur $118.42    TP1 line $94.74*    +3.80pp over  (FULLY_CLOSED object, new lot)
+MRVL    +22.8%  cur $260.99    TP1 line $208.79*   +2.80pp over  (INVISIBLE — FIFO will add)
+QCOM    +22.0%  cur $202.27    TP1 line $161.82*   +2.00pp over  (INVISIBLE — FIFO will add)
+```
+
+*TP1 lines reconstructed from per-share cost = price / (1 + pnl/100); TP1 line = cost_ps × 1.20
+
+Queue unchanged from #27 (no new crosses, no falls-back-below). All 6 entries propagate to next FIFO recompute.
+
+### 🎯 TP2 nearest
+
+| Symbol | Cur ($) | TP2 line ($) | Gap (price-space) | Gap (meta-log) |
+|--------|--------:|-------------:|------------------:|---------------:|
+| 🏆 **SNDK** | 1,772.00 | 1,921.61 | **+8.44%** | -8.4% |
+| MRK | 148.49 | 165.51 | +11.46% | -11.5% |
+| INTC | 124.35 | 139.50 | +12.18% | -12.2% |
+| HOOD | 118.42 | 133.92 | +13.09% | -13.1% |
+| MRVL | 260.99 | 297.55 | +14.01% | -14.0% |
+
+SNDK remains TP2 nearest at **+8.44%** (price-space) / **-8.4%** (meta-log convention). Gap **unchanged** from #27's +8.36% within rounding ($1773.08 → $1772.00, −$1.08 intra-day = no net narrowing). SNDK TP2 nearest is **stalled** in the <0.05pp/hr band per skill's `SNDK-Post-TP1-March` tag (cron #24 docs) — gap not narrowing despite TP1-over-line status for 3+ windows.
+
+### 🚨 Cap violations (2 positions > 10% MV)
+
+| Symbol | MV ($) | Cap% | Δ vs #27 |
+|--------|-------:|-----:|---------:|
+| ⚠️ **MRVL** | 12,005.54 | **11.81%** | +0.04pp (marginal worsen) |
+| ⚠️ **DE** | 11,634.29 | **11.44%** | -0.05pp (marginal improve) |
+
+Both marginal — neither trades. MRVL worsened +0.04pp despite -$8.18 price drop ($261.17 → $260.99), because denominator shrank faster than numerator (other positions declining). DE improved -0.05pp on -$5.94 price drop (similar denominator-shrinkage effect).
+
+### ⚠️ RKLB streak — relief attempt 2 FAILED, streak resumes
+
+```
+#35 Mon 03:00 BJT: -5.80%   (streak low)
+#36 Tue 03:30 BJT: -6.20%   (re-deterioration)
+#27 Fri 22:00 BJT: -4.00%   (relief attempt 2, +2.20pp from #36, +1.80pp from #35 low)
+#33 Fri 23:00 BJT: -6.40%   (REVERSAL — re-deteriorated -2.40pp, back below #36, streak continues)
+```
+
+RKLB at **−6.40%** has RE-DETERIORATED below #36's −6.20%, eroding all #27's relief within 1h of RTH open. **Cumulative relief from #35 low: now ~−0.6pp** (was +1.80pp at #27). Streak counter continues uninterrupted — relief reversal confirms skill's `RKLB-Relief-Reversal` pattern (per cron #33 docs): relief attempts within RTH open are NOISE, do NOT signal streak break.
+
+Active MA10-trail SL $69.41 vs current $73.06 = **5.0% buffer** (at warning threshold). RKLB right back at the streak-low zone; if deterioration continues, fixed 5% entry-anchored SL ($78.07 × 0.95 = $74.17) is now further away than active MA10-trail, so the active trail is the binding constraint.
+
+### 🔍 MA10/MA20 trail-stop diagnostic
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**yfinance cache state**: SPY last date = 2026-09-25 (TODAY, Fri). **yfinance caught up** — live Fri 09-25 RTH data flowing.
+
+### 🔭 Next cron preview
+
+**Cron #34 — 2026-09-26 01:00 BJT (Sat 13:00 EDT) — RTH mid-session follow-through**: 3h into RTH. Expect:
+- TP1-over-line queue: 6 unchanged (FIFO recompute will pick up if inter-cron)
+- RKLB streak: monitor for sustained deterioration below -6.5% or fresh relief attempt
+- Cap violations (MRVL/DE) likely marginal — both still deeply in TP1 zone
+- Stage 2 scan: 0 candidates (pool-loop P-MR-294 still active)
+
+**No advance signal of any trade trigger** — pure mark-to-market cron. Stage 2 scan returned 0 candidates. SNDK TP2 nearest stalled (no narrowing for 3+ windows); RKLB re-deteriorating post-relief-reversal.
+
+### 📝 Log / State 檔案動作
+
+```
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (this section)
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (cron #33, zt=3)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (61 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt 2→3 (same-BJT-day carry)
+✅ /tmp/ai_trader_cash_floor.json — cf=0 unchanged
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (287 entries, semantic invariant preserved)
+```
+
+### 📊 當日總結 (2026-09-25 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +8.44% from TP2 line $1921.61 — unchanged from #27 +8.36%, stalled band)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27 Thu): ~$102,263 (Thu 09-24 RTH close)
+💰 收市前總權益 (今日 03:30 #36 Thu): $102,263.73 (Thu 09-24 RTH close -30min)
+💰 現在 (今日 23:00 #33 Fri):        $101,869.96
+📈 日內 MTM (#27→#33):              -$445.27 (-0.44%) [+1h RTH]
+📦 未實現 PnL:                       +$8,034.41 (+8.58%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    MRVL 11.81% / DE 11.44%
+🚦 零觸發連續 (zt):                   3
+```
+
+**Day narrative**: Fri 09-25 RTH open #27 → #33 cron. Pre-market follow-through with classic TP1-over-line RTH profit-taking (RKLB re-deterioration $231.84 dominant; HOOD/DE/COP contributing). SNDK TP2 nearest stalled at +8.44% (3+ windows no narrowing). RKLB relief reversal: −4.00% → −6.40% within 1h RTH, eroding all of #27's relief attempt 2 — streak continues, NO streak break signal. 6 TP1-over-line queue unchanged from #27. No trades fired; trades_log.json unchanged at 287 entries (semantic invariant preserved). Stage 2 pool-loop P-MR-294 — 0 candidates, structural.
+
+---
