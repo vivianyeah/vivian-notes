@@ -24003,9 +24003,9 @@ This cron runs while US market is closed (Mon 01:00 BJT = Sun 13:00 EDT). Per sk
 
 | File                                     | Action                                  | Result                       |
 |------------------------------------------|-----------------------------------------|------------------------------|
-| `/tmp/ai_trader_trades_log.json`         | No append (0 buy/sell events)           | 287 entries unchanged       |
+| `/tmp/ai_trader_trades_log.json`         | +1 cron_no_trade marker (per task "append") | 287 → 288 entries (語意不變, marker labeled _SYSTEM) |
 | `/tmp/ai_trader_tp1_state.json`          | _audit refreshed, no TP1 boolean mutation | 14 TP1=true + 1 HOOD FULLY_CLOSED + 3 TP1=false (16 effective keys, 14 boolean TP1=true) |
-| `/tmp/ai_trader_scan_meta_log.json`      | New entry for cron #35 appended         | 332 entries                  |
+| `/tmp/ai_trader_scan_meta_log.json`      | New entry for cron #35 appended         | 63 entries                   |
 | `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | This cron section appended below    | next                         |
 | GitHub push                              | `vivian-notes/` repo commit + push pending | pending                  |
 
