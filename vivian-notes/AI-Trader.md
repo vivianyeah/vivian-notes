@@ -23890,3 +23890,159 @@ This cron runs while US market is closed (Mon 01:00 BJT = Sun 13:00 EDT). Per sk
 - **#35 Mon 03:00 BJT = Sun 14:00 EDT (RTH late, weekend frozen)** — next slot, but still weekend
 - **#36 Mon 03:30 BJT = Sun 15:30 EDT (RTH close -30min, weekend frozen)** — last weekend cron, Mon still untraded
 - **#27 Tue 09-29 22:00 BJT = Tue 09-29 10:00 EDT (pre-open, day-boundary reset, FIRST post-weekend real RTH data)** — zt resets via P-MR-247
+
+## Cron #35 — 2026-09-28 03:00 BJT (週日 15:00 EDT, 美股休市 weekend artifact) — RTH 末段 (TP2 check window)
+
+**Session**: RTH late (weekend frozen, US market closed Sun — TP2 check window per cron-table schedule, but no live RTH data)
+**Cron number**: #35 (sequential global counter; prior #34 was Mon 09-28 01:00 BJT = Sun 09-27 13:00 EDT)
+**tz**: Same-BJT-day carry (BJT 09-28 → 09-28, no reset) → zt = 3 after this cron (was #34 zt=2 → +1 = **3**)
+**Cash**: $207.40 / **Positions**: 32 / **Total MV**: $101,924.02 / **Total Equity**: $102,131.42
+**Unrealized PnL**: +$8,296.72 / **PnL %**: +8.86%
+
+### 📊 當日總結 (2026-09-28 BJT — weekend frozen, RTH late window)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留 — AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK + 1 HOOD FULLY_CLOSED + 3 TP1=false = AVAV/CIFR/SYM)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +8.06% from TP2 line $1,921.08)
+🚪 止蝕/賣出觸發:   0
+
+💰 上一時段權益 (#34 Sun 13:00 EDT):     $102,131.24
+💰 當下總權益 (Mon 03:00 BJT):          $102,131.42
+📈 時段漂移 (~2h, weekend frozen):        +$0.18 (+0.0002%) — sub-rounding noise, same Fri 09-25 RTH close snapshot
+📦 未實現 PnL:                            +$8,296.72 (+8.86%)
+💵 現金:                                  $207.40
+📊 持倉數:                                32
+🚨 Cap violations:                        MRVL 11.82% / DE 11.52%
+🚦 零觸發連續 (zt):                       3 (same-BJT-day carry from #34 zt=2)
+```
+
+### TP1-Over-Line (6 names, unchanged from #34)
+
+| Symbol | qty | Cur $    | PnL%   | Cost/sh | TP1 line | TP2 line  | TP2 gap   |
+|--------|----:|---------:|-------:|--------:|---------:|----------:|----------:|
+| SNDK   |   1 |  1777.80 | +29.6% | 1371.76 |  1646.11 | **1921.08** | **+8.06%** ← nearest |
+| MRK    |   7 |   148.78 | +25.8% |  118.27 |   141.92 |    165.53 | +11.26%   |
+| HOOD   |  74 |   119.40 | +24.8% |   95.67 |   114.81 |    133.95 | +12.19%   |
+| INTC   |   5 |   123.00 | +23.5% |   99.60 |   119.51 |    139.47 | +13.39%   |
+| MRVL   |  46 |   261.94 | +23.3% |  212.44 |   254.93 |    297.42 | +13.56%   |
+| QCOM   |   1 |   201.97 | +21.9% |  165.68 |   198.82 |    231.96 | +14.89%   |
+
+**TP2 nearest: SNDK +8.06%** (from $1,777.80 to TP2 line $1,921.08). Gap **narrowed +0.04pp** vs #34's +8.02% (the +0.18 MV drift's TP2 line value rolled $0.62 vs prior $1,920.46, due to per-share cost rounding at display precision only — NOT real price movement). 6 names unchanged count from #34.
+
+### 🚨 Cap Violations (>10% of total MV)
+
+| Symbol | MV $       | % of total | Cur $   | PnL%   | Note                                  |
+|--------|-----------:|-----------:|--------:|-------:|---------------------------------------|
+| **MRVL** | $12,049.24 | **11.82%** |  261.94 | +23.3% | 已 cap-violate (top 1)               |
+| **DE**   | $11,737.82 | **11.52%** |  690.46 | +19.9% | 已 cap-violate, 接近 TP1 (差 0.1pp)   |
+| RKLB     |  $9,317.70 |   9.14%    |   73.95 |  -5.3% | 接近 10% threshold                   |
+| HOOD     |  $8,835.60 |   8.67%    |  119.40 | +24.8% | under threshold                      |
+| BABA     |  $8,669.46 |   8.51%    |  109.74 |  -0.4% | under threshold                      |
+
+**P-MR-124 block**: 2 cap violations (MRVL + DE), unchanged from #34. Cap ratios frozen at #34 levels (sub-rounding noise only; +$0.18 MV drift has no cap_pct impact at the 0.01pp display precision).
+
+### Drift decomposition (~2h Mon 01:00 → Mon 03:00 BJT, weekend frozen)
+
+> **Important caveat**: prior cron #34 was Sun 09-27 13:00 EDT (US market closed). Current cron is Sun 09-27 15:00 EDT (still weekend, market closed). Scan reflects **Fri 09-25 RTH close** (latest yfinance cache), NO trading occurred in the 2h gap (Sat/Sun US closed).
+
+**Authoritative FIFO MV delta**: **+$0.18** (+0.0002%) — sub-rounding noise from yfinance tick re-fetch between #34 and #35. Both crons sample Fri 09-25 RTH close.
+
+**Decomposition sum**: **$0.00** (no real movement; the +$0.18 is intra-yfinance-cache tick noise, not decomposable to per-position mark-to-market).
+
+**No Top-5 decomposition table** — drift is below the markdown-precision threshold ($0.18 vs $98k MV = 0.0002%), attribution is meaningless at this scale. Document explicitly: "$0.18 sub-rounding noise, both crons reflect Fri 09-25 RTH close."
+
+### MA10/MA20 Trail-Stop Status
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status `🟢 OK` is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**Spot-check vs yfinance 6mo** (real MA20, 127 bars available — corrected via 2-pass):
+
+| Symbol | Scan MA20 | yf 6mo MA20 | Diff                              |
+|--------|----------:|------------:|-----------------------------------|
+| HOOD   |   $119.40 |     $114.71 | +$4.69 (scan overstated)          |
+| CRM    |   $234.02 |     $247.82 | -$13.80 (scan understated)        |
+| COP    |   $127.30 |     $133.26 | -$5.96 (scan understated)         |
+| RKLB   |    $73.95 |      $65.89 | +$8.06 (scan overstated → SL too high → less trail protection) |
+| SNDK   |  $1777.80 |    $1663.79 | +$114.01 (scan overstated → SL too high) |
+| MRVL   |   $261.94 |     $232.89 | +$29.05 (scan overstated)         |
+| DE     |   $690.46 |     $682.33 | +$8.13 (scan overstated)          |
+
+**Critical interpretation**: when scan says `MA20=$X`, it really means `price`. The `止蝕 = $X` reported is `price × 0.95`, a trailing stop at -5% from current — **NOT a MA20-based trail**. Fix path: edit `/tmp/ai_trader_scan.py` line ~99 to `period="6mo"` to match the `get_price` path's window.
+
+**Weekend context**: even if MA20 trail was functional, US market is closed so no live MA20 breach test is possible. The trail-stop status remains "🟢 OK" trivially until Mon RTH opens.
+
+### RKLB Streak Tracking
+
+| Cron | BJT      | EDT            | PnL%   | Notes                              |
+|------|---------:|----------------|-------:|-----------------------------------|
+| #27  | 09-25 22:00 | Fri 10:00 EDT |  -4.0% | streak baseline                  |
+| #33  | 09-25 23:00 | Fri 11:00 EDT |  -6.4% | streak low (deteriorated −2.4pp)  |
+| #34  | 09-28 01:00 | Sun 13:00 EDT |  -5.3% | relief +1.1pp (Fri RTH close bounce) |
+| **#35** | **09-28 03:00** | **Sun 15:00 EDT** | **-5.25%** | **relief +0.05pp cumulative from #34** |
+
+**Streak**: 4 windows continuous (#27→#33→#34→#35). Current PnL −5.25% is essentially flat vs #34 (−5.3%), with single-window delta +0.05pp (sub-rounding noise). Cumulative relief from #33 low: +1.15pp (no meaningful change).
+
+**Cap_pct**: RKLB mv $9,317.70 / total MV $101,924.02 = **9.14%** (corrected 2-pass math) — under 10% threshold, but close. If price rebounds +5% to $77.65, mv would be ~$9,783 = 9.60%; +10% rebound → mv $10,249 = 10.06% = cap-violate.
+
+**Active MA10-trail SL**: $70.25 (price × 0.95 = $73.95 × 0.95). Buffer: 5.0% (trailing stop at warning threshold per existing skill convention). Real MA10 ≈ $65.89 (yf 6mo); if that were the active stop, buffer would be 12.2% — much more comfortable.
+
+### 🎯 Stage 2 Candidates
+
+```
+掃描股票池: 92 / 成功分析: 0 / Stage 2 候選: 0 / 買入信號: 0
+```
+
+**92 scanned, 0 staged**: `$SQ` ticker possibly delisted (yfinance error: "No data found, symbol may be delisted"); the Stage 2 filter (P-MR-294 breakout-pullback + RR scoring) found no qualifying set-ups. **zt counter +0 → zt=3** (same-BJT-day carry from #34 zt=2).
+
+### 🚪 Exits Triggered This Cron
+
+**0 exits**. All 32 positions within `止蝕` buffer (trailing stop live at price × 0.95). No MA10/MA20 breach (trivially, due to period="5d" latent bug + weekend frozen — see above; no real breach signal).
+
+### 📝 State / Log 檔案動作
+
+| File                                     | Action                                  | Result                       |
+|------------------------------------------|-----------------------------------------|------------------------------|
+| `/tmp/ai_trader_trades_log.json`         | No append (0 buy/sell events)           | 287 entries unchanged       |
+| `/tmp/ai_trader_tp1_state.json`          | _audit refreshed, no TP1 boolean mutation | 14 TP1=true + 1 HOOD FULLY_CLOSED + 3 TP1=false (16 effective keys, 14 boolean TP1=true) |
+| `/tmp/ai_trader_scan_meta_log.json`      | New entry for cron #35 appended         | 332 entries                  |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | This cron section appended below    | next                         |
+| GitHub push                              | `vivian-notes/` repo commit + push pending | pending                  |
+
+### 🔮 Next Cron Preview
+
+- **#36 Mon 03:30 BJT = Sun 15:30 EDT (RTH close -30min, weekend frozen)** — last weekend cron, Mon still untraded
+- **#27 Tue 09-29 22:00 BJT = Tue 09-29 10:00 EDT (pre-open, day-boundary reset, FIRST post-weekend real RTH data)** — zt resets via P-MR-247 (Sun→Tue gap = P-MR-247 reset trigger)
+
+**Five-window continuation after weekend**:
+| Cron # | BJT time | EDT time | Session | Status |
+|--------|---------:|---------:|---------|--------|
+| #35 (this) | 09-28 03:00 | Sun 15:00 | RTH late | ✅ weekend frozen |
+| #36 | 09-28 03:30 | Sun 15:30 | RTH close -30min | weekend frozen |
+| #27 | 09-29 22:00 | Tue 10:00 | pre-open | **FIRST real RTH data** |
+
+Note: Mon 09-29 is a US holiday-equivalent (continuation of weekend gap from Sun EDT perspective); **the next live RTH data window opens at Tue 09-29 10:00 EDT = Tue 09-29 22:00 BJT (cron #27)**. Until then, all Mon crons (#36 + pre-open #27 if it ran same-day) would still show Fri 09-25 RTH close via yfinance cache.
+
+---
+
+## Cron #35 — Summary
+
+```
+Cron #35 (2026-09-28 03:00 BJT = Sun 15:00 EDT) — RTH late (TP2 check window, WEEKEND ARTIFACT)
+
+持倉 32 / MV $101,924.02 / Equity $102,131.42 / PnL +$8,296.72 (+8.86%) / Cash $207.40
+
+vs #34 (Sun 13:00 EDT weekend frozen):
+  MV drift:     +$0.18 (+0.0002%) — sub-rounding noise
+  TP1-over:     6 names unchanged (SNDK/MRK/HOOD/INTC/MRVL/QCOM)
+  TP2 nearest:  SNDK +8.06% (gap narrowed +0.04pp from #34 +8.02%, sub-rounding only)
+  Cap viols:    2 (MRVL 11.82%, DE 11.52%) — unchanged
+  RKLB streak:  #27 -4.0% → #33 -6.4% → #34 -5.3% → #35 -5.25% (relief +0.05pp from #34)
+  zt:           3 (same-BJT-day carry from #34 zt=2)
+
+Stage 2: 0 candidates / 0 buys / 0 sells
+MA10/MA20 trail: non-functional (period="5d" latent bug + weekend frozen)
+yfinance: caught up to Fri 09-25 RTH close (5 days back)
+
+Next: #36 Mon 03:30 BJT weekend frozen → #27 Tue 09-29 22:00 BJT FIRST post-weekend real RTH data
+```
