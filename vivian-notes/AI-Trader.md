@@ -24382,3 +24382,26 @@ Next: #27 Tue 09-29 22:00 BJT FIRST post-weekend real RTH data (P-MR-247 day-bou
 | #36    | 09-29 03:30    | Mon 15:30         | RTH close -30min (trail-stop confirm) | end of 5-window    |
 
 ---
+
+
+## Cron #27 — Summary
+
+```
+Cron #27 (2026-09-28 22:00 BJT = Mon 10:00 EDT) — Next-day pre-open (FIRST post-weekend real RTH data)
+
+持倉 32 / MV $101,195.11 / Equity $101,402.51 / PnL +$7,571.44 (+8.09%) / Cash $207.40
+
+vs #36 (Sun 03:30 BJT weekend frozen at Fri 09-25 RTH close):
+  MV drift:     -$728.73 (-0.715%) — cleanest decomp to date, +$0.18 residual
+  TP1-over:     3 names (SHRUNK from 6: SNDK/MRK/HOOD; MRVL/INTC/QCOM fell below TP1 line on Mon gap-down)
+  TP2 nearest:  SNDK +11.47% (WIDENED +3.45pp from #36 +8.02%, weekend gap-down)
+  Cap viols:    2 (DE 11.57% top 1, MRVL 11.55%) — same names, DE swapped to top
+  RKLB streak:  6-window #27 -4.0% → #33 -6.4% → #34 -5.3% → #35 -5.25% → #36 -5.25% → #27 -6.8% (relief streak BROKEN, deteriorated -1.55pp from #36)
+  zt:           5 (same-BJT-day carry from #36 zt=4)
+
+Stage 2: 0 candidates / 0 buys / 0 sells
+MA10/MA20 trail: non-functional (period="5d" latent bug fires on every cron; real MA20 deviates $3.72-$47.71)
+yfinance: caught up to Mon 09-28 RTH intraday (CRM 10:00 EDT 5m bar = $226.27 ≈ scan $226.74)
+
+Next: #33 Mon 09-28 23:00 BJT (pre-market follow-through, +1h RTH, zt→6)
+```
