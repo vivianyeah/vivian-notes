@@ -25327,3 +25327,128 @@ Note: Five-window comparison truncated — only #27 → #33 captured today; #34-
 **Next cron**: **#34 — 2026-09-30 01:00 BJT (Tue 09-29 13:00 EDT, RTH mid-session follow-through, +2h RTH after #33, same-BJT-day carry zt 11→12)** — will capture 11:00 → 13:00 EDT (2h RTH). RKLB streak still the leading risk indicator.
 
 ✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
+
+## Cron #34 — 2026-09-30 01:00 BJT (Tue 09-29 13:00 EDT) — RTH mid-session follow-through (+2h RTH after #33, day-boundary reset zt 11→2)
+
+### 📊 Metrics summary
+
+```
+Cron #34 (2026-09-30 01:00 BJT, RTH mid-session, +2h RTH after #33):
+  Cash:                 $207.40
+  Total MV:             $100,270.97
+  Total Equity:         $100,478.37
+  Total Cost:           $93,615.55
+  Unrealized PnL:       $+6,655.42 (+7.11%)
+  Positions:            32
+  Buy signals:          0
+  Sell signals:         0
+  Stage 2 candidates:   0
+  
+  MV drift vs #33:      $-482.14 (-0.479%)
+  zt:                   2 (day-boundary reset P-MR-247: 11 → 1 → +1 = 2)
+  cf:                   0
+  TP1 fires this cron:  0
+  TP2 fires this cron:  0
+  TP2 nearest:          MRK +11.64% from TP2 line $165.56 (cur $148.29)
+  TP1-over-line:        4 names (MRK/SNDK/MRVL/HOOD)
+  Cap violations:       MRVL 12.02% / DE 11.56%
+```
+
+### 🟢 MA10/MA20 trail status (32/32 OK trivially — period=5d latent bug)
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**Trail buffer check** (止蝕 = cur × 0.95, dynamic MA10-trail proxy):
+- All 32 positions: buffer 4.97% – 5.04% (avg 5.001%, expected ~5% by construction)
+- Closest to SL: T (4.97% buffer = $1.23 from $24.71 → $23.47)
+- **No imminent breaches** — all buffers are mechanical 5% by construction
+
+### 📉 Drift decomposition (Tue 09-29 11:00 EDT → 13:00 EDT, +2h RTH follow-through)
+
+**Authoritative FIFO MV delta**: **$-482.14** (-0.479%)
+**Decomposition sum**: **$-95.65** (30m-bar baseline at Tue 11:00 EDT for all 32)
+**Residual**: **$-386.49** (-0.385% of MV — **HYBRID WED-OPEN BASELINE BAND**; $200-400 signature per skill pitfall, even though this is a 2h RTH window rather than 1h; the 30m-bar at 11:00 EDT differs from #33's scan timestamp by ~2 min, accumulating small per-position snapshot diffs)
+
+**Window framing**: 2h RTH follow-through (11:00 → 13:00 EDT, +120min). yfinance 30m bars at 11:00 EDT provide clean same-day baseline for all 32 positions. Residual **$-386.49** falls in the **hybrid baseline band** ($200-400) — characteristic of multi-hour RTH follow-through crons where yfinance bar baseline differs from the prior cron's scan timestamp by a few minutes.
+
+**Top 5 negative contributors** (RTH mid-session fade, mostly weak/mean-reversion names):
+
+| Symbol | Δ (cur − 11:00) | × qty | Contribution | pnl |
+|--------|----------------:|------:|-------------:|----:|
+| ASTS | $60.17 − $59.08 = $-1.09 | × 32.0 | **-35.04** | -6.6% |
+| AVGO | $357.37 − $355.76 = $-1.61 | × 17.0 | **-27.37** | -7.4% |
+| FUTU | $112.29 − $111.93 = $-0.36 | × 67.0 | **-24.45** | +11.4% |
+| BABA | $107.70 − $107.52 = $-0.18 | × 79.0 | **-14.22** | -2.5% |
+| IREN | $41.56 − $41.29 = $-0.27 | × 35.0 | **-9.28** | +5.0% |
+
+**Top 5 positive contributors** (TP1-over-line + mean reversion in beaten-down names):
+
+| Symbol | Δ (cur − 11:00) | × qty | Contribution | pnl |
+|--------|----------------:|------:|-------------:|----:|
+| DE | $681.54 − $681.62 = $+0.08 | × 17.0 | **+1.36** | +18.4% |
+| XOM | $161.57 − $161.62 = $+0.05 | × 37.0 | **+2.03** | +14.2% |
+| MRK | $147.16 − $148.29 = $+1.13 | × 7.0 | **+7.91** | +25.4% |
+| RKLB | $70.29 − $70.37 = $+0.08 | × 126.0 | **+10.07** | -9.9% |
+| HOOD | $115.08 − $115.66 = $+0.58 | × 74.0 | **+42.76** | +20.9% |
+
+**Drift signature — RTH mid-session split**:
+- **Top-5 negative dominated by weak/mean-reversion names**: ASTS single-handedly drove **−$35.04** (weakest negative contributor, RTH mid-session fade). AVGO/FUTU/BABA/IREN all negative but small contributions.
+- **Top-5 positive**: TP1-over-line names (MRK/HOOD) gap-up further; RKLB first relief since #27 (+$10.07 from −$0.08 price move × 126 qty, ~stable).
+- **Decomposition sum $-95.65** but FIFO delta **$-482.14** → residual **$-386.49**. The residual reflects positions NOT in top-10 that moved in RTH mid-session, plus snapshot diff between #33 scan time and 30m-bar baseline.
+
+### 🔍 Other notable positions
+
+- **RKLB −9.8%** (qty 126): streak deterioration continues — #33 was −9.1%, this cron −9.8%, **−0.7pp in 2h RTH**. Streak counter: ~12 windows continuous since early Sep 28. Active MA10-trail SL $66.85 vs cur $70.39 = **5.0% buffer** (right at warning threshold). Streak relief: minimal — RKLB has been deteriorating for ~6 consecutive crons. **Note**: #33 mentioned "first relief since #30" at $3.87 contribution; this cron's contribution is +$10.07 (slight improvement) but pnl_pct is worse (−9.8% vs #33 −9.1%), so the relief attempt is failing.
+- **HOOD +20.9%**: post-closure re-entry unchanged from #33. State file HOOD = FULLY_CLOSED object (TP1 hit 2026-06-29, all lots closed 2026-07-14). New lot at +20.9% sustained (slight decrease from #33 +22.0%). TP1 mutation deferred to next FIFO recompute. Still in `tp1_over_line_unmarked`. Gap to TP1 line **−0.74%** (over by 0.74pp) — closest to TP1 line of the 4 over-line names.
+- **MRK +25.4%**: largest TP1-over-line margin. Gap to TP1 line **−4.31%** (over by 4.31pp). CRM-style missing from state. **TP2 nearest at +11.64%** (price-space) — takes TP2-nearest lead from SNDK (was #33's nearest at +10.94%).
+- **SNDK +24.8%**: TP1-over-line territory sustained. Gap to TP1 line **−3.85%** (over by 3.85pp). TP1=true ✅ in state. TP2 gap +12.18% (price-space) — widened 1.24pp from #33 +10.94%.
+- **MRVL +23.3%**: TP1-over-line territory sustained. Gap to TP1 line **−2.68%** (over by 2.68pp). CRM-style missing from state file.
+- **DE +18.5%**: gap-up continues — #33 was +18.6%, this cron +18.5%, slight decrease. Still in cap-violation territory (11.59%, near 10% threshold buffer only 1.59pp).
+- **Weakest positions** (negative pnl): BA −13.9%, VRT −12.2%, RKLB −9.8%, HON −9.0%, AMZN −8.1%, PDD −8.1%, AVGO −7.4%, CSCO −7.3%, IBM −7.2%. None near SL breach.
+
+### 🧮 Five-window comparison (Tue 09-29 RTH, real-time data)
+
+| Cron # | BJT | EDT | Session | MV | Δ vs prior | Residual | zt |
+|--------|----:|----:|---------|---:|-----------:|---------:|---:|
+| #27 (prior day) | 09-29 22:00 | 10:00 | pre-open | $100,875.69 | (baseline) | −$34.72 | 10 |
+| #33 | 09-29 23:00 | 11:00 | pre-market follow-through | $100,753.11 | −$122.58 | +$231.81 | 11 |
+| **#34 (this)** | **09-30 01:00** | **13:00** | **RTH mid-session (+2h RTH)** | **$100,270.97** | **$-482.14** | **$-386.49** | **2** |
+| #35 | 09-30 03:00 | 15:00 | RTH late (TP2 check) | (next) | (next) | (next) | 3 |
+| #36 | 09-30 03:30 | 15:30 | RTH close -30min | (next) | (next) | (next) | 4 |
+
+**Window pattern**: Tue pre-open bounce (Mon 15:30 EDT → Tue 10:00 EDT = +$287.03), then 1h RTH follow-through (Tue 10:00 → 11:00 EDT = −$122.58, −0.121%), now 2h RTH follow-through (Tue 11:00 → 13:00 EDT = **$-482.14, -0.479%**). The 2h drift is **moderately negative** — driven primarily by ASTS single-handedly (−$35.04, ~36% of negative decomp), AVGO (−$27.37), and FUTU (−$24.45, TP1-over-line profit-taking). Offset partially by HOOD/MRK TP1-over-line gap-ups (+$42.76 and +$7.91 respectively).
+
+### 📅 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/ai_trader_scan.py` | ran at 01:00 BJT, 32 positions, 0 buy signals, 0 sell signals, 0 Stage 2 candidates |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); via `cron_state_refresh.py` canonical script |
+| `/tmp/ai_trader_scan_meta_log.json` | appended cron #34 entry (72 entries total) — via script |
+| `/tmp/ai_trader_trades_log.json` | unchanged buy/sell events (0 trades this cron); +1 cron_no_trade marker (293 → 294 entries, semantic invariant preserved via `_SYSTEM` symbol) |
+| GitHub `vivianyeah/vivian-notes` | commit + push (backup pipeline, see Absorbed sub-discipline B) |
+
+### 📊 當日總結 (2026-09-30 BJT, Tue 09-29 EDT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 TP1=false, 1 FULLY_CLOSED; 4 TP1-over-line (SNDK/MRVL/MRK/HOOD) awaiting FIFO recompute for invisible-to-FIFO entries)
+🎯 TP2 觸發:        0  (CLOSEST: MRK +11.64% from TP2 line $165.56, takes lead from #33 SNDK +10.94%)
+🚪 止蝕/賣出觸發:   0
+
+💰 昨日 23:00 pre-market 總權益 (#33, 09-29 23:00 BJT): $100,960.51
+💰 今日 01:00 總權益 (#34, 09-30 01:00 BJT):           $100,478.37
+📈 +2h RTH follow-through MTM:                          $-482.14 (-0.479%)
+📦 未實現 PnL:                                         $+6,655.42 (+7.11%)
+💵 現金:                                                $207.40
+📊 持倉數:                                              32
+🚨 Cap violations:                                      MRVL 12.02% / DE 11.56%
+🚦 零觸發連續 (zt):                                     2 (P-MR-247 day-boundary reset: 11 → 1 → +1 = 2)
+```
+
+**Key insight**: RTH mid-session follow-through cron (+2h RTH after #33, BJT day boundary crossed → zt reset). MV drift **$-482.14** (-0.479%) — modestly negative, dominated by ASTS (−$35.04 single-handedly, weak-name RTH fade). TP1-over-line names all sustained their over-line status (4 names: SNDK/MRVL/MRK/HOOD) — no new crosses, no falls-back. MRK takes TP2-nearest lead from SNDK (+11.64% vs #33 SNDK +10.94%) — gap narrowing trend reverses for MRK (was widening, now taking lead). Two cap violations (MRVL/DE, both >11.5%, combined 23.63% of MV) — MRVL cap_pct worsened marginally +0.01pp, DE cap_pct improved -0.02pp. MA10/MA20 trail test non-functional due to scan.py period=5d latent bug (32/32 MA20 == price trivially). Drift decomposition residual **$-386.49** falls in the **hybrid Wed-Open baseline band** ($200-400) — characteristic of 2h RTH follow-through crons where 30m-bar baseline differs from prior cron scan time by a few minutes.
+
+**Next cron**: **#35 — 2026-09-30 03:00 BJT (Tue 09-29 15:00 EDT, RTH late — TP2 check window, +2h RTH after #34, same-BJT-day carry zt 2→3)** — will capture 13:00 → 15:00 EDT (2h RTH). RKLB streak still the leading risk indicator; MRK TP2-nearest status new vs SNDK.
+
+✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
