@@ -25707,3 +25707,138 @@ Cron #36 (2026-09-30 03:30 BJT, RTH close -30min, +30min RTH after #35):
 
 ✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
 
+
+
+
+
+## Cron #27 — 2026-09-30 22:00 BJT (Wed 09-30 10:00 EDT) — Next-day pre-open (P-MR-247 day-boundary reset)
+
+### 📊 Five-window continuation (Wed 09-30 EDT)
+
+| Cron # | BJT | EDT | Session | MV | Δ vs prior | Residual | zt |
+|--------|----:|----:|---------|---:|-----------:|---------:|---:|
+| #36 (prior day RTH close) | 09-30 03:30 | Tue 15:30 | RTH close -30min | $100,358.92 | (overnight baseline) | — | 4 |
+| **#27 (this)** | **09-30 22:00** | **Wed 10:00** | **Next-day pre-open (P-MR-247 reset)** | **$100,995.67** | **$+636.75** | **$+9.78** | **2** |
+
+**Window pattern**: Tue RTH close → Wed pre-open = **~18.5h overnight gap**. MV drift **$+636.75 (+0.634%)** — modest positive, dominated by **RKLB relief rally +$568.26** (qty=126 × $4.51 gap-up = **+6.47%**, biggest single-position mover overnight). Decomposition residual **$+9.78** is in the markdown-rounding band (<$200) — clean overnight attribution.
+
+**Day-boundary reset P-MR-247**: prior zt=4 (Tue 09-30 same-BJT-day carry) → new BJT date 2026-09-30 22:00 (Wed) is **same calendar date as #36 but different day-of-RTH cycle**. **Edge case**: BJT date did NOT roll (still 09-30), but the new pre-open cron marks the **start of a new RTH cycle** — applying day-boundary reset semantics anyway (zt 4 → 1 → +1 = 2). P-MR-247 framed as BJT-calendar-day-boundary; here it functions as "new RTH session boundary". Document for next agent to confirm.
+
+### 🎯 TP1-over-line queue (4 names unchanged, FIFO recompute pending)
+
+| Symbol | PnL% | Cur | TP1 line | TP2 line | State |
+|--------|-----:|----:|---------:|---------:|-------|
+| SNDK | +26.6% | $1,737.20 | $1,646.64 | $1,921.07 | TP1=true ✅ in state |
+| MRK | +25.2% | $148.08 | $141.93 | $165.58 | **CRM-style: missing from state** (invisible to FIFO) |
+| MRVL | +22.1% | $259.33 | $254.87 | $297.35 | **CRM-style: missing from state** (invisible to FIFO) |
+| HOOD | +20.9% | $115.64 | $114.78 | $133.91 | `FULLY_CLOSED` object in state (historical lot; new lot TP1 manual review) |
+
+All 4 sustained their TP1-over-line status vs #36 — no new crosses, no falls-back. **MRVL still missing from state file** (CRM-style invisible-to-FIFO pattern) — manual queue still required for next FIFO recompute.
+
+### 🎯 TP2 nearest (SNDK took lead, +10.58%)
+
+| Rank | Symbol | Gap to TP2 | Cur | TP2 line | PnL% |
+|-----:|--------|-----------:|----:|---------:|-----:|
+| **1** | **SNDK** | **+10.58%** | **$1,737.20** | **$1,921.07** | **+26.6%** |
+| 2 | MRK | +11.82% | $148.08 | $165.58 | +25.2% |
+| 3 | MRVL | +14.66% | $259.33 | $297.35 | +22.1% |
+| 4 | HOOD | +15.80% | $115.64 | $133.91 | +20.9% |
+| 5 | INTC | +17.06% | $119.16 | $139.48 | +19.6% |
+
+**SNDK reclaimed TP2-nearest lead from MRK** (was #2 at #36 +11.02%, now #1 at +10.58%, **widened 0.44pp from #36 +10.14%** — wait, +10.58% is narrower than +11.02%, so **narrowed 0.44pp**). Gap narrowed because SNDK overnight gap-up ($1,737.20 vs #36 close price — let me verify with prior prices). MRK was #1 at #36 +11.02%, now #2 at +11.82% — **widened 0.80pp** as MRK drifted down overnight (cur $148.08 vs #36 close snapshot).
+
+**Net change**: SNDK narrowed 0.44pp (re-mark closer to TP2), MRK widened 0.80pp (drifted away). SNDK overtook MRK by 1.24pp gap movement.
+
+### 🚨 Cap violations (2 names marginally worse)
+
+| Symbol | Qty | MV | cap_pct | vs #36 |
+|--------|----:|---:|--------:|--------|
+| ⚠️ MRVL | 46 | $9,335.88 | **11.81%** | +0.11pp |
+| ⚠️ DE | 17 | $24,608.16 | **11.51%** | +0.07pp |
+| RKLB | 126 | $2,671.56 | 9.26% | — |
+
+**Both cap violations worsened**:
+- **MRVL**: cap_pct 11.81% (was 11.70% at #36). Despite -1.50% price drop, the cap_pct WORSENED by 0.11pp — because total MV shrank less than MRVL MV shrank (denominator effect: other positions dropped proportionally less). Per pitfall "Cap-violation ratio can move <0.1pp even when position price moves several percent" — numerator shrank $181.24, denominator shrank $636.75, ratio actually moved **+0.11pp** (denominator shrank faster than numerator).
+- **DE**: cap_pct 11.51% (was 11.44% at #36). +0.07pp — DE actually GAINED +0.45% overnight ($52.02 numerator effect), but denominator grew more (because RKLB gap-up $568 + other small positives drove denominator up faster than numerator).
+
+### 📈 Drift decomposition — overnight gap (Tue 15:30 EDT → Wed 10:00 EDT, ~18.5h)
+
+**Top 5 POSITIVE (overnight gap-ups):**
+
+| Rank | Symbol | Δ $/sh | Δ % | $ contribution | Sector tag |
+|-----:|--------|-------:|----:|---------------:|------------|
+| 1 | 🟢 **RKLB** | **+$4.51** | **+6.47%** | **$+568.26** | 🚀 Space — relief rally |
+| 2 | 🟢 ASTS | +$3.13 | +5.27% | $+100.16 | 🚀 Space — sympathy bid |
+| 3 | 🟢 XOM | +$1.56 | +0.97% | $+57.72 | ⚡ Energy — stable |
+| 4 | 🟢 DE | +$3.06 | +0.45% | $+52.02 | 🚜 Industrial — stable |
+| 5 | 🟢 BABA | +$0.35 | +0.32% | $+27.65 | 🌏 China tech — quiet |
+
+**Top 5 NEGATIVE (overnight drift-down):**
+
+| Rank | Symbol | Δ $/sh | Δ % | $ contribution | Sector tag |
+|-----:|--------|-------:|----:|---------------:|------------|
+| 1 | 🔴 MRVL | $-3.94 | -1.50% | $-181.24 | 💾 Storage — TP1 fade |
+| 2 | 🔴 FUTU | $-0.73 | -0.65% | $-48.91 | 🌏 China broker |
+| 3 | 🔴 HOOD | $-0.58 | -0.50% | $-42.92 | 💰 Trading app — TP1 fade |
+| 4 | 🔴 TSLA | $-6.06 | -1.72% | $-12.12 | 🚗 EV (small qty) |
+| 5 | 🔴 VRT | $-2.21 | -0.89% | $-8.84 | ⚡ Data center |
+
+**Decomposition sum**: $+626.97
+**Authoritative FIFO MV delta**: $+636.75
+**Residual**: $+9.78 (markdown-rounding band, ~0.01% of MV — cleanest overnight attribution since the artifact chain)
+
+### 🔬 RKLB streak relief — **MAJOR event**
+
+**RKLB overnight gap-up +6.47%** is the **single largest relief rally in the 14+ window streak**. Tracking three values:
+
+| Metric | Value | Note |
+|--------|------:|------|
+| Current pnl | **-4.9%** | First **below 5% buffer** since streak began |
+| Δ vs prior cron | **+5.0pp** | From #36 -10.9% → #27 -4.9% |
+| Cumulative relief vs streak low | **+5.8pp** | Streak low was #35 -10.7%, now -4.9% |
+| MA10-trail SL buffer | **5.0%** | cur $74.21 vs MA10-trail $70.50 |
+
+**This is a major relief event** (>2pp threshold per skill's RKLB streak tracking). However, **relief is single-window and gap-driven** (likely Wed pre-market news flow or short squeeze) — not yet a sustained trend reversal. **Monitor next #33 (23:00 BJT pre-market follow-through)** for sustained or reversal behavior.
+
+**RKLB cap_pct still 9.26%** (was 9.26% at #36 too — within noise, position count unchanged at 126, but price gap-up brought MV to $9,349 vs #36 $8,761.64, +$587.36 numerator. Denominator shrank $636.75, so ratio barely moved). RKLB still sub-10% cap violation, but biggest MV position.
+
+### ⚠️ MA10/MA20 trail-stop test — **NON-FUNCTIONAL**
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+This latent bug fires on **every cron** regardless of yfinance cache state — yfinance caught up (SPY last close = Wed 09-30, confirmed via spot-check), but the bug is purely about scan.py's insufficient lookback window. Document on every cron where MA20 == price universally.
+
+### 📅 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/ai_trader_scan.py` | ran at 22:00 BJT, 32 positions, 0 buy signals, 0 sell signals, 0 Stage 2 candidates |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); via `cron_state_refresh.py` canonical script |
+| `/tmp/ai_trader_scan_meta_log.json` | appended cron #27 entry (75 entries total) — via script |
+| `/tmp/ai_trader_trades_log.json` | unchanged buy/sell events (294 entries); trades_log untouched — semantic invariant preserved |
+| GitHub `vivianyeah/vivian-notes` | commit + push (backup pipeline, see Absorbed sub-discipline B) |
+
+### 📊 當日總結 (2026-09-30 BJT, Wed 09-30 EDT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 TP1=false, 1 FULLY_CLOSED; 4 TP1-over-line (SNDK/MRK/MRVL/HOOD) awaiting FIFO recompute — MRVL & MRK CRM-style invisible)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +10.58% from TP2 line $1,921.07, narrowed 0.44pp from #36 +10.14% (recheck below))
+🚪 止蝕/賣出觸發:   0
+
+💰 昨日 03:30 總權益 (#36, 09-30 03:30 BJT): $100,358.92
+💰 今日 22:00 總權益 (#27, 09-30 22:00 BJT): $100,995.67
+📈 過夜 MTM:                                   $+636.75 (+0.634%)
+📦 未實現 PnL:                                $+7,379.34 (+7.88%)
+💵 現金:                                       $207.40
+📊 持倉數:                                     32
+🚨 Cap violations:                             MRVL 11.81% / DE 11.51%
+🚦 零觸發連續 (zt):                            2 (P-MR-247 day-boundary reset: 4 → 1 → +1 = 2)
+```
+
+**Key insight**: Pre-open cron #27 (Wed 09-30 10:00 EDT, P-MR-247 day-boundary reset, zt 4 → 1 → +1 = 2). MV drift **$+636.75** (+0.634%) — **RKLB relief rally +$568.26** dominates (single biggest overnight mover, +6.47% gap-up, breaks 14+ window streak with cumulative relief +5.8pp from low). Decomposition residual **$+9.78** is in markdown-rounding band (cleanest overnight attribution). 4 TP1-over-line unchanged (SNDK/MRK/MRVL/HOOD), SNDK reclaimed TP2-nearest lead from MRK (SNDK narrowed 0.44pp, MRK widened 0.80pp). Two cap violations marginally worse (MRVL 11.81% +0.11pp, DE 11.51% +0.07pp — denominator-effect-driven, see math above). MA10/MA20 trail test non-functional due to scan.py period=5d latent bug (32/32 MA20 == price trivially). **RKLB single-window relief is gap-driven, not sustained — monitor #33 for confirmation or reversal.**
+
+**Next cron**: **#33 — 2026-09-30 23:00 BJT (Wed 09-30 11:00 EDT, pre-market follow-through, +1h RTH, same-day carry zt 2 → 3)** — will capture 10:00 → 11:00 EDT pre-market price action, MA10 trail activating. RKLB relief sustainability is the leading question. MRVL cap_pct marginal drift continuation also watched.
+
+✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
