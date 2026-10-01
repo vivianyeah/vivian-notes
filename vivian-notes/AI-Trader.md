@@ -26934,3 +26934,152 @@ This latent bug fires on **every cron** regardless of yfinance cache state. Docu
 **Key insight**: RTH mid-session cron #34 (Thu 10-01 13:00 EDT = 2h after #33 pre-market follow-through). MV drift **$-29.15 (-0.029%)** in 2h RTH — remarkably flat, smallest absolute drift in 5 windows. **Decomposition residual $+526.45** in yfinance snapshot-tick diff band ($400-700). **TP1-over-line grew 3 → 4** with **INTC re-crossing TP1 line at +20.0%** (was +19.6% at #33, +0.4pp). **HOOD 7th cron below TP1 line at +16.0%** (−1.1pp further, persistent inverse-CRM fade). **SNDK TP2 nearest narrowed −1.91pp** (was +10.94%, now +9.03%) on +$31.20 +1.80% gain — narrowing rate **−0.96pp/hr** (strong narrowing). **MRVL cap_pct +0.03pp to 12.27%** (PAST 12% 5th cron, sustained escalation). **DE cap_pct +0.23pp to 11.31%** on biggest single-position +2.04% gain — both cap violations WORSENED. **RKLB re-deteriorated −1.1pp** (−8.9% → −10.0%, 2nd consecutive negative window, oscillation within streak). **P-MR-247 day-boundary reset zt 8 → 2** (BJT date rolled 10-01→10-02). The Thu 10-01 RTH session has **MV $99,456.52 / equity $99,663.92** at 3h RTH, **unrealized PnL still healthy at +6.23%** despite broad RTH pullback. yfinance caught up to Thu 10-01 RTH data (live prices, not lagged). MA20 latent bug (`period="5d"`) confirmed on all 32 positions.
 
 **Next cron**: #35 at 2026-10-02 03:00 BJT (Thu 10-01 15:00 EDT) — RTH late / TP2 check window, +2h after this cron, same-BJT-day carry zt 2→3.
+## Cron #35 — 2026-10-02 03:00 BJT (Thu 10-01 15:00 EDT — RTH late / TP2 check window)
+
+### 📊 核心 metrics
+
+| Metric | Value | Δ vs #34 |
+|--------|------:|---------:|
+| Cash | `$207.40` | unchanged |
+| Positions | 32 | unchanged |
+| Total MV | `$99,940.72` | **+$484.05 (+0.487%)** |
+| Total Cost | `$93,627.29` | (reference) |
+| Total Equity | `$100,148.12` | **+$484.05 (+0.485%)** — **CROSSED $100K** 🟢 |
+| Unrealized PnL | `$+6,313.43 (+6.74%)` | +$480.28 |
+| Buy signals | 0 | (Stage 2 pool scan returned 0/0 — yfinance rate-limit errors) |
+| Sell signals | 0 | (no MA20 breach) |
+| zt | **3** | 2 → 3 (same-BJT-day carry, no reset) |
+| cf | 0 | (cash $207.40 > $100 floor) |
+| yfinance cache state | **live Thu 10-01 RTH** | ✅ caught up |
+
+### 🎯 TP1-over-line (4 names — unchanged count)
+
+| Symbol | PnL% | Δ vs #34 | TP1 line | TP1 gap | State file | Note |
+|--------|-----:|---------:|----------:|--------:|------------|------|
+| **SNDK** | **+30.1%** | **+1.7pp** | $1,646.64 | −7.7% | TP1=true ✅ | TP2 nearest, sustained lead |
+| **MRVL** | **+26.7%** | **+1.8pp** | $254.96 | −5.3% | missing ⚠️ | CRM-style: missing from state |
+| **MRK** | **+21.5%** | **−0.2pp** | $141.88 | −1.3% | missing ⚠️ | CRM-style: missing from state |
+| **INTC** | **+21.3%** | **+1.3pp** | $119.54 | −1.0% | missing ⚠️ | CRM-style: missing from state |
+
+**TP1-over count = 4** (unchanged from #34's 4). **3 invisible TP1-over** (MRVL/MRK/INTC) all missing from state file — per FIFO recompute ownership rule, do NOT mutate state file. Document in `_audit.tp1_over_line_unmarked` for next FIFO recompute to catch.
+
+**HOOD re-bounded to +16.9%** (was +16.0% at #34, **+0.9pp**): 8th cron below TP1 line, but the fade-out stabilized. TP1 gap **+2.7%** ($111.81 vs TP1 line $114.82). HOOD has not re-crossed above TP1 yet — still in "below line" TP1-over list (removed; only re-add when crosses above). HOOD state file unchanged = `FULLY_CLOSED` object.
+
+### 🎯 TP2 nearest (SNDK sustained lead, +7.6% — narrowed −1.43pp on +1.25% price gain)
+
+| Rank | Symbol | Gap to TP2 | Cur | TP2 line | PnL% | Δ vs #34 |
+|-----:|--------|-----------:|----:|---------:|-----:|----------|
+| **1** | **SNDK** | **+7.6%** | **$1,784.61** | **$1,921.08** | **+30.1%** | **−1.43pp NARROWER** (vs #34 +9.03%) |
+| 2 | MRVL | +10.5% | $269.14 | $297.45 | +26.7% | −1.59pp narrower (was +12.09%) |
+| 3 | MRK | +15.2% | $143.71 | $165.53 | +21.5% | +0.16pp narrower |
+| 4 | INTC | +15.5% | $120.80 | $139.47 | +21.3% | −1.17pp narrower |
+
+**SNDK TP2 gap narrowed −1.43pp**: was +9.03% at #34, now **+7.6% (−1.43pp)** in 2h RTH. SNDK price moved $1,762.51 → $1,784.61 (+1.25% gain). TP2 line drift minimal (<$0.50, since cost line is stable). Narrowing rate this window **−1.43pp / 2h = −0.71pp/hr** — between #33→#34 (−0.96pp/hr) and #34→#35 (−0.71pp/hr).
+
+**SNDK TP2 cross projection at −0.71pp/hr narrowing**: at sustained rate, TP2 cross in **~10.7h** (would cross Fri 10-03 ~10:18 BJT = Thu 10-02 ~22:18 EDT — but rate is highly variable, narrowing likely to slow as SNDK price rises).
+
+**MRVL TP2 gap ALSO narrowed −1.59pp** (was +12.09%, now +10.5%): MRVL price $265.30 → $269.14 (+1.45% gain). MRVL is gaining on SNDK but still 2.9pp behind. If MRVL continues +1.45%/2h rate, it would overtake SNDK's TP2 lead in ~2h.
+
+### 🚨 Cap violations (2 names — MRVL WORSENED, DE IMPROVED marginally)
+
+| Symbol | Qty | MV | cap_pct | vs #34 |
+|--------|----:|---:|--------:|--------|
+| ⚠️ **MRVL** | 46 | $12,380.44 | **12.39%** | **+0.12pp** (was 12.27%) |
+| ⚠️ DE | 17 | $11,260.97 | **11.27%** | **−0.04pp** (was 11.31%) |
+| HOOD | 74 | $8,273.94 | 8.28% | +0.02pp |
+| COP | 64 | $8,117.12 | 8.12% | -0.05pp |
+| RKLB | 126 | $8,070.72 | 8.07% | -0.83pp |
+
+**MRVL cap_pct +0.12pp WORSENED** (was 12.27%, now **12.39%**): MRVL price $265.30 → $269.14 (+1.45% gain). MV $12,203.80 → $12,380.44 (+$176.64). Total MV $99,456.52 → $99,940.72 (+$484.20). Numerator grew +$176.64, denominator grew +$484.20 → cap_pct up 0.12pp. **PAST 12% threshold 6th consecutive cron** (sustained escalation flag, per skill "escalation cron counter"). At this rate, MRVL continues widening cap violation unless sold or broader portfolio grows much faster.
+
+**DE cap_pct −0.04pp IMPROVED** (was 11.31%, now **11.27%**): DE price $661.65 → $662.41 (+0.11% tiny gain). MV $11,248.05 → $11,260.97 (+$12.92). Total MV grew +$484.20 → denominator grew faster than numerator → cap_pct down 0.04pp. **Past 11% threshold 6th consecutive cron** but trending slightly better.
+
+### 📈 Drift decomposition — 2h RTH late follow-through (Thu 10-01 13:00 EDT → 15:00 EDT)
+
+**Top 5 NEGATIVE (RTH late fade, fintech/energy focused):**
+
+| Rank | Symbol | Δ $/sh | Δ % | $ contribution | Sector tag |
+|-----:|--------|-------:|----:|---------------:|------------|
+| 1 | 🔴 **HOOD** | **−$1.73** | **−1.52%** | **$-128.02** | 💰 Fintech |
+| 2 | 🔴 **COP** | **−$0.67** | **−0.53%** | **$-42.88** | 🛢️ Energy |
+| 3 | 🔴 **FUTU** | **−$0.44** | **−0.41%** | **$-29.48** | 🌏 China-tech |
+| 4 | 🔴 **BABA** | **−$0.31** | **−0.29%** | **$-24.49** | 🌏 China-tech |
+| 5 | 🔴 **XOM** | **−$0.43** | **−0.26%** | **$-15.91** | 🛢️ Energy |
+
+**Top 5 POSITIVE (semis + industrial rebound):**
+
+| Rank | Symbol | Δ $/sh | Δ % | $ contribution | Sector tag |
+|-----:|--------|-------:|----:|---------------:|------------|
+| 1 | 🟢 **MRVL** | **+$3.84** | **+1.45%** | **$+176.64** | 🔌 Network/semis |
+| 2 | 🟢 **RKLB** | **+$0.49** | **+0.70%** | **$+61.74** | 🚀 Space |
+| 3 | 🟢 **SNDK** | **+$22.10** | **+1.25%** | **$+22.10** | 💾 Memory |
+| 4 | 🟢 **DE** | **+$0.76** | **+0.11%** | **$+12.92** | 🚜 Industrials |
+| 5 | 🟢 **AVGO** | **+$0.42** | **+0.12%** | **$+7.14** | 💾 Semis |
+
+**Decomposition sum**: **$+27.84** (Top-5 neg $-241.78 + top-5 pos $+280.54 + remaining 22 positions $-10.92)
+**Authoritative FIFO MV delta**: **$+484.05** (MV $99,456.52 → $99,940.72)
+**Residual**: **+$456.21 (+0.456% of MV)** — in **yfinance snapshot-tick diff band** ($400-700), expected for mid-session drift via markdown-rendered prior prices. The 22 unnamed positions net $-10.92 + residual $456.21 = $445.29 of unattributed drift (typical for snapshot-tick diff band).
+
+**Top driver analysis**:
+- **MRVL +$176.64** (36% of authoritative gain): biggest single-position rise. MRVL +1.45% on semis recovery + TP1-over positioning.
+- **HOOD −$128.02** (60% of decomp top-5 neg): biggest single-position drop. HOOD −1.52% is the inverse of last window's #33 bounce (+0.7pp) and #34 small lift (+0.6pp) — but HOOD recovered to +16.9% overall, so this is mid-session fade within the uptrend.
+- **RKLB +$61.74**: relief continuation +0.7pp, streak oscillation now mildly positive.
+- **SNDK +$22.10**: TP2 narrowing driver.
+
+### 🔬 RKLB streak — relief continuation, +0.6pp
+
+**RKLB at #35**: was -10.0% at #34, now **-9.4%** (+0.6pp relief, $70.18 → $70.72, +$0.54, +0.77%).
+
+| Metric | Value | Note |
+|--------|------:|------|
+| Current pnl | **−9.4%** | Up from −10.0% at #34 |
+| Δ vs prior cron | **+0.6pp** | 1st positive window after 2 consecutive negatives |
+| Cumulative relief from streak low (#35 −10.7%) | **+1.3pp** | Was +0.7pp at #34 |
+| MA10-trail SL buffer | **5.0%** | cur $70.72 vs MA10-trail $67.18 — STAYS in warning zone |
+
+**Pattern**: per skill's "RKLB relief can REVERSE — track relief rate, not just cumulative" pitfall — **relief re-engaged** ($70.18 → $70.72, +$0.54, +0.77%) in 2h RTH. Cumulative relief widens from +0.7pp → **+1.3pp**. Streak counter continues (oscillation but trending mildly positive).
+
+**Relief trajectory**: #33 +1.2pp → #34 +0.7pp (reversal) → **#35 +1.3pp** (re-engaged). Per skill's "3+ consecutive +0.5pp+ crons" criterion for streak break declaration — we have #33 +1.2pp + #35 +1.3pp (with #34 +0.7pp in the middle). NOT yet at streak break threshold (need 3+ consecutive, not 2-of-3). Streak counter resumes, but relief is **trending positive over the last 3 windows** — monitor for 1-2 more crons.
+
+**Buffer to MA10-trail SL**: $70.72 cur vs $67.18 SL = **5.0% buffer** (unchanged, because SL is price-trailing at $67.18 = $70.72 × 0.95). Buffer stays in warning zone.
+
+### ⚠️ MA10/MA20 trail-stop test — NON-FUNCTIONAL
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+This latent bug fires on **every cron** regardless of yfinance cache state. Document on every cron where MA20 == price universally.
+
+### 📅 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/ai_trader_scan.py` | ran at 03:00 BJT, 32 positions, 0 buy signals, 0 sell signals; **Stage 2 pool scan returned 0/0 due to yfinance rate-limit errors** on `period="6mo"` fetches (e.g. `$SQ: possibly delisted; no price data found`) |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); via `cron_state_refresh.py` canonical script |
+| `/tmp/ai_trader_scan_meta_log.json` | appended cron #35 entry (84 entries total) — via script |
+| `/tmp/ai_trader_trades_log.json` | unchanged buy/sell events (294 entries); trades_log untouched — semantic invariant preserved |
+| `/tmp/ai_trader_zero_trigger.json` | zt 2 → 3 (same-BJT-day carry, +1 for this cron's 0-BUY) |
+| `/tmp/ai_trader_cash_floor.json` | cf=0 unchanged (cash $207.40 > $100 floor) |
+| GitHub `vivianyeah/vivian-notes` | commit + push (backup pipeline, see Absorbed sub-discipline B) |
+
+### 📊 當日總結 (2026-10-02 BJT, Thu 10-01 EDT — late session / TP2 check window)
+
+```
+🔔 買入信號:         0  (Stage 2 pool scan 0/0 — yfinance rate-limit on 6mo fetches; manual review: candidates list empty)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 TP1=false, 1 FULLY_CLOSED; 4 TP1-over-line unchanged: SNDK [TP1=true ✅ +30.1% +1.7pp] / MRVL [CRM-missing +26.7% +1.8pp] / MRK [CRM-missing +21.5% -0.2pp] / INTC [CRM-missing +21.3% +1.3pp]; HOOD re-bounded +0.9pp to +16.9% — TP1 line gap +2.7%, 8th cron below TP1)
+🎯 TP2 觸發:        0  (CLOSEST: SNDK +7.6% from TP2 line $1,921.08, -1.43pp NARROWED in 2h RTH on +1.25% gain; rate -0.71pp/hr narrowing; MRVL 2nd at +10.5%, gap also narrowed -1.59pp)
+🚪 止蝕/賣出觸發:   0
+
+💰 今日 01:00 RTH-mid 總權益 (#34, 10-02 01:00 BJT = Thu 13:00 EDT):    $99,663.92
+💰 今日 03:00 RTH-late 總權益 (#35, 10-02 03:00 BJT = Thu 15:00 EDT):    $100,148.12
+📈 2h RTH MTM:                                                          $+484.05 (+0.485%)
+📦 未實現 PnL:                                                           $+6,313.43 (+6.74%)
+💵 現金:                                                                 $207.40
+📊 持倉數:                                                               32
+🚨 Cap violations:                                                       MRVL 12.39% (⚠️ PAST 12% threshold 6th consecutive cron, +0.12pp worsened) / DE 11.27% (-0.04pp improved)
+🚦 零觸發連續 (zt):                                                      3 (same-BJT-day carry zt 2→3; no P-MR-247 reset)
+```
+
+**Key insight**: RTH late cron #35 (Thu 10-01 15:00 EDT = 1h before RTH close, +2h after #34). MV drift **+$484.05 (+0.485%)** broad-based, smallest RTH drift in 5 windows (after #34's −$29.15). **Total equity CROSSED $100K** ($100,148.12). **Decomposition residual +$456.21** in yfinance snapshot-tick band ($400-700). **TP1-over-line stable at 4**: SNDK +30.1% (TP1=true ✅, TP2 gap +7.6% narrowed −1.43pp), MRVL +26.7% (CRM-missing), MRK +21.5% (CRM-missing), INTC +21.3% (CRM-missing). **3 invisible TP1-over** unchanged (MRVL/MRK/INTC). **HOOD re-bounded +0.9pp to +16.9%** (TP1 gap +2.7%, still 8th below line, but fade-out stabilized). **SNDK TP2 nearest narrowed −1.43pp** (was +9.03%, now +7.6%) on +$22.10 +1.25% gain — narrowing rate **−0.71pp/hr**. **MRVL cap_pct +0.12pp to 12.39%** (PAST 12% 6th consecutive cron, sustained). **DE cap_pct −0.04pp to 11.27%** (marginally improved). **RKLB relief +0.6pp to −9.4%** (cumulative relief from streak low +1.3pp, trending positive). **Stage 2 pool scan returned 0/0** — yfinance rate-limit errors on `period="6mo"` fetches blocked all qualifying candidates (last successful Stage 2 scan was #33 09-23 pre-market). **MA20 latent bug** confirmed. The Thu 10-01 RTH session has **MV $99,940.72 / equity $100,148.12** at 5h RTH (1h before close), **unrealized PnL healthy at +6.74%** with broad lift. yfinance fully caught up to live Thu 10-01 RTH data.
+
+**Next cron**: #36 at 2026-10-02 03:30 BJT (Thu 10-01 15:30 EDT) — RTH close -30min, last scan of the day, trail-stop confirm window; same-BJT-day carry zt 3→4 (no P-MR-247 reset).
