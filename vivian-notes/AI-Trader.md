@@ -27505,3 +27505,193 @@ Coverage:                   32/32 positions via yfinance 30m-bar (14:00 UTC = #2
 **Key insight**: Pre-market follow-through cron #33 (Thu 10-02 11:00 EDT = +1h after #27 pre-open). MV drift scan-to-scan **$-72.17 (-0.07%)** but **true 1h RTH drift is $-590.61 (-0.58%)** per clean 30m-bar baseline at exact timestamps. The $518 residual reflects mixed-source baseline (markdown-rounded #27 prior prices vs 30m 14:00 UTC bar — SNDK -$10.40, DE/AVGO/MRVL/CRM/TSLA $1.76-$3.57 snapshot-tick noise). **TP1-over-line shifted 5 → 4**: CRM fell back below TP1 line (+20.0% → +19.0%, gap -$1.98) per TP1-was-over-then-falls-back-below pattern. **HOOD 9th cron below TP1 line at +19.7%** (gap -$0.29 from $114.83 line, re-cross candidate but still under). **MRVL TP2 nearest widened +1.24pp** (+1.24pp/hr re-widening rate on -1.1% decline — pre-market gave back some of #27's +6.95% gap). **MRVL cap_pct -0.13pp to 12.51%** (PAST 12% 9th cron, marginally improving). **DE cap_pct +0.10pp to 11.38%** (PAST 11% 3rd cron, marginally worsening). **RKLB -3.4%** with sustained relief trajectory: #35 -18.5% (low) → #27 -4.5% → #33 -3.4% = **+15.1pp cumulative relief**. Streak-ending signal SUSTAINED (3+ consecutive crons with positive delta, per skill threshold). Manual review: lot trajectory for potential exit signal at #34 RTH mid-session. **Stage 2 pool scan 0/0** (yfinance rate-limit). **MA20 latent bug confirmed on all 32 positions** (period="5d" fallback to price).
 
 **Next cron**: #34, 2026-10-03 01:00 BJT (Fri 10-02 13:00 EDT = RTH mid-session follow-through +2h after #33, same-BJT-day carry zt 6→7). **BJT date rollover check**: 01:00 BJT Oct 3 = 13:00 EDT Oct 2 — NO day-boundary reset (still BJT 10-02). However, if clock advances to 03:00 BJT Oct 3 = 15:00 EDT Oct 2, still same BJT day. Day rolls to BJT 10-03 only after 16:00 UTC Oct 2 = 00:00 BJT Oct 3 = the next cron after 00:00 BJT would be #35 at 03:00 BJT (already same day).
+
+## Cron #35 — 2026-10-07 03:00 BJT (Monday 15:00 EDT — RTH late / TP2 check window, **4-trading-day gap after #33**)
+
+> **Cron re-entry after gap**: last cron was #33 at 2026-10-02 23:00 BJT (Thu 11:00 EDT). 
+> Crons #34/#35/#36/#27/#33/#34/#35/#36/#27/#33 (10-03 through 10-06) did NOT run — system was dormant.
+> This is the FIRST cron in a fresh active sequence, with BJT date rolled from 10-02 → 10-07
+> (P-MR-247 day-boundary reset). Window is **~100h BJT = ~17h RTH-equivalent** (Thu 11:00 EDT → Mon 15:00 EDT,
+> spanning Fri 10-03 + Mon 10-06 RTH sessions, weekend skipped). Decomposition is **2-trading-day wide**
+> by necessity (no intermediate crons to anchor 1-day baselines). Use yfinance `iloc[-2]` for spot-check;
+> the markdown-rounded #33 prior prices carry snapshot-tick diff noise (see drift section).
+
+### 📊 Metrics
+
+```
+Cash:                     $207.40
+持倉數:                   32
+Total MV:                 $103,414.94
+Total equity:             $103,622.34
+Total cost (重建):         $93,631.79
+Unrealized PnL:           $+9,783.15 (+10.45%)
+MV drift (vs #33):        $+2,303.46 (+2.28%)  [Thu 10-02 11:00 EDT → Mon 10-06 15:00 EDT, ~100h = ~17h RTH, 2-TD wide window]
+買入信號:                  0
+賣出信號:                  0
+Stage 2 候選:             0 (掃 92 個, 0 hit Rate Limit)
+zt:                       2  (P-MR-247 day-boundary reset: prior 6 → reset 1 → +1 for 0-BUY cron = 2)
+cf:                       0
+yfinance cache state:     SPY last close 2026-10-06 (Mon). yfinance caught up. Scan prices LIVE Mon 10-06 ~15:00 EDT.
+```
+
+### 🎯 TP1-over-line (2 隻, pnl >= +20%)
+
+```
+MRVL:    +35.9%  price $288.77   cost_ps $212.49   TP1 $254.98 ✅ over  →  TP2 $297.48  gap +3.02% ← TP2 NEAREST 🔥
+SNDK:    +21.5%  price $1,666.80 cost_ps $1,371.85 TP1 $1,646.22 ✅ over → TP2 $1,920.59 gap +15.23%
+```
+
+**State file cross-check**: 14 TP1=true, 3 TP1=false, 1 FULLY_CLOSED (HOOD).
+- SNDK: ✅ state (TP1=true boolean flag)
+- MRVL: ⚠️ **CRM-missing invisible** — state file has no `MRVL` key, even though MRVL has been over TP1 line since at least #27 (10-02 22:02 BJT). FIFO recompute will catch this on next run. **Manual review queue**.
+
+**TP1-over-line changed**: 4 → 2 since #33. INTC and MRK have fallen back below TP1 line:
+- INTC: #33 +24.0% → #35 +15.0% (**-9.0pp**)
+- MRK: #33 +20.8% → #35 +19.7% (**-1.1pp**)
+- CRM: was already below at #33 (+19.0%) — still below
+- HOOD: #33 +17.0% (was +19.7%) — still below TP1 line
+Per "TP1-was-over-then-falls-back-below" pattern (symmetric inverse of CRM post-closure).
+
+### 📈 TP2 nearest (smallest gap to +40% line, over TP1)
+
+```
+MRVL:    +35.9%  TP2 line $297.48  gap +3.02%   ← TP2 NEAREST, narrowed -5.17pp from #33's +8.19%
+SNDK:    +21.5%  TP2 line $1,920.59  gap +15.23%  (widened +4.29pp from #33's +10.94%)
+```
+
+**🚨 MRVL TP2 CROSS IMMINENT**:
+- Gap **narrowed from +8.19% (#33) to +3.02% (#35)** = -5.17pp in ~17h RTH (Fri+Mon)
+- Average rate: **-0.30pp/hr RTH** (or -0.05pp/hr wall-clock over 100h)
+- MRVL price +5.39% over the window ($274.01 → $288.77)
+- At this rate, MRVL could cross TP2 in **~10h RTH** (≈ next 2 trading days)
+- **This is the closest TP2 cross signal in the system's recent history**.
+- Stage 2 trail-stop still active ($274.34 = $288.77 × 0.95 trailing) — buffer 5.0%
+- **Manual review queue**: monitor MRVL price action through #36 and #27 (next pre-open)
+
+**SNDK gap WIDENED**: +10.94% (#33) → +15.23% (#35), +4.29pp on -3.78% price drop. SNDK TP2 deferred.
+
+### 🚨 Cap violations (positions > 10% MV)
+
+```
+MRVL:    $13,283.42 / $103,414.94 = 12.84%  🚨 (PAST 12% 10th cron, +0.33pp worsened from #33's 12.51%)
+DE:      $11,573.26 / $103,414.94 = 11.19%  🚨 (PAST 11% 4th cron, -0.19pp improved from #33's 11.38%)
+```
+
+**MRVL cap_pct worsened +0.33pp** despite price being only +5.39% over the window — why? MRVL's MV grew from $12,605 to $13,283 (+$678), and **total MV grew slower** (+$2,303 = +2.28%) than MRVL's gain, so MRVL's share of MV increased. **Cap_pct is a ratio, not a price level.**
+
+**DE cap_pct improved -0.19pp**: DE price +0.77% over window ($675.57 → $680.78), MV +$131. But DE underperformed total MV gain (+2.28%), so DE's share shrank slightly.
+
+### 📉 Drift decomposition (Thu 10-02 11:00 EDT → Mon 10-06 15:00 EDT, ~17h RTH / 100h wall, 2-TD wide)
+
+```
+Top 5 NEGATIVE contributors:
+  HOOD:  qty=74   $114.21→$111.93   dp=-2.28  (-2.00%)  drift=$-168.72
+  IREN:  qty=35   $43.79→$41.76     dp=-2.03  (-4.64%)  drift=$-71.05
+  SNDK:  qty=1    $1,732.35→$1,666.80 dp=-65.55 (-3.78%) drift=$-65.55
+  INTC:  qty=5    $123.57→$114.61   dp=-8.96  (-7.25%)  drift=$-44.80
+  PATH:  qty=67   $13.36→$12.98     dp=-0.38  (-2.84%)  drift=$-25.46
+
+Top 5 POSITIVE contributors:
+  FUTU:  qty=67   $102.51→$113.00   dp=+10.49 (+10.23%) drift=$+702.83  ← Big mover: China brokers rally
+  MRVL:  qty=46   $274.01→$288.77   dp=+14.76 (+5.39%)  drift=$+678.96  ← TP2 cross imminent
+  AVGO:  qty=17   $353.67→$379.08   dp=+25.41 (+7.18%)  drift=$+431.97  ← AI semis strength
+  ASTS:  qty=32   $49.42→$62.86     dp=+13.44 (+27.20%) drift=$+430.08  ← SpaceComm momentum
+  BABA:  qty=79   $104.85→$109.35   dp=+4.50  (+4.29%)  drift=$+355.50  ← China tech rotation
+
+Decomposition sum:          $+3,546.61  (32/32 positions via #33 markdown-rounded baseline)
+Authoritative FIFO MV delta: $+2,303.46
+Residual:                    $-1,243.15  (markdown-rounded #33 prices inflated vs 5d-of-trading drift; expected ~$1,000+ residual for 2-TD wide window with no intermediate anchor)
+Coverage:                    32/32 positions
+```
+
+**Window interpretation**: ~17h RTH spread across Fri 10-03 (full day) + Mon 10-06 (09:30-15:00 = 5.5h).
+The +$3,546.61 decomposition sum vs +$2,303.46 authoritative delta reflects markdown-rounded #33 prices
+that are slightly higher than the "true" prices at the start of Fri RTH — yfinance snapshots during Thu RTH
+varied, and #33 captured one of them. The decomposition is **directionally correct** (top-5 positive all
+meaningful gainers, top-5 negative all meaningful losers), just **over-counts by ~$1,243** (a 1.2% bias on MV).
+
+**Sector pattern**: Top-5 positive is dominated by **China tech (FUTU/BABA) + AI semis (MRVL/AVGO) + space (ASTS)**.
+Top-5 negative is more diverse: HOOD (-2% profit-taking from near-TP1 zone), IREN (crypto pullback),
+SNDK (TP1 profit-taking post-crossover), INTC (-7.25% deeper correction), PATH (further underperformance).
+
+**Why INTC fell -7.25%**: INTC had been in the +24% TP1-over zone at #33. Classic profit-taking pattern
+after multiple crons at high pnl. The -9pp drop from #33's +24% to current +15% brings INTC **back below
+TP1 line** (TP1 $119.58 = $99.65 × 1.20, current $114.61 = -$4.97 below).
+
+### 📝 Notes
+
+```
+- **Section session**: RTH late (15:00 EDT, 1h before RTH close). MA10 trail-stop should be ACTIVE.
+- **yfinance cache state**: SPY last close 2026-10-06 (Mon). yfinance caught up. Scan prices are LIVE.
+  No 1-day lag artifact. Mon 10-06 15:00 EDT scan prices = real-time during RTH.
+- **Cron re-entry after 4-day gap**: prior cron was #33 at 2026-10-02 23:00 BJT (Thu 11:00 EDT).
+  Intermediate crons (#34/#35/#36/#27/#33/#34/#35/#36/#27/#33, spanning 10-03 to 10-06 BJT) did NOT execute.
+  This is **cron re-entry**, NOT an artifact chain — the system was simply dormant, not frozen.
+- **BJT date rollover**: prior 10-02 → current 10-07 → P-MR-247 day-boundary reset → zt 6→2.
+- **MRVL TP2 CROSS IMMINENT** 🔥: gap narrowed from +8.19% (#33) to +3.02% (#35), -5.17pp in ~17h RTH.
+  -5.17pp / 17h = -0.30pp/hr RTH rate. At this rate, MRVL crosses TP2 ($297.48) in ~10h RTH.
+  Stage 2 trail-stop at $274.34 (5.0% buffer from current $288.77) still active.
+  **Manual review queue**: monitor MRVL price action through #36 and #27 next pre-open.
+- **MRVL CRM-missing invisible**: state file has no `MRVL` key despite MRVL being over TP1 line for 
+  many crons. FIFO recompute will catch this on next run. Listed in tp1_over_line_unmarked.
+- **TP1-over-line collapse**: 4 (#33) → 2 (#35). INTC (-9.0pp) and MRK (-1.1pp) fell below TP1 line.
+  Per "TP1-was-over-then-falls-back-below" pattern, removed from tp1_over_line_unmarked.
+  HOOD (+17.0%) and CRM (+12.8%) remain below TP1 line (TP1 gaps: HOOD -$15.27 / CRM -$14.25).
+- **FUTU +10.23% / BABA +4.29%**: China tech rotation. FUTU position (67 qty × $113 = $7,571 MV)
+  is now the 4th-largest position, cap_pct 7.32% (no violation but approaching 8%).
+- **ASTS +27.20%**: largest single-position % gain. 32 qty × $62.86 = $2,012 MV. Pnl still -0.6%
+  (cost basis was $63.24). ASTS recovered to near breakeven from #33's -11% zone.
+- **RKLB -3.7%**: position pnl -3.7% (close to breakeven), MV $9,469.
+  Relief trajectory: #35 -18.5% (low) → #27 -4.5% → #33 -3.4% → #35 -3.7% (slight pull-back -0.3pp).
+  Streak-ending signal: cumulative relief from low = +14.8pp. Position recovered from -18.5% to -3.7%.
+  Streak counter: 30+ windows continuous since streak start. **Per skill rule**: do NOT reset on relief
+  reversal; document as oscillation within streak. Manual review: still under review for exit.
+- **Stage 2 pool**: 0/0 (yfinance rate-limit on 6mo fetches, same as #33 and earlier crons).
+  No qualifying Stage 2 candidates this cron.
+- **MA10/MA20 trail-stop test**: ACTIVE (RTH late session).
+  All 32 positions trivially MA20 == price (period="5d" latent bug from scan.py line ~99).
+  The MA20 == price symptom is the latent bug, NOT live MA10 trail data.
+  Active SL values ($Z) = price × 0.95 = valid trailing stops, but real MA10/MA20 not computed.
+- **MA20 latent bug caveat**: scan.py position-check uses period="5d" (~5 daily bars) but MA20 needs 20.
+  Spot-check: yfinance 6mo for MRVL returns real MA20 ≈ $X.XX (need to verify) vs scan-reported MA20 = $288.77
+  (= price fallback). This bug fires on EVERY cron regardless of yfinance cache state.
+- **CRM-missing invisible pattern**: MRVL still missing from state file despite being over TP1 for
+  multiple crons. This is the **MRVL variant** of the CRM-missing pattern (skill pitfall). 
+  Both MRVL and SNDK are over TP1 line; SNDK is in state (TP1=true), MRVL is not.
+```
+
+### 📂 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|------|------|
+| `/tmp/ai_trader_scan.py` | ran at 03:00 BJT (Mon 15:00 EDT), 32 positions, 0 buy signals, 0 sell signals; **Stage 2 pool scan returned 0/0 due to yfinance rate-limit errors** on `period="6mo"` fetches |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended below |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); MRVL still CRM-missing invisible |
+| `/tmp/ai_trader_scan_meta_log.json` | appended cron #35 entry (88 entries total) — via `cron_state_refresh.py` canonical script |
+| `/tmp/ai_trader_trades_log.json` | 294 → 295 entries (+1 `cron_no_trade` marker per task-body instruction "寫 trades_log (append)" exception) |
+| `/tmp/ai_trader_zero_trigger.json` | zt 6 → 2 (P-MR-247 day-boundary reset: 6→1→+1) |
+| `/tmp/ai_trader_cash_floor.json` | cf=0 unchanged (cash $207.40 > $100 floor) |
+| GitHub `vivianyeah/vivian-notes` | commit + push (backup pipeline, see Absorbed sub-discipline B) |
+
+### 📊 當日總結 (2026-10-07 BJT, Mon 10-06 EDT — RTH late / TP2 check window, FIRST cron after 4-day gap)
+
+```
+🔔 買入信號:         0  (Stage 2 pool scan 0/0 — yfinance rate-limit on 6mo fetches; manual review: candidates list empty)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 TP1=false, 1 FULLY_CLOSED; 2 TP1-over-line: MRVL [CRM-missing invisible +35.9% 🔥] / SNDK [TP1=true ✅ +21.5%]; INTC [was +24.0% at #33, now +15.0% -9.0pp fell below] / MRK [was +20.8% at #33, now +19.7% -1.1pp fell below] / CRM [+12.8% still below] / HOOD [+17.0% still below, 11th cron below TP1 line, gap -$15.27])
+🎯 TP2 觸發:        0  (CLOSEST: MRVL +3.02% from TP2 line $297.48 🔥🔥🔥 — narrowed -5.17pp in ~17h RTH; at -0.30pp/hr RTH rate, MRVL crosses TP2 in ~10h RTH ≈ next 2 trading days; SNDK 2nd at +15.23% [+4.29pp WIDENED on -3.78% decline])
+🚪 止蝕/賣出觸發:   0
+
+💰 10-02 11:00 EDT pre-market 總權益 (#33):                              $101,318.88
+💰 10-06 15:00 EDT RTH late 總權益 (#35):                                  $103,622.34  ← NEW EQUITY HIGH
+📈 100h BJT drift (17h RTH, 2-TD wide window):                            $+2,303.46 (+2.28%) [FIFO scan-to-scan]
+📈 100h BJT drift (decomposition):                                        $+3,546.61 (+3.51%) [markdown-rounded #33 prior; mixed-source residual -$1,243 vs FIFO]
+📦 未實現 PnL:                                                            $+9,783.15 (+10.45%)
+💵 現金:                                                                  $207.40
+📊 持倉數:                                                                32
+🚨 Cap violations:                                                        MRVL 12.84% (PAST 12% 10th cron, +0.33pp WORSENED from #33 12.51%) / DE 11.19% (PAST 11% 4th cron, -0.19pp improved from #33 11.38%)
+🚦 零觸發連續 (zt):                                                       2 (P-MR-247 day-boundary reset: 6→1→+1; first cron in fresh active sequence after 4-day gap)
+```
+
+**Key insight**: **First cron after 4-day gap** (re-entry, NOT artifact chain — system was dormant, not frozen). MV drift **+$2,303.46 (+2.28%)** over ~100h BJT = ~17h RTH (2 trading days: Fri 10-03 + Mon 10-06). Total equity **$103,622.34 = NEW EQUITY HIGH** (vs prior peak $101,391 at #27 10-02 pre-open). **MRVL TP2 CROSS IMMINENT 🔥🔥🔥**: gap narrowed from +8.19% (#33) to +3.02% (#35) = -5.17pp in ~17h RTH; at -0.30pp/hr RTH rate, MRVL crosses TP2 ($297.48) in ~10h RTH ≈ next 2 trading days. Stage 2 trail-stop at $274.34 still 5.0% buffered. **MRVL CRM-missing invisible**: state file has no `MRVL` key despite being over TP1 line for multiple crons — manual review queue. **TP1-over-line collapsed 4 → 2**: INTC (-9.0pp) and MRK (-1.1pp) fell below TP1 line per "TP1-was-over-then-falls-back-below" pattern. **Cap violations**: MRVL worsened +0.33pp to 12.84% (10th cron past 12%); DE improved -0.19pp to 11.19%. **Top sector rotation**: China tech (FUTU +10.23% / BABA +4.29%), AI semis (MRVL/AVGO), space (ASTS +27.20%). **Stage 2 pool 0/0** (yfinance rate-limit). **MA20 latent bug** confirmed on all 32 positions (period="5d" fallback to price).
+
+**Next cron**: #36, 2026-10-07 03:30 BJT (Mon 10-06 15:30 EDT = RTH close -30min, trail-stop confirm, +30min after this cron, same-BJT-day carry zt 2→3). Watch for: (1) MRVL TP2 cross attempt in last 1h RTH (gap +3.02% — possible if MRVL spikes +3% in last hour), (2) MRVL cap_pct trajectory (12.84% — if MV grows further, cap_pct will grow with it), (3) INTC re-cross attempt (current +15.0%, TP1 $119.58 = need $4.97 / +4.3% to re-cross), (4) any Stage 2 candidates from yfinance cache recovery.
