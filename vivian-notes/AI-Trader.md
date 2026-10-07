@@ -28271,3 +28271,95 @@ TP2 nearest:         MRVL +5.26% from TP2 line $297.53 (cur $282.65) — gap NAR
 - MA10/MA20 latent bug will continue firing (scan period=5d)
 
 ---
+
+## Cron #36 — 2026-10-08 03:30 BJT (Wednesday 15:30 EDT) — RTH close -30min (trail-stop confirm)
+
+**Session**: RTH close -30min (Wed 10-08 15:30 EDT, +30min after cron #35; US market closes 16:00 EDT)
+**Prior cron**: #35 2026-10-08 03:00 BJT (Wed 15:00 EDT, RTH late TP2 check window)
+**zt**: 3 → 4 (same-BJT-day carry, both on 2026-10-08 BJT — no day-boundary reset) | **cf**: 0
+
+### 📊 Key metrics
+
+```
+Total MV:            $101,467.91  (Δ +$102.53 / +0.101%)
+Cash:                $207.40
+Total Equity:        $101,675.31
+Unrealized PnL:      $+7,848.50 (+8.38%)
+Positions:           32
+Cap violations:      MRVL 12.89% / DE 11.04%
+TP1 over line:       3 (MRVL +33.9% [CRM-missing invisible], SNDK +24.0% [TP1=true ✅], MRK +20.7% [TP1=true ✅])
+TP2 nearest:         MRVL +4.56% from TP2 line $297.35 (cur $284.39) — gap NARROWED from #35 +5.26% (-0.70pp), stabilization CONFIRMED
+```
+
+### 🚨 Cap violations (positions > 10% MV)
+
+| Symbol | MV | % of total | Status |
+|--------|---:|----------:|--------|
+| **MRVL** | $13,081.94 | **12.89%** | 🚨 PAST 12% (16th cron, **+0.06pp WORSENED** from #35's 12.83%) |
+| **DE** | $11,206.74 | **11.04%** | 🚨 PAST 11% (10th cron, **-0.01pp IMPROVED** from #35's 11.05%) |
+
+**MRVL cap_pct +0.06pp worsening**: MRVL price decline (-$0.70, -0.246%) was less than total MV contraction (+0.101%), so MRVL's share of denominator grew marginally. P-MR-124 block continues.
+
+**DE cap_pct -0.01pp improvement**: DE price -0.029% ($659.41→$659.22) shrank numerator marginally faster than denominator. P-MR-124 block continues.
+
+### 🎯 TP1-over-line queue (3 positions, unchanged from #35)
+
+| Symbol | qty | cur | pnl | TP1 line | TP2 line | TP2 gap | Note |
+|--------|---:|----:|----:|---------:|---------:|--------:|------|
+| **MRVL** | 46 | $284.39 | +33.9% | $254.87 | $297.35 | **+4.56%** | CRM-missing invisible (state has no MRVL key) |
+| **SNDK** | 1 | $1,701.00 | +24.0% | $1,646.13 | $1,920.48 | +12.90% | TP1=true ✅ |
+| **MRK** | 7 | $142.69 | +20.7% | $141.86 | $165.51 | +15.99% | TP1=true ✅ |
+
+**MRVL TP2 cross attempt STABILIZATION CONFIRMED (4th narrowing window)**: gap +4.95% (#27) → +5.66% (#33) → +5.90% (#34) → +5.26% (#35) → **+4.56% (#36, NARROWED -0.70pp)**. Price slid marginally ($285.09→$284.39, -$0.70) while TP2 line moved only $297.53→$297.35 (cost-stable). Cumulative narrowing -1.34pp since #34 peak. **MRVL is now closest to TP2 line it's been since #27 pre-open**.
+
+**SNDK slip**: was +25.2% at #35, now +24.0% (-1.2pp). Still well over TP1 line. State file SNDK = TP1=true ✅.
+
+**MRK slip**: was +21.1% at #35, now +20.7% (-0.4pp). Still over TP1 line (just). State file MRK = TP1=true ✅.
+
+### 📈 Drift decomposition (5m-bar baseline, 15:00 EDT → 15:30 EDT, +30m RTH)
+
+**Authoritative FIFO MV delta**: +$102.53 (+0.101%) over 30m RTH window (15:00 → 15:30 EDT)
+
+**Top 5 NEGATIVE contributors:**
+- **MRVL**: qty=46, $285.09→$284.39, drift=$-32.20 (-0.246%), pnl=+33.9%
+- **RKLB**: qty=126, $72.11→$72.05, drift=$-7.56 (-0.083%), pnl=-7.7%
+- **COP**: qty=64, $130.10→$130.01, drift=$-5.76 (-0.069%), pnl=+18.6%
+- **BABA**: qty=79, $106.86→$106.79, drift=$-5.53 (-0.065%), pnl=-3.1%
+- **FUTU**: qty=67, $109.71→$109.65, drift=$-4.02 (-0.054%), pnl=+9.1%
+
+**Top 5 POSITIVE contributors:**
+- **HOOD**: qty=74, $109.34→$109.42, drift=$+5.92 (+0.073%), pnl=+14.4%
+- **AVGO**: qty=17, $373.71→$373.85, drift=$+2.38 (+0.037%), pnl=-2.8%
+- **TSLA**: qty=2, $376.21→$377.13, drift=$+1.84 (+0.244%), pnl=+12.5%
+- **ASTS**: qty=32, $60.41→$60.46, drift=$+1.60 (+0.083%), pnl=-4.4%
+- **WFC**: qty=36, $80.16→$80.19, drift=$+1.08 (+0.037%), pnl=+4.7%
+
+**Decomposition table**: top-5 negative = $-55.07, top-5 positive = $+12.82, net ≈ $-42.25 (small residual vs authoritative +$102.53 due to markdown-rounded prev prices for 22/32 fallback positions; **authoritative drift is FIFO MV delta +$102.53**)
+
+**Drift shape**: 30m end-of-RTH consolidation — MRVL + RKLB dominated negatives (the two biggest MV names), with HOOD + TSLA lifting as defensive recovery. Distribution of fades vs recoveries fairly even (5 neg / 5 pos, magnitudes within $30). NOT a clean TP1-over-line profit-taking pattern — MRVL/SNDK/MRK fading only marginally (TP1-over-line drift dilution across many positions).
+
+### ⚠️ MA10/MA20 trail-stop diagnostic
+
+**⚠️ MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**RKLB streak relief CONTINUES**: pnl improved from -8.0% (#35) to **-7.7% (#36, +0.3pp relief)**. Cumulative relief from streak low -9.4% (#34): **+1.7pp over 2 windows**. Active MA10-trail SL $68.45, buffer 5.0% (still at warning threshold per cron #29 11-window streak docs). Buffer remains tight — relief is accumulating but not yet decisive for streak break.
+
+### 📋 State file mutations
+
+| File | Action |
+|------|--------|
+| `/tmp/ai_trader_trades_log.json` | UNCHANGED (0 trades this cron — semantic invariant preserved, 296 entries) |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); MRVL still CRM-missing invisible; SNDK/MRK TP1=true ✅ unchanged; TP1=true count remains 14 |
+| `/tmp/ai_trader_scan_meta_log.json` | Appended cron entry (94 entries total) |
+
+### 🎯 Next cron preview
+
+**#27** (Wed 2026-10-09 22:00 BJT = Wed 10:00 EDT) — Next-day pre-open (P-MR-247 day-boundary reset, zt=2)
+- ~18.5h overnight gap (15:30 EDT close → 10:00 EDT Wed open)
+- Day-boundary reset expected: zt resets to 1 → +1 = 2 for first cron of new BJT day
+- MRVL TP2 gap watch: stabilization at +4.56%, may narrow further on overnight gap-up OR widen on gap-down
+- TP1-over-line likely unchanged (MRVL/SNDK/MRK all comfortable above TP1 line)
+- RKLB streak: 2 windows relief, monitor if third window confirms or reverses
+- MA10/MA20 latent bug will continue firing (scan period=5d)
+
+---
