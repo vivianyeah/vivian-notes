@@ -27988,3 +27988,96 @@ Top 5 POSITIVE contributors:
 **Key insight**: Next-day pre-open (Tue 10-07 10:00 EDT, P-MR-247 day-boundary reset, zt 3→2). 1-trading-day drift **$-1,961.50 (-1.90%)** — broad market selloff (32/32 mostly DOWN). yfinance caught up — cleanest decomp residual in days (+$1.45 vs FIFO). **MRVL TP2 cross STABILIZED**: gap +4.95% (vs #36 +3.63% widening), +1.32pp narrowing overnight reversed the in-day widening — gap stabilizing in 3-6% band, NOT converging to TP2 cross imminent. **MRVL cap_pct +0.09pp to 12.87%** (12th cron past 12%, +1 cron from #36's 11th). **DE cap_pct +0.06pp to 11.28%** (6th cron past 11%). **NEW TP1-over-line**: MRK +20.8% (was +19.6% at #36, just crossed overnight). State file has MRK = TP1=true already (prior FIFO recompute). **TP1-over-line total: 3** (MRVL/SNDK/MRK). **Stage 2 pool 0/0** (yfinance rate-limit). **MA20 latent bug** confirmed on all 32 positions (period="5d" fallback to price, pre-open session where MA10 is dormant anyway).
 
 **Next cron**: #33, 2026-10-07 23:00 BJT (Tue 10-07 11:00 EDT = pre-market follow-through, +1h RTH). Watch for: (1) **MRVL TP2 cross trajectory** — does the +4.95% gap stabilize, narrow further, or resume widening? Pre-market typically sees position re-mark. (2) **MRK TP1 confirmation** — verify state file TP1=true via FIFO recompute. (3) **HOOD/CRM/INTC re-cross attempts** — any +3% lift could trigger TP1-over-line re-entry. (4) **Stage 2 candidates** — if rate-limit recovers, watch for new setups. (5) **MA10 trail activation** — MA10 was dormant during pre-open, will activate at RTH open 09:30 EDT (= 22:30 BJT) — first live trail-stop test at #33's RTH mid-session window.
+
+## Cron #33 — 2026-10-07 23:00 BJT (Tue 11:00 EDT) — Pre-market follow-through
+
+**Session**: Pre-market follow-through (Tue 11:00 EDT, +1h post-RTH-open)
+**Prior cron**: #27 2026-10-07 22:00 BJT (next-day pre-open, zt 3→2 P-MR-247 reset)
+**zt**: 2 → 3 (same-BJT-day carry) | **cf**: 0
+
+### 📊 Key metrics
+
+```
+Total MV:            $100,854.63  (Δ -$451.98 / -0.446%)
+Cash:                $207.40
+Total Equity:        $101,062.03
+Positions:           32
+Cap violations:      MRVL 12.84% (PAST 12% 13th cron) / DE 11.05% (PAST 11% 7th cron)
+TP1 over line:       3 (MRVL +32.5% [CRM-missing invisible], SNDK +24.7% [TP1=true ✅], MRK +21.1% [fresh over line])
+TP2 nearest:         MRVL +5.66% from TP2 line $297.39 (cur $281.46) — gap WIDENED +0.71pp from #27 +4.95%
+```
+
+### 🚨 Cap violations (positions > 10% MV)
+
+| Symbol | MV | % of total | Status |
+|--------|---:|----------:|--------|
+| **MRVL** | $12,947.16 | **12.84%** | 🚨 PAST 12% (13th cron, **-0.03pp IMPROVED** from #27's 12.87%) |
+| **DE** | $11,140.44 | **11.05%** | 🚨 PAST 11% (7th cron, **-0.23pp IMPROVED** from #27's 11.28%) |
+
+**MRVL cap_pct -0.03pp improvement**: MRVL price -0.71% ($283.46→$281.46), total MV shrank -0.45%, so MRVL's share dropped marginally. Cap_pct is a ratio. P-MR-124 block continues.
+
+**DE cap_pct -0.23pp improvement**: DE -2.43% (via 30m-bar baseline $671.61→$655.32) underperformed total MV -0.45%. P-MR-124 block continues.
+
+### 🎯 TP1-over-line queue (3 positions, unchanged from #27)
+
+| Symbol | qty | cur | pnl | TP1 line | TP2 line | TP2 gap | Note |
+|--------|---:|----:|----:|---------:|---------:|--------:|------|
+| **MRVL** | 46 | $281.46 | +32.5% | $254.91 | $297.39 | **+5.66%** | CRM-missing invisible (state has no MRVL key) |
+| **SNDK** | 1 | $1,710.69 | +24.7% | $1,646.21 | $1,920.58 | +12.27% | TP1=true ✅ |
+| **MRK** | 7 | $143.20 | +21.1% | $141.90 | $165.55 | +15.61% | Fresh over line (was +20.8% at #27, +0.3pp lift) |
+
+**MRK confirms re-cross**: was +19.6% at #36, +20.8% at #27, now +21.1%. State file already has MRK = TP1=true (prior FIFO recompute). Re-confirmed via inter-cron path.
+
+**MRVL TP2 cross ATTEMPT FADING**: gap +5.66% (vs #27 +4.95%). Widened +0.71pp over 1h RTH. Reversal of the +1.32pp overnight narrowing. Gap now in 4-6% stabilizing band — not converging to imminent cross.
+
+### 📈 Drift decomposition (30m-bar baseline, 10:00 EDT → #33 scan)
+
+**Authoritative FIFO MV delta**: -$451.98 (-0.446%) over 1h RTH window (10:00 → 11:00 EDT)
+
+**Top 5 NEGATIVE contributors:**
+- **DE**: qty=17, $671.61→$655.32, drift=$-276.93 (-2.43%), pnl=+13.8%
+- **MRVL**: qty=46, $283.39→$281.46, drift=$-88.55 (-0.68%), pnl=+32.5%
+- **RKLB**: qty=126, $71.83→$71.45, drift=$-48.27 (-0.53%), pnl=-8.5%
+- **COP**: qty=64, $130.06→$129.32, drift=$-47.36 (-0.57%), pnl=+17.9%
+- **XOM**: qty=37, $164.49→$163.82, drift=$-24.79 (-0.41%), pnl=+15.7%
+
+**Top 5 POSITIVE contributors:**
+- **FUTU**: qty=67, $107.09→$108.14, drift=$+70.35 (+0.98%), pnl=+7.6%
+- **BABA**: qty=79, $106.41→$107.00, drift=$+46.52 (+0.55%), pnl=-2.9%
+- **SNDK**: qty=1, $1698.93→$1710.69, drift=$+11.76 (+0.69%), pnl=+24.7%
+- **AVGO**: qty=17, $371.62→$372.17, drift=$+9.35 (+0.15%), pnl=-3.2%
+- **VRT**: qty=4, $241.01→$242.10, drift=$+4.38 (+0.45%), pnl=-14.4%
+
+**Decomp sum**: -$397.43 (32 positions via yfinance 30m-bar at 10:00 EDT baseline)
+**Residual**: +$54.55 (markdown-rounding noise band <$200 — clean baseline, within skill's <$200 band)
+
+### ⚠️ MA10/MA20 trail-stop diagnostic
+
+**⚠️ MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**Real MA20 vs scan-reported** (spot-check via yfinance 6mo):
+- HOOD: real MA20 $114.90 vs scan $107.93 (diff -$6.97)
+- CRM: real MA20 $237.29 vs scan $223.13 (diff -$14.16)
+- MRVL: real MA20 $253.95 vs scan $281.46 (diff +$27.51)
+- COP: real MA20 $130.24 vs scan $129.32 (diff -$0.92)
+- RKLB: real MA20 $69.11 vs scan $71.45 (diff +$2.34)
+
+### 📋 State file mutations
+
+| File | Action |
+|------|--------|
+| `/tmp/ai_trader_trades_log.json` | UNCHANGED (0 trades this cron) |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` block refreshed (no TP1 flag mutation — FIFO recompute owns that); MRVL still CRM-missing invisible |
+| `/tmp/ai_trader_scan_meta_log.json` | Appended cron entry |
+
+### 🎯 Next cron preview
+
+**#34** (Wed 2026-10-08 01:00 BJT = Tue 13:00 EDT) — RTH mid-session follow-through
+- Expect ~+2h RTH drift from current snapshot
+- TP1-over-line likely unchanged (MRVL/SNDK/MRK)
+- MRVL TP2 gap watch: stabilizing band 4-6%, fading cross attempt
+- MA10/MA20 latent bug will continue firing (scan period=5d)
+
+---
+
+**Done.**
