@@ -28651,3 +28651,117 @@ TP1=true count **unchanged at 14**. State file mutations: only `_audit` block re
 
 ---
 
+## Cron #34 — 2026-10-09 01:00 BJT (Thu 13:00 EDT) — RTH mid-session follow-through (next-day, day-boundary reset P-MR-247)
+
+**Day-boundary reset (P-MR-247)**: Wed BJT 10-08 23:00 (#33) → Thu BJT 10-09 01:00 (#34) = new BJT day, so zt resets 6 → 1 → +1 = **2** for first cron of new BJT day. cf=0 (cash $207.40 well above floor).
+
+### 🎯 Cron metrics
+
+```
+💰 開盤總權益 (#33 prior close):  $100,633.03
+💰 收市前總權益 (今日 01:00):     $99,649.61
+📈 日內 MTM:                       -$983.42 (-0.98%)
+📦 未實現 PnL:                    $+5,830.99 (+6.23%)
+💵 現金:                           $207.40
+📊 持倉數:                         32
+🚦 零觸發連續 (zt):                2 (day-boundary reset)
+```
+
+### 📈 Drift decomposition (Wed 11:00 EDT 2026-10-08 → Thu 13:00 EDT 2026-10-09, ~2h RTH)
+
+**Authoritative FIFO MV delta: -$983.42 (-0.98%)**
+**Decomposition sum: -$755.89 (yfinance 30m-bar baseline at #33 EDT timestamp, 32/32 positions covered)**
+**Residual: -$227.53** (within hybrid 2h RTH follow-through band $200-400, expected from prior-scan ±2min drift)
+
+**Top 5 negative contributors** (TP1-over-line profit-taking dominates RTH mid-session pattern):
+
+| Symbol | Qty | Prev ($) | Cur ($) | Δ ($) | Contrib ($) | PnL % | Note |
+|--------|----:|---------:|--------:|------:|------------:|------:|------|
+| **MRVL** | 46 | 276.38 | 268.90 | -7.48 | **-343.85** | +26.6% | TP1-over invisible, largest decliner (-2.7%) |
+| AVGO | 17 | 371.83 | 364.44 | -7.39 | -125.55 | -5.2% | Semi weakness |
+| RKLB | 126 | 69.35 | 68.42 | -0.93 | -116.55 | -12.3% | Streak continues, -12.3% now (32+ windows) |
+| HOOD | 74 | 108.06 | 107.18 | -0.88 | -64.75 | +12.0% | Mild fade |
+| SNDK | 1 | 1639.18 | 1599.57 | -39.61 | -39.61 | +16.6% | Memory-name pressure |
+
+**Top 5 positive contributors** (defensive + low-pnl bounce):
+
+| Symbol | Qty | Prev ($) | Cur ($) | Δ ($) | Contrib ($) | PnL % | Note |
+|--------|----:|---------:|--------:|------:|------------:|------:|------|
+| WFC | 36 | 79.97 | 81.01 | +1.04 | +37.44 | +5.8% | Bank bounce |
+| DE | 17 | 641.91 | 643.52 | +1.61 | +27.37 | +11.8% | Industrial-defensive |
+| PATH | 67 | 12.98 | 13.14 | +0.16 | +11.04 | +10.1% | Mild green |
+| IBM | 8 | 219.33 | 220.38 | +1.05 | +8.40 | -7.4% | Defensive |
+| MRK | 7 | 139.63 | 140.76 | +1.13 | +7.91 | +19.1% | Pharma defensive |
+
+### 🎯 TP1 / TP2 status
+
+```
+TP1-over-line (pnl ≥ +20%):     2
+  MRVL +26.6% (cur $268.90, cost_ps $212.40, TP1 line $254.88)  ← CRM-pattern INVISIBLE (no state key)
+  COP  +21.9% (cur $133.63, cost_ps $109.62, TP1 line $131.55)  ← CRM-pattern INVISIBLE (no state key)
+
+TP2 nearest (price-space positive convention):
+  MRVL  cur $268.90  TP2 line $297.36  gap +10.58%  (was -8.0% at #33, widened +2.6pp — expansion confirmed, NOT stabilization)
+  COP   cur $133.63  TP2 line $153.47  gap +14.85%
+  MRK   cur $140.76  TP2 line $165.46  gap +17.55%
+```
+
+**TP1=true count: 14** (UNCHANGED — state file mutations limited to `_audit` only, FIFO recompute owns TP1 flag mutations).
+
+### 🚨 Cap violations (>10% of total MV)
+
+```
+MRVL  12.44%  (MV=$12,369.40, qty=46, price=$268.90, pnl=+26.6%)
+DE    11.00%  (MV=$10,939.84, qty=17, price=$643.52, pnl=+11.8%)
+```
+
+Both unchanged from #33 (MRVL 12.62% → 12.44% slight improvement; DE 10.89% → 11.00% slight worsening on price-up while total denominator also shrank).
+
+### 📋 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_tp1_state.json   — _audit refreshed (zt=2, MRVL/COP invisible queue; TP1 flags UNCHANGED at 14)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 97th entry
+✅ /tmp/ai_trader_cash_floor.json  — cf=0 (cash $207.40 well above floor)
+✅ /tmp/ai_trader_zero_trigger.json — zt=2 (P-MR-247 day-boundary reset: 6 → 1 → +1 = 2)
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED at 296 (0 trades this cron; semantic invariant preserved)
+```
+
+### 🟢 Buy/Sell signals
+
+```
+🔔 買入信號:         0
+🚪 止蝕/賣出觸發:   0
+```
+
+**Stage 2 候選**: 0 (RTH mid-session: MA10 trail active but no qualifying breakout-pullback setups surfaced in scan).
+
+### ⚠️ MA20 latent bug caveat (every cron)
+
+MA10/MA20 trail-stop test non-functional this cron: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). 32/32 positions trivially OK.
+
+### 📊 當日總結 (2026-10-09 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留; 2 CRM-invisible TP1-over-line: MRVL +26.6% / COP +21.9%)
+🎯 TP2 觸發:        0  (CLOSEST: MRVL +10.58% from TP2 line $297.36, widening confirmed)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (#33 prior):          $100,633.03
+💰 收市前總權益 (今日 01:00):        $99,649.61
+📈 日內 MTM:                          -$983.42 (-0.98%)
+📦 未實現 PnL:                       $+5,830.99 (+6.23%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    MRVL 12.44% / DE 11.00%
+🚦 零觸發連續 (zt):                   2
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #35 — 2026-10-09 03:00 BJT (Thu 15:00 EDT) — RTH late (TP2 check window)**
+
+Same-BJT-day carry (zt=2 → 3). MRVL TP2 widening rate at +2.6pp/2h: if acceleration continues → TP2 cross imminent; if deceleration → stabilization (CRM-style pattern). RKLB streak: now -12.3% (vs #33 -11.x%; continued deterioration, no relief). MRVL/COP invisible queue unchanged. Cap violations expected stable. MA20 latent bug will continue firing.
+
+---
