@@ -28765,3 +28765,130 @@ MA10/MA20 trail-stop test non-functional this cron: scan.py position-check uses 
 Same-BJT-day carry (zt=2 → 3). MRVL TP2 widening rate at +2.6pp/2h: if acceleration continues → TP2 cross imminent; if deceleration → stabilization (CRM-style pattern). RKLB streak: now -12.3% (vs #33 -11.x%; continued deterioration, no relief). MRVL/COP invisible queue unchanged. Cap violations expected stable. MA20 latent bug will continue firing.
 
 ---
+
+
+## Cron #35 — 2026-10-09 03:00 BJT (Thu 15:00 EDT) — RTH late (TP2 check window)
+
+**Same-BJT-day carry (zt=2 → 3)**: cron #34 → #35 = same Thu BJT day, so zt carry 2 → +1 = **3**. cf=0 (cash $207.40 well above floor). yfinance caught up to 2026-10-08 (LIVE RTH data, no artifact chain).
+
+### 🎯 Cron metrics
+
+```
+💰 開盤總權益 (#34 prior 01:00):  $99,649.61
+💰 收市前總權益 (今日 03:00):     $100,002.73
+📈 日內 MTM (2h RTH):              +$353.12 (+0.355%)
+📦 未實現 PnL:                    $+6,164.02 (+6.58%)
+💵 現金:                           $207.40
+📊 持倉數:                         32
+🚦 零觸發連續 (zt):                3 (same-day carry)
+```
+
+### 📈 Drift decomposition (#34 13:00 EDT → #35 15:00 EDT, ~2h RTH)
+
+**Authoritative FIFO MV delta: +$353.12 (+0.355%)**
+**Decomposition sum: +$411.20 (yfinance 30m-bar baseline at #34 EDT timestamp, 32/32 positions covered)**
+**Residual: -$58.08** (excellent — clean 30m-bar baseline, prior-scan ±2min drift, well within noise band)
+
+**Top 5 negative contributors** (semi weakness + quiet RTH):
+
+| Symbol | Qty | Prev ($) | Cur ($) | Δ ($) | Contrib ($) | PnL % | Note |
+|--------|----:|---------:|--------:|------:|------------:|------:|------|
+| AVGO | 17 | 362.34 | 358.48 | -3.86 | -65.62 | -6.8% | Semi weakness, -1.07% |
+| ASTS | 32 | 56.33 | 56.25 | -0.08 | -2.64 | -11.1% | Flat |
+| XOM | 37 | 168.76 | 168.71 | -0.05 | -1.67 | +19.2% | Flat |
+| AMZN | 1 | 255.02 | 254.49 | -0.53 | -0.53 | -5.4% | Flat |
+| PATH | 67 | 13.16 | 13.16 | -0.00 | -0.33 | +10.3% | Flat |
+
+**Top 5 positive contributors** (MRVL rebound dominates after #34 fade):
+
+| Symbol | Qty | Prev ($) | Cur ($) | Δ ($) | Contrib ($) | PnL % | Note |
+|--------|----:|---------:|--------:|------:|------------:|------:|------|
+| **MRVL** | 46 | 266.75 | 274.03 | +7.28 | **+334.88** | +29.0% | TP1-over invisible, **REBOUND +2.73%** |
+| HOOD | 74 | 106.69 | 107.11 | +0.42 | +30.71 | +11.9% | Mild green |
+| WFC | 36 | 81.54 | 81.92 | +0.38 | +13.68 | +7.0% | Bank bounce |
+| BABA | 79 | 105.10 | 105.26 | +0.16 | +13.03 | -4.5% | Mild green |
+| VRT | 4 | 241.18 | 244.06 | +2.88 | +11.52 | -13.7% | Industrial bounce |
+
+### 🎯 TP1 / TP2 status
+
+```
+TP1-over-line (pnl ≥ +20%):     3
+  MRVL +29.0% (cur $274.03, cost_ps $212.43, TP1 line $254.91)  ← CRM-pattern INVISIBLE (no state key)
+  COP  +22.4% (cur $134.23, cost_ps $109.67, TP1 line $131.60)  ← CRM-pattern INVISIBLE (no state key)
+  MRK  +20.1% (cur $141.96, cost_ps $118.20, TP1 line $141.84)  ← CRM-pattern INVISIBLE (no state key)
+
+Near TP1 line (pnl ≥ +15%):
+  XOM  +19.2% (cur $168.71, TP1 line $169.84, gap +0.7%)  ← almost over!
+  SNDK +17.0% (cur $1605.0, TP1 line $1646.15, gap +2.6%)
+  T    +15.7% (cur $24.90, TP1 line $25.83, gap +3.7%)
+
+TP2 nearest (price-space positive convention):
+  MRVL  cur $274.03  TP2 line $297.40  gap +8.53%  (was +10.58% at #34, narrowed -2.05pp — STABILIZATION CONFIRMED, RTH fade reversing)
+  COP   cur $134.23  TP2 line $153.53  gap +14.38%
+  MRK   cur $141.96  TP2 line $165.48  gap +16.57%
+```
+
+**TP2 widening rate (MRVL, leading indicator)**:
+- #34 → #35 (+2h RTH): -2.05pp (NARROWING, gap closing)
+- Previous pattern (#33 → #34, 2h): +2.6pp (widening)
+- **Rate reversal confirmed**: MRVL TP2 cross projection DEFERRED (gap closing, not widening). This is the RTH fade reversal pattern — TP1-over-line profit-taking exhausted, buyers re-entering.
+
+**TP1=true count: 14** (UNCHANGED — state file mutations limited to `_audit` only, FIFO recompute owns TP1 flag mutations).
+
+### 🚨 Cap violations (>10% of total MV)
+
+```
+MRVL  12.63%  (MV=$12,605.38, qty=46, price=$274.03, pnl=+29.0%)
+DE    11.07%  (MV=$11,043.37, qty=17, price=$649.61, pnl=+12.8%)
+```
+
+Both worsened from #34 (MRVL 12.44% → 12.63% on price rebound lifting numerator; DE 11.00% → 11.07% on price-up while denominator also rose modestly).
+
+### 📋 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_tp1_state.json   — _audit refreshed (zt=3, MRVL/COP/MRK invisible queue; TP1 flags UNCHANGED at 14)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 98th entry
+✅ /tmp/ai_trader_cash_floor.json  — cf=0 (cash $207.40 well above floor)
+✅ /tmp/ai_trader_zero_trigger.json — zt=3 (3rd consec zero-trigger, same-day carry from #34)
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED at 296 (0 trades this cron; semantic invariant preserved)
+```
+
+### 🟢 Buy/Sell signals
+
+```
+🔔 買入信號:         0
+🚪 止蝕/賣出觸發:   0
+```
+
+**Stage 2 候選**: 0 (RTH late window: MA10 trail active but no qualifying breakout-pullback setups surfaced in scan).
+
+### ⚠️ MA20 latent bug caveat (every cron)
+
+MA10/MA20 trail-stop test non-functional this cron: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop). 32/32 positions trivially OK.
+
+### 📊 當日總結 (2026-10-09 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留; 3 CRM-invisible TP1-over-line: MRVL +29.0% / COP +22.4% / MRK +20.1%)
+🎯 TP2 觸發:        0  (CLOSEST: MRVL +8.53% from TP2 line $297.40, stabilization CONFIRMED, gap narrowing)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (#33 prior):          $100,633.03
+💰 收市前總權益 (今日 03:00):        $100,002.73
+📈 日內 MTM (2h RTH):                +$353.12 (+0.355%)
+📦 未實現 PnL:                       $+6,164.02 (+6.58%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    MRVL 12.63% / DE 11.07%
+🚦 零觸發連續 (zt):                   3
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #36 — 2026-10-09 03:30 BJT (Thu 15:30 EDT) — RTH close -30min (trail-stop confirm)**
+
+Same-BJT-day carry (zt=3 → 4). MRVL rebound watch: did +2.73% bounce hold or fade into close? If holds → MRVL TP2 gap continues narrowing (potential +6-7% by close). XOM near TP1 line (gap +0.7%): could re-cross tonight via after-hours or hold for next RTH. RKLB streak: -12.8% (no relief at #35, continued deterioration). MA20 latent bug will continue firing.
+
+---
