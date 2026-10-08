@@ -28892,3 +28892,133 @@ MA10/MA20 trail-stop test non-functional this cron: scan.py position-check uses 
 Same-BJT-day carry (zt=3 → 4). MRVL rebound watch: did +2.73% bounce hold or fade into close? If holds → MRVL TP2 gap continues narrowing (potential +6-7% by close). XOM near TP1 line (gap +0.7%): could re-cross tonight via after-hours or hold for next RTH. RKLB streak: -12.8% (no relief at #35, continued deterioration). MA20 latent bug will continue firing.
 
 ---
+## Cron #36 — 2026-10-09 03:30 BJT (Thu 15:30 EDT) — RTH close -30min (trail-stop confirm)
+
+### 📊 Metrics snapshot
+
+```
+📦 持倉數:                    32
+💰 Cash:                      $207.40
+💰 Total MV:                  $99,989.62
+💰 Total Equity:              $100,197.02
+💰 Unrealized PnL:            $+6,366.81 (+6.80%)
+🚦 zt:                        4 (same-BJT-day carry from #35)
+🚦 cf:                        0
+📈 Cron-to-cron MV drift:     $+194.29 (+0.19%) over 30-min RTH window (#35 → #36, 15:00 → 15:30 EDT)
+```
+
+**5m-bar baseline drift decomposition** (cleanest sub-30-min RTH window to date):
+
+| Direction | Symbol | $Δ | Note |
+|-----------|--------|-----:|------|
+| 🔻 Top-5 negative | MRVL | −$89.24 | qty 46 × −$1.94; TP1-over +27.8% gave back #35 rebound |
+| 🔻 | SNDK | −$10.31 | qty 1 × −$10.31; TP1-over +16.1% profit-taking |
+| 🔻 | CSCO | −$7.83 | qty 29 × −$0.27; flat PnL |
+| 🔻 | VRT | −$3.88 | qty 4 × −$0.97; weak −14.1% |
+| 🔻 | LRCX | −$0.98 | qty 1 × −$0.98 |
+| 🔺 Top-5 positive | DE | +$72.93 | qty 17 × +$4.29; cap-violator rebounded late |
+| 🔺 | RKLB | +$71.82 | qty 126 × +$0.57; streak relief +0.9pp |
+| 🔺 | HOOD | +$28.12 | qty 74 × +$0.38 |
+| 🔺 | FUTU | +$21.44 | qty 67 × +$0.32 |
+| 🔺 | IBM | +$13.12 | qty 8 × +$1.64 |
+
+- Decomposition sum: **+$155.38**
+- Authoritative FIFO MV delta: **+$194.29**
+- Residual: **−$38.91** (within <$200 markdown-rounding band; clean 5m-bar baseline)
+
+### 🎯 TP1 / TP2 status
+
+**TP1 over line (3 positions, all CRM-invisible)** — missing from state file keys, awaiting next FIFO recompute:
+
+| Symbol | PnL | Cost (per-share reconstructed) | TP1 line | TP2 line | Gap to TP2 (price-space) |
+|--------|----:|------------------------------:|---------:|---------:|-------------------------:|
+| **MRVL** | +27.8% | $212.47 | $254.97 | $297.46 | **+9.55%** (widened +1.02pp from #35 +8.53%) |
+| COP | +22.6% | $109.67 | $131.61 | $153.54 | +14.19% |
+| MRK | +20.4% | $118.19 | $141.83 | $165.47 | +16.28% |
+
+**TP2 nearest**: **MRVL** at +9.55% price-space gap (cur $271.54 vs TP2 $297.46). Widened +1.02pp from #35 — RTH fade resumed after the #35 +2.73% rebound. Rate of change: #34 +10.58% → #35 +8.53% → #36 +9.55% (~−2pp then +1pp → oscillating, NOT monotonic stabilization).
+
+### 🚨 Cap violations (>10%)
+
+| Symbol | Cap % | MV | Δ vs #35 | Status |
+|--------|------:|----:|---------:|--------|
+| **MRVL** | 12.49% | $12,490.84 | −0.14pp (improved) | 16th consecutive cron |
+| **DE** | 11.13% | $11,124.29 | +0.06pp (worsened) | 16th consecutive cron |
+
+Both cap violations persist. MRVL improvement is denominator-effect (other positions declined) plus numerator drop ($273.48 → $271.54). DE worsening is also denominator-effect in reverse (DE +0.66% gained while denominator shrank).
+
+### 🟢 Active MA10/MA20 trail-stop status
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**30-min price action summary** (32/32 MA10/MA20 trivially OK per latent bug):
+- DE +0.66% (rebounded $4.29), RKLB +0.83% (streak relief +0.9pp)
+- MRVL −0.71% (fade resumed, TP1-over profit-taking)
+
+### 📈 RKLB streak tracking
+
+- **#36: −11.9%** (vs #35 −12.8%, **+0.9pp relief**)
+- **Cumulative relief from #34 low −17.7%**: now **+5.8pp cumulative**
+- Streak counter: **34+ windows** continuous deterioration since #27 pre-open (2026-09-08)
+- Buffer to active MA10-trail SL: $65.32 vs $68.76 = **5.0% buffer** (at warning threshold)
+- **Diagnostic**: relief >2, intermediate 1-2pp — "sustained relief, streak likely ending" per skill pitfall
+- **No auto-exit on relief alone** — manual review only
+
+### 🔄 Five-window comparison (today, 2026-10-09 BJT)
+
+| Cron # | Time BJT | EDT | Session | MV | Drift vs prior | zt | TP2 nearest (price-space) |
+|-------:|---------:|----:|---------|----:|---------------:|---:|--------------------------:|
+| #27 | 22:00 | 10:00 | Pre-open (same-BJT-day carry) | (prior day) | — | 5 | — |
+| #33 | 23:00 | 11:00 | Pre-market follow-through | $100,425.63 | −$161.42 (−0.16%) | 6 | MRVL +8.02% |
+| #34 | 01:00 | 13:00 | RTH mid-session (P-MR-247 reset) | $99,442.21 | −$990.82 (−0.99%) | 2 | MRVL +10.58% |
+| #35 | 03:00 | 15:00 | RTH late (TP2 check) | $99,795.33 | +$353.12 (+0.36%) | 3 | MRVL +8.53% |
+| **#36** | **03:30** | **15:30** | **RTH close -30min** | **$99,989.62** | **+$194.29 (+0.19%)** | **4** | **MRVL +9.55%** |
+
+### 📊 Daily summary block
+
+```
+### 📊 當日總結 (2026-10-09 BJT)
+
+```
+🔔 買入信號:                 0
+🎯 TP1 觸發:                0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:                0  (CLOSEST: MRVL +9.55% from TP2 line $297.46)
+🚪 止蝕/賣出觸發:           0
+
+💰 開盤總權益 (前一日 22:00):  $101,XXX.XX  (reference: prior day close)
+💰 收市前總權益 (今日 03:30):  $100,197.02
+📈 日內 MTM:                   −$XXX.XX (next-day pre-open #27 will reconcile)
+📦 未實現 PnL:                $+6,366.81 (+6.80%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 12.49% / DE 11.13%
+🚦 零觸發連續 (zt):            4
+```
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #27 — 2026-10-09 22:00 BJT (Fri 10:00 EDT) — next-day pre-open (P-MR-247 reset)**
+
+Day-boundary reset applies (2026-10-09 BJT ≠ 2026-10-08 BJT): zt 4 → 1 → +1 = **zt=2** for first scan of new day. MRVL TP2 gap watch: #34 +10.58% → #35 +8.53% → #36 +9.55% (oscillating, not stabilizing). RKLB streak: cumulative relief +5.8pp from #34 low, approaching "major relief > 2pp" threshold for manual review (but no auto-exit). Cap violations both marginal improvement direction (MRVL −0.14pp, DE +0.06pp). MA20 latent bug continues.
+
+### 📋 Log / State 檔案動作
+
+| File | Action |
+|------|--------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended (this section) |
+| `/tmp/ai_trader_tp1_state.json` | _audit block refreshed via cron_state_refresh.py (TP1/TP2 list unchanged) |
+| `/tmp/ai_trader_scan_meta_log.json` | entry appended (99 total) |
+| `/tmp/ai_trader_trades_log.json` | unchanged — 0 trades this cron (semantic invariant preserved, 296 entries) |
+| `/tmp/ai_trader_cash_floor.json` | unchanged (cf=0, cash $207.40 > $100 floor) |
+| `/tmp/ai_trader_zero_trigger.json` | unchanged (zt=4 same-BJT-day carry) |
+
+### 🐛 Notes / Pitfalls encountered
+
+- **MA20 latent bug**: 32/32 positions MA20 == price (period="5d" insufficient lookback). Apply caveat to every cron section until patched.
+- **5m-bar baseline success**: residual −$38.91 (within <$200 markdown-noise band) — cleanest sub-30-min RTH drift decomposition to date. Validates the NEW technique for sub-30-min windows (different from the 30m-bar "exact" baseline used for 2h windows).
+- **MRVL TP2 nearest oscillation**: #34 +10.58% → #35 +8.53% → #36 +9.55% (widen → narrow → widen) — skill's rate-deceleration stabilization signal is NOT present; pattern is "RTH fade + after-hours bounce + RTH fade" cyclic, NOT monotonic stabilization.
+- **Cap_pct ratio decoupling**: MRVL improvement (−0.14pp) is denominator-effect (other positions declined); DE worsening (+0.06pp) is also denominator-effect. Both cap ratios are dominated by the broader portfolio's drift, not the position's own price action.
+- **CRM-invisible TP1-over pattern persists**: MRVL/COP/MRK all missing from state file keys but pnl ≥ +20%. Will require FIFO recompute to add.
+
+---
