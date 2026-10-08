@@ -28363,3 +28363,158 @@ TP2 nearest:         MRVL +4.56% from TP2 line $297.35 (cur $284.39) — gap NAR
 - MA10/MA20 latent bug will continue firing (scan period=5d)
 
 ---
+## Cron #27 — 2026-10-08 22:00 BJT (Wed 10:00 EDT) — Next-day pre-open (same-BJT-day carry, no P-MR-247 reset)
+
+**Session classification**: Pre-open follow-through, **same BJT day as #36** (both 2026-10-08). No P-MR-247 day-boundary reset applies — zt carries forward 4 → 5. This is a structural variant from the canonical pre-open pattern (which usually sees a BJT-day rollover): the previous cron was Tue 10-07 15:30 EDT RTH close and the current is Wed 10-08 10:00 EDT ~30min after RTH open, so drift window is overnight+pre-open (~18.5h).
+
+### 📈 Headline metrics
+
+```
+💰 Total MV:                  $100,587.05
+💰 Total equity:              $100,794.45
+💵 Cash:                       $207.40
+📊 Positions:                  32
+🚨 Cap violations:             MRVL 12.74% / DE 11.08%
+🎯 TP2 nearest:                MRVL +6.79% (cur $278.51 vs TP2 $297.42)
+🎯 TP1-over-line (pnl ≥ +20%): MRVL +31.1% / COP +21.2%
+🚦 Zero-trigger consecutive:    5 (zt=5, same-day carry from #36)
+```
+
+**Authoritative FIFO MV drift**: **-$880.86 (-0.87%)** vs #36 (Tue 10-07 15:30 EDT, MV $101,467.91).
+
+### 🔄 Drift decomposition (Tue 10-07 close → Wed 10-08 10:00 EDT)
+
+Baseline source: **yfinance `iloc[-2]` = Tue 10-07 close** (cleanest single-source; SPY spot-check confirmed yfinance cached through Wed 10-08 — `last 3 dates = ['2026-10-06', '2026-10-07', '2026-10-08']`).
+
+| Window | Authoritative MV Δ | Decomposition sum | Residual |
+|---|---|---|---|
+| Tue 15:30 EDT → Wed 10:00 EDT (~18.5h overnight+pre-open) | **-$880.86 (-0.87%)** | -$868.32 | **+$12.54** |
+
+Residual +$12.54 is well within markdown-rounding noise band (<$200); cleanest residual for any pre-open cron to date.
+
+**Top-5 positive contributors** (RTH rebound — oil/energy + defensive):
+
+| Sym | Prev (Tue close) | Cur (Wed 10:00 EDT) | Δpx | MV Δ |
+|---|---|---|---:|---:|
+| COP | $129.84 | $132.96 | +$3.12 (+2.40%) | **+$199.68** |
+| XOM | $164.05 | $168.00 | +$3.95 (+2.41%) | **+$146.15** |
+| CVX | $205.15 | $210.58 | +$5.43 (+2.65%) | **+$65.16** |
+| WFC | $80.26 | $80.75 | +$0.49 (+0.61%) | +$17.64 |
+| IBM | $220.51 | $222.41 | +$1.90 (+0.86%) | +$15.20 |
+
+**Top-5 negative contributors** (TP1-over-line profit-taking + tech selloff):
+
+| Sym | Prev (Tue close) | Cur (Wed 10:00 EDT) | Δpx | MV Δ |
+|---|---|---|---:|---:|
+| MRVL | $284.68 | $278.51 | -$6.17 (-2.17%) | **-$283.82** |
+| RKLB | $71.92 | $69.85 | -$2.07 (-2.88%) | **-$260.82** |
+| HOOD | $109.51 | $106.00 | -$3.51 (-3.20%) | **-$259.74** |
+| AVGO | $376.51 | $367.07 | -$9.44 (-2.51%) | **-$160.48** |
+| ASTS | $60.65 | $57.90 | -$2.75 (-4.53%) | **-$88.00** |
+
+**Pattern**: pre-open fade dominated by MRVL (still TP2 nearest) and HOOD (TP1=true was true historically), with AVGO/RKLB continuing their underperformance. Energy/oil positions (COP/XOM/CVX) bounced on overnight gap — possibly oil price recovery or sector rotation into defensives.
+
+### 🎯 TP2 nearest — MRVL widening +6.79%
+
+| | #36 (Tue RTH close) | #27 (Wed pre-open) |
+|---|---:|---:|
+| MRVL price | $284.39 | $278.51 |
+| TP2 line | $297.35 | $297.42 |
+| Gap (price-space) | +4.55% | **+6.79%** |
+| Rate of change | — | +2.24pp overnight |
+
+**TP2 gap WIDENED by ~2.2pp overnight** (price fell $5.88 from $284.39 → $278.51, while TP2 line drifted +$0.07 from cost reconstruction noise). MRVL still the dominant TP2-nearest candidate — next closest is COP at +15.51% (a wide margin). MRVL TP2 cross projection: at -$0.30/4h rate over the prior session, would need ~75h to reach TP2 line — but rate is non-stationary, no firm ETA.
+
+### 🚨 Cap violations
+
+| Symbol | cap_pct | MV | qty | Notes |
+|---|---:|---:|---:|---|
+| **MRVL** | **12.74%** | $12,811.46 | 46 | Widened slightly vs #36 (+0.04pp); price decline but offset by total MV shrinkage |
+| **DE** | **11.08%** | $11,145.03 | 17 | Modestly improved; new position or stable |
+
+Both flags remain in effect. P-MR-124 cap block: any new Stage 2 entry that would push either symbol higher is rejected.
+
+### 🎯 TP1-over-line reconciliation
+
+**Current over-line (pnl ≥ +20%)**: MRVL (+31.1%), COP (+21.2%)
+
+**Diff vs #36 prior list**:
+- ✅ **MRVL**: kept (was +33.9% invisible → now +31.1% invisible; -2.8pp)
+- ❌ **SNDK**: REMOVED (was +24.0% TP1=true ✅ → now **+19.6%** FELL BELOW TP1 line, -4.4pp)
+- ❌ **MRK**: REMOVED (was +20.7% TP1=true ✅ → now **+19.3%** FELL BELOW TP1 line, -1.4pp)
+- ➕ **COP**: ADDED (NEW invisible, +21.2%; **NOT in state file** — CRM pattern, requires manual FIFO recompute)
+
+**Current `tp1_over_line_unmarked`**: `['MRVL (CRM-missing invisible, +31.1%, -2.8pp vs #36)', 'COP (NEW invisible, +21.2%)']`
+
+Both positions are **CRM-pattern invisible** — they have current prices above TP1 line but lack `TP1=true` flag in state file. FIFO recompute will catch on next run.
+
+**Fell-back-below alerts**:
+- **SNDK**: #36 +24.0% → #27 +19.6% (-4.4pp overnight gap-down). State file SNDK stays `TP1=true` (historical), no cron mutation.
+- **MRK**: #36 +20.7% → #27 +19.3% (-1.4pp overnight gap-down). State file MRK stays `TP1=true` (historical), no cron mutation.
+
+Per the inverse-CRM pattern pitfall: falling below the line is symmetric to crossing up. Both positions are pure mark-to-market until FIFO recompute resolves lot-by-lot state. If either re-crosses above TP1 line at next cron, they return to the queue.
+
+### ⚠️ MA10/MA20 trail-stop diagnostic — latent bug fires
+
+⚠️ MA10/MA20 trail-stop test **non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. All 32/32 positions show `MA20 = 現價` (trivially). Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation.
+
+The `止蝕=$Z` field IS valid (computed as `price × 0.95` = live trailing stop). Spot-check: MRVL止蝕=$264.58 = $278.51 × 0.95 ✓.
+
+**Pre-open context**: MA10 trail is dormant in pre-market (not yet active). The MA20 bug fires regardless of session — it's a structural scan.py defect, not a session-level one. Live MA10/MA20 trail-stop test resumes when yfinance intraday data is queried (out of cron scope).
+
+### 📊 TP1=true count (state file audit)
+
+```
+TP1=true (boolean flag):        14
+  AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK
+TP1=false:                       3
+  AVAV, CIFR, SYM
+TP1=FULLY_CLOSED (object):       1
+  HOOD
+```
+
+TP1=true count unchanged at **14** (SNDK stays TP1=true; fell below line is mark-to-market, not state mutation).
+
+### 📋 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_tp1_state.json   — _audit refreshed (zt=5, MRVL/COP invisible queue; TP1 flags UNCHANGED)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 95th entry
+✅ /tmp/ai_trader_cash_floor.json  — cf=0 (cash $207.40 well above floor)
+✅ /tmp/ai_trader_zero_trigger.json — zt=5 (5th consec zero-trigger, same-day carry)
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED at 296 (0 trades this cron; semantic invariant preserved)
+```
+
+### 🟢 Buy/Sell signals
+
+```
+🔔 買入信號:         0
+🚪 止蝕/賣出觸發:   0
+```
+
+**Stage 2 候選**: 0 (RTH pre-open window: MA10 dormant, no qualifying breakout-pullback setups).
+**股票池 scan**: 0 (yfinance scan returned no qualifying setups — pre-open window typically sparse).
+
+### 📊 當日總結 (2026-10-08 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: MRVL +6.79% from TP2 line $297.42)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 RTH close):   $101,675.31
+💰 收市前總權益 (今日 22:00):     $100,794.45
+📈 隔夜+盤前 MTM:                  -$880.86 (-0.87%)
+📦 未實現 PnL:                     $+6,961.17 (+7.44%)
+💵 現金:                            $207.40
+📊 持倉數:                          32
+🚨 Cap violations:                  MRVL 12.74% / DE 11.08%
+🚦 零觸發連續 (zt):                 5
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #33 — 2026-10-08 23:00 BJT (Wed 11:00 EDT) — Pre-market follow-through**
+
+Same BJT day; zt carries 5 → 6. Pre-market active (MA10 trail activating). MRVL TP2 nearest watch: did MRVL gap further down or rebound on Wed pre-market? COP newly invisible (CRM pattern) — confirm FIFO recompute awareness. SNDK/MRK fell below TP1 line — monitor for re-cross. Cap violations: MRVL/DE expected unchanged (no new entries this cron).
