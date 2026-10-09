@@ -29022,3 +29022,136 @@ Day-boundary reset applies (2026-10-09 BJT ≠ 2026-10-08 BJT): zt 4 → 1 → +
 - **CRM-invisible TP1-over pattern persists**: MRVL/COP/MRK all missing from state file keys but pnl ≥ +20%. Will require FIFO recompute to add.
 
 ---
+
+## Cron #27 — 2026-10-09 22:00 BJT (Fri 10:00 EDT) — Next-day pre-open (same-BJT-day carry from #36, no P-MR-247 reset)
+
+### 📊 Metrics snapshot
+
+```
+📦 持倉數:                    32
+💰 Cash:                      $207.40
+💰 Total MV:                  $100,577.52
+💰 Total Equity:              $100,784.92
+💰 Unrealized PnL:            $+6,947.18 (+7.42%)
+🚦 zt:                        5 (same-BJT-day carry from #36 zt=4)
+🚦 cf:                        0
+📈 Cron-to-cron MV drift:     $+527.49 (+0.53%) over 1-trading-day window (Thu 10-08 RTH close → Fri 10-09 ~10:00 EDT)
+```
+
+**1-trading-day drift decomposition** (cleanest yfinance iloc[-2] baseline, single-source):
+
+| Direction | Symbol | $Δ | Note |
+|-----------|--------|-----:|------|
+| 🔻 Top-5 negative | MRVL | −$211.60 | qty 46 × −$4.60 (−1.67%); TP1-over +27.1% RTH fade |
+| 🔻 | ASTS | −$155.84 | qty 32 × −$4.87 (−8.55%); weak −17.7% |
+| 🔻 | RKLB | −$110.88 | qty 126 × −$0.88 (−1.29%); streak 35+ windows |
+| 🔻 | T | −$29.82 | qty 14 × −$2.13 (−8.56%) |
+| 🔻 | IREN | −$17.85 | qty 35 × −$0.51 (−1.43%) |
+| 🔺 Top-5 positive | BABA | +$383.15 | qty 79 × +$4.85 (+4.59%); strong China-tech bounce |
+| 🔺 | FUTU | +$265.99 | qty 67 × +$3.97 (+3.65%); same China-tech theme |
+| 🔺 | COP | +$85.12 | qty 64 × +$1.33 (+0.99%); TP1-over +23.6% narrow gain |
+| 🔺 | AVGO | +$62.73 | qty 17 × +$3.69 (+1.02%) |
+| 🔺 | DE | +$56.95 | qty 17 × +$3.35 (+0.51%); cap-violator flat gain |
+
+- Decomposition sum: **+$527.49**
+- Authoritative FIFO MV delta: **+$527.49**
+- Residual: **$0.00** (perfect single-source yfinance iloc[-2] baseline, Thu 10-08 close)
+
+### 🎯 TP1 / TP2 status
+
+**TP1 over line (4 positions, ALL CRM-invisible — missing from state file keys)** — awaiting next FIFO recompute:
+
+| Symbol | PnL | Cost (per-share reconstructed) | TP1 line | TP2 line | Gap to TP2 (price-space) |
+|--------|----:|------------------------------:|---------:|---------:|-------------------------:|
+| **MRVL** | +27.1% | $212.48 | $254.97 | $297.47 | **+10.15%** (widened +0.60pp from #36 +9.55%) |
+| COP | +23.6% | $109.64 | $131.57 | $153.50 | +13.27% |
+| XOM | +20.0% ⚠️ NEW | $141.51 | $169.81 | $198.11 | +16.67% |
+| MRK | +22.2% | $118.22 | $141.86 | $165.50 | +14.57% |
+
+⚠️ **XOM newly crossed TP1 line overnight** (+20.0% exactly at threshold). Previously at +18.5% or below (not in #36 TP1-over list). Joins MRVL/COP/MRK as the 4th CRM-invisible TP1-over position. All 4 still missing from state file keys — FIFO recompute will need to add them on next run.
+
+**TP2 nearest**: **MRVL** at +10.15% price-space gap (cur $270.06 vs TP2 $297.47). Widened +0.60pp from #36 +9.55% — RTH fade pattern continued overnight (Thu close → Fri open drift was −1.67% for MRVL, the largest negative contributor). Rate of change: #34 +10.58% → #35 +8.53% → #36 +9.55% → #27 +10.15% (slow oscillation, NOT monotonic stabilization; widening resumed).
+
+### 🚨 Cap violations (>10%)
+
+| Symbol | Cap % | MV | Δ vs #36 | Status |
+|--------|------:|----:|---------:|--------|
+| **MRVL** | 12.35% | $12,422.76 | −0.14pp (improved) | 17th consecutive cron |
+| **DE** | 11.09% | $11,150.81 | −0.04pp (improved) | 17th consecutive cron |
+
+Both cap violations persist. MRVL improvement is numerator (price drop) + denominator (small total MV rise). DE marginal improvement from denominator effect (DE +0.51% gain slower than portfolio).
+
+### 🟢 Active MA10/MA20 trail-stop status
+
+⚠️ **MA10/MA20 trail-stop test non-functional this cron**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop, dormant pre-open).
+
+**Pre-open price action summary** (32/32 MA10/MA20 trivially OK per latent bug):
+- BABA +4.59%, FUTU +3.65% (China-tech rally)
+- ASTS −8.55%, T −8.56% (broad overnight weakness in small-caps/telecom)
+- MRVL −1.67% (TP1-over profit-taking continued)
+
+### 📈 RKLB streak tracking
+
+- **#27: −13.5%** (vs #36 −11.9%, **−1.6pp deterioration**)
+- **Cumulative relief from #34 low −17.7%**: now **+4.2pp cumulative** (down from #36 +5.8pp)
+- Streak counter: **35+ windows** continuous deterioration since #27 pre-open (2026-09-08)
+- Buffer to active MA10-trail SL: $67.52 vs $64.14 = **5.0% buffer** (at warning threshold)
+- **Diagnostic**: relief REVERSED — "relief attempt failed, streak continues, cumulative relief pulls back"
+- **No auto-exit on relief alone** — manual review only; relief reversal is consistent with the skill's "RKLB relief can REVERSE" pitfall pattern
+
+### 🔄 Five-window comparison (today, 2026-10-09 BJT)
+
+| Cron # | Time BJT | EDT | Session | MV | Drift vs prior | zt | TP2 nearest (price-space) |
+|-------:|---------:|----:|---------|----:|---------------:|---:|--------------------------:|
+| #27 | 22:00 | 10:00 | Pre-open (same-BJT-day carry) | $100,577.52 | +$527.49 (+0.53%) | 5 | MRVL +10.15% |
+| #33 | 23:00 | 11:00 | Pre-market follow-through | (next) | — | 6 | (next) |
+| #34 | 01:00 | 13:00 | RTH mid-session (next-day, P-MR-247 reset) | (next) | — | 2 | (next) |
+| #35 | 03:00 | 15:00 | RTH late (TP2 check) | (next) | — | 3 | (next) |
+| #36 | 03:30 | 15:30 | RTH close -30min | (next) | — | 4 | (next) |
+
+### 📊 Daily summary block
+
+```
+🔔 買入信號:                 0
+🎯 TP1 觸發:                0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:                0  (CLOSEST: MRVL +10.15% from TP2 line $297.47)
+🚪 止蝕/賣出觸發:           0
+
+💰 開盤總權益 (今日 22:00):   $100,784.92
+📦 未實現 PnL:                $+6,947.18 (+7.42%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 12.35% / DE 11.09%
+🚦 零觸發連續 (zt):            5
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #33 — 2026-10-09 23:00 BJT (Fri 11:00 EDT) — Pre-market follow-through**
+
+Same-BJT-day carry: zt 5 → 6. MRVL TP2 gap watch: +9.55% (RTH close #36) → +10.15% (pre-open #27) — widening resumed, NOT stabilization. RKLB streak: cumulative relief +4.2pp from #34 low (reversed −1.6pp from #36); 5.0% buffer to MA10-trail SL — still at warning threshold. XOM newly crossed TP1 line (+20.0%) overnight — joins MRVL/COP/MRK as 4th CRM-invisible TP1-over. Cap violations both marginally improved (MRVL −0.14pp, DE −0.04pp). MA20 latent bug continues.
+
+### 📋 Log / State 檔案動作
+
+| File | Action |
+|------|--------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended (this section) |
+| `/tmp/ai_trader_tp1_state.json` | _audit block refreshed via cron_state_refresh.py (TP1/TP2 list unchanged, 4 TP1-over all CRM-invisible) |
+| `/tmp/ai_trader_scan_meta_log.json` | entry appended (100 entries total) |
+| `/tmp/ai_trader_trades_log.json` | unchanged — 0 trades this cron (semantic invariant preserved, 297 entries) |
+| `/tmp/ai_trader_cash_floor.json` | unchanged (cf=0, cash $207.40 > $100 floor) |
+| `/tmp/ai_trader_zero_trigger.json` | unchanged (zt=5 same-BJT-day carry) |
+
+### 🐛 Notes / Pitfalls encountered
+
+- **Same-BJT-day carry (no P-MR-247 reset)**: This cron is at 22:00 BJT on the SAME BJT date as #36 (2026-10-09). Both crons are 2026-10-09 BJT, so no day-boundary reset; zt carried from 4 → 5. Distinct from the typical "next-day pre-open" pattern where #27 is a fresh BJT day.
+- **1-trading-day window**: Drift is measured against Thu 10-08 RTH close (yfinance iloc[-2], single-source clean baseline). Residual $0.00 confirms perfect attribution.
+- **MA20 latent bug**: 32/32 positions MA20 == price (period="5d" insufficient lookback). Apply caveat to every cron section until patched.
+- **XOM newly crossed TP1 line**: All 4 TP1-over positions (MRVL/COP/XOM/MRK) are CRM-invisible — missing from state file keys. FIFO recompute will add them on next run. No auto-action this cron.
+- **MRVL TP2 widening resumed**: After #35 narrowing (rate −0.39pp/hr, stabilization signal), #36 +#27 widening (+0.60pp cumulative over 18h) suggests the RTH fade pattern is dominant. Rate of change: #34 +10.58% → #35 +8.53% → #36 +9.55% → #27 +10.15% (oscillating, NOT stabilizing).
+- **RKLB streak relief reversal**: Per skill's "RKLB relief can REVERSE" pitfall — cumulative relief +5.8pp (#36) → +4.2pp (#27, −1.6pp reversal). Streak continues; buffer 5.0% (warning threshold).
+- **Cap_pct ratio marginal improvement**: Both MRVL (−0.14pp) and DE (−0.04pp) cap ratios improved slightly. MRVL: numerator (price drop $274.66→$270.06) + denominator (small MV rise) compounded. DE: denominator effect (DE gain slower than portfolio average).
+- **BABA +4.59% / FUTU +3.65% theme**: China-tech rallied overnight; largest positive contributors. Not TP1-over (BABA +0.3%, FUTU +12.2%) but meaningful for portfolio drift.
+- **ASTS −8.55% / T −8.56% weakness**: Small-cap ASTS (already weak −17.7%) and telecom T (−1.7% PnL) declined overnight. Single-day weakness, no breach signals.
+
+---
