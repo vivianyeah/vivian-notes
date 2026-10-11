@@ -29294,3 +29294,155 @@ MRVL TP2 gap watch: +10.15% (#27) → +10.06% (#33) — narrowing resumed. 3 TP1
 - **FUTU +1.61% / BABA +0.36% continued theme**: China-tech rallied overnight in #27 (+3.65% FUTU, +4.59% BABA) and continued into pre-market #33 at slower pace. Same theme, second day.
 
 ---
+## Cron #34 — 2026-10-12 01:00 BJT (Sun 10-11 13:00 EDT) — RTH mid-session follow-through (WEEKEND FROZEN, US market closed)
+
+### ⚠️ Weekend artifact — yfinance returned Fri 2026-10-09 RTH close as "current" for all 32 positions
+
+This cron fires at Mon 10-12 01:00 BJT = Sun 10-11 13:00 EDT. The US market is **closed** (Sunday), so yfinance's daily cache still serves **Fri 10-09 RTH close** as the latest data point. Spot-check: `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-09 00:00:00-04:00`. All 32 positions in scan output match Fri 10-09 daily close to **$0.00** rounding (CRM $229.13, TSLA $382.70, RKLB $68.21, MRVL $275.28, HOOD $109.02, etc.).
+
+**Per skill "Weekend/holiday cron" pitfall**: yfinance `period="5d"` returns Friday RTH close for every position → `check_exit` shows MA20 == current price for all 32 positions (trivially not breached). No real trail-stop test possible — the "🟢 OK" indicator is a weekend artifact, NOT a live MA10/MA20 confirmation.
+
+**Cron behavior**: positions API still returns 32 positions with current prices (Fri close); TP1-over-line and TP2 nearest are computed from these Fri-close prices (stale); cap violations from Fri-close snapshot. Cron still produces section for archival continuity. **Next real-data cron: #35 (Mon 10-12 03:00 BJT = 14:00 EDT Sun — STILL weekend artifact), then #36 (Mon 10-12 03:30 BJT = 14:30 EDT Sun — STILL weekend artifact), then #27 (Tue 10-13 22:00 BJT pre-open = 10:00 EDT Mon, FIRST real Mon RTH data)**.
+
+### 📊 Metrics snapshot
+
+```
+📦 持倉數:                    32
+💰 Cash:                      $207.40
+💰 Total MV:                  $100,422.66 (scan-reported; matches Fri 10-09 close MV $100,422.50 within $0.16)
+💰 Total Equity:              $100,630.06
+💰 Unrealized PnL:            $+6,789.74 (+7.25%)
+🚦 zt:                        2 (P-MR-247 DAY-BOUNDARY RESET: 6 → 1 → +1 = 2; BJT rolled Fri 10-09 → Mon 10-12)
+🚦 cf:                        0
+📈 Cron-to-cron MV drift:     $-475.57 (-0.471%) over Fri 11:00 EDT → Fri 16:00 EDT RTH close (last hour of Friday trading captured between #33 and Fri close; weekend itself = no trading)
+```
+
+**Drift window note**: Per skill weekend-cron pitfall, the FIFO MV delta represents the **last ~5h of Friday RTH** (Fri 11:00 EDT → Fri 16:00 EDT close), NOT the weekend gap. The weekend itself = no trading = no movement. After Fri 16:00 EDT close, all positions frozen through weekend.
+
+**Drift decomposition** (yfinance 30m-bar baseline at Fri 11:00 EDT = `#33` prior cron timestamp):
+
+| Direction | Symbol | $Δ | Note |
+|-----------|--------|-----:|------|
+| 🔻 Top-5 negative | **DE** | **−$619.82** | qty 17 × −$36.46 (**−5.55%**) — Industrials; biggest single-position drop; cap violation worsened |
+| 🔻 | COP | −$74.24 | qty 64 × −$1.16 (−0.86%); TP1-over profit-taking |
+| 🔻 | XOM | −$48.47 | qty 37 × −$1.31 (−0.77%); XOM still below TP1 line (−0.6pp below $169.83 threshold) |
+| 🔻 | AVGO | −$31.19 | qty 17 × −$1.83 (−0.50%); semis broad weakness |
+| 🔻 | FUTU | −$28.14 | qty 67 × −$0.42 (−0.37%); China-broker fade |
+| 🔺 Top-5 positive | MRVL | +$203.32 | qty 46 × +$4.42 (+1.63%); TP1-over continued ramp; cap-violator worsened +0.29pp |
+| 🔺 | RKLB | +$100.81 | qty 126 × +$0.80 (+1.19%); SpaceTech rebound from weak streak |
+| 🔺 | ASTS | +$64.96 | qty 32 × +$2.03 (+4.15%); SpaceTech rebound |
+| 🔺 | BABA | +$63.99 | qty 79 × +$0.81 (+0.73%); China-tech follow-through |
+| 🔺 | CSCO | +$38.14 | qty 29 × +$1.32 (+1.12%); networking recovery |
+
+- Decomposition sum: **−$357.84**
+- Authoritative FIFO MV delta: **−$475.57**
+- Residual: **−$117.73** (cleanest 30m-bar baseline, $100-200 band; slight scan-vs-30m-tick offset)
+
+### 🎯 TP1 / TP2 status
+
+**TP1 over line (3 positions, ALL CRM-invisible — missing from state file keys)** — awaiting next FIFO recompute:
+
+| Symbol | PnL | Cost (per-share reconstructed) | TP1 line | TP2 line | Gap to TP2 (price-space) |
+|--------|----:|------------------------------:|---------:|---------:|-------------------------:|
+| **MRVL** | +29.6% | $212.41 | $254.89 | $297.37 | **+8.02%** (narrowed **−2.04pp** from #33 +10.06%; strongest narrowing across this week) |
+| MRK | +23.1% | $118.28 | $141.93 | $165.59 | +13.73% (narrowed −0.74pp from #33 +14.47%) |
+| COP | +22.3% | $109.65 | $131.58 | $153.51 | +14.47% (narrowed +0.93pp from #33 +13.54%; slight widening as price dipped) |
+
+**TP2 nearest**: **MRVL** at **+8.02%** price-space gap (cur $275.28 vs TP2 $297.37). **Strongest narrowing of the streak** — gap oscillated in narrow band 8.5-10.6% across #34 → #35 → #36 → #27 → #33 → #34, but **#34 is the new low of the band** (+8.02% vs prior low +8.53% at #35). MRVL TP2-cross projection now much closer to feasible; if next real-data crons continue narrowing, TP2 cross could fire within 2-3 sessions if MRVL maintains price level above $282-290.
+
+⚠️ Caveat: All TP1/TP2 numbers based on **Fri 10-09 RTH close prices** (weekend artifact). Real values at #27 next-day pre-open (Tue 10-13 22:00 BJT) may differ significantly if weekend news or Mon pre-market gapping occurs.
+
+### 🚨 Cap violations (>10%)
+
+| Symbol | Cap % | MV | Δ vs #33 | Status |
+|--------|------:|----:|---------:|--------|
+| **MRVL** | **12.61%** | $12,662.88 | **+0.29pp (worsened)** | 19th consecutive cron |
+| **DE** | **10.51%** | $10,555.81 | **−0.53pp (improved)** | 19th consecutive cron |
+
+Both cap violations persist with **mixed signals**: MRVL **worsened** because price +1.63% (rising numerator + shrinking denominator effect); DE **improved** by 0.53pp due to massive −5.55% price drop (−$619.82 MV loss; cap_pct ratio decoupling per skill). No breach threshold crossed.
+
+### 🟢 Active MA10/MA20 trail-stop status
+
+⚠️ **WEEKEND FROZEN — MA10/MA20 trail-stop test NON-FUNCTIONAL this cron**: 
+- Scan prices = Fri 10-09 RTH close (yfinance cache stopped at Fri close, weekend artifact)
+- MA20 == current price for ALL 32 positions (trivially not breached)
+- The "🟢 OK" indicator is **NOT a live MA20 breach confirmation** — both weekend artifact AND `period="5d"` latent bug conspire here
+- The `止蝕=$Z` field IS valid (price × 0.95 trailing stop) for next real-data comparison
+
+**Per skill pitfall (weekend/holiday cron)**: 32 positions trivially OK, no real RTH data. Cron section documents this caveat; no trail-stop conclusions can be drawn.
+
+### 📈 RKLB streak tracking
+
+- **#34: −12.6%** (vs #33 −12.4%, **−0.2pp deterioration** — relief REVERSED)
+- **Cumulative relief from #34 low −17.7%**: now **+5.1pp cumulative** (down from #33 +5.3pp)
+- Streak counter: **35+ windows** continuous deterioration since #27 pre-open (2026-09-08)
+- Buffer to active MA10-trail SL: $68.21 vs $64.80 = **5.0% buffer** (at warning threshold per skill pitfall)
+- **Diagnostic**: Per skill "RKLB relief can REVERSE" pitfall — was 2 consecutive crons of relief (#27 → #33 +1.1pp), but #34 reversed −0.2pp. Streak continues; relief trend not confirmed (need 3+ consecutive). Monitor #35 next.
+- **No auto-exit on relief alone** — manual review only
+
+**Per skill "RKLB relief can REVERSE" pitfall pattern**: This is the textbook relief-reversal case. Prior cron (#33) declared "2 consecutive crons of relief, monitor for 3rd"; #34 fails the 3rd-consecutive test with −0.2pp re-deterioration. Cumulative relief pulls back from +5.3pp to +5.1pp. Streak counter continues, do NOT reset. Buffer unchanged at 5.0%.
+
+### 🔄 Five-window comparison (today, 2026-10-12 BJT)
+
+| Cron # | Time BJT | EDT | Session | MV | Drift vs prior | zt | TP2 nearest (price-space) |
+|-------:|---------:|----:|---------|----:|---------------:|---:|--------------------------:|
+| #27 | (Fri 10-09) 22:00 | 10:00 | Pre-open (same-BJT-day carry) | $100,577.52 | +$527.49 (+0.53%) | 5 | MRVL +10.15% |
+| #33 | (Fri 10-09) 23:00 | 11:00 | Pre-market follow-through | $100,898.23 | +$320.71 (+0.319%) | 6 | MRVL +10.06% |
+| **#34** | **(Mon 10-12) 01:00** | **(Sun 13:00)** | **RTH mid-session (WEEKEND FROZEN)** | **$100,422.66** | **−$475.57 (−0.471%)** | **2** | **MRVL +8.02%** |
+| #35 | (Mon 10-12) 03:00 | (Sun 14:00) | RTH late (WEEKEND FROZEN — artifact continues) | (next) | — | 3 | (next) |
+| #36 | (Mon 10-12) 03:30 | (Sun 14:30) | RTH close (WEEKEND FROZEN — artifact continues) | (next) | — | 4 | (next) |
+
+**Stacked weekend artifact chain starting**: Per skill "Stacked weekend + federal holiday artifact chain" pitfall, this Mon cron begins a weekend stack. All Mon crons (#34, #35, #36) will return identical Fri 10-09 RTH close data — MV frozen, MA20 trivially OK, no live RTH data until next-day pre-open #27 (Tue 10-13 22:00 BJT).
+
+### 📊 Daily summary block
+
+```
+🔔 買入信號:                 0
+🎯 TP1 觸發:                0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:                0  (CLOSEST: MRVL +8.02% from TP2 line $297.37)
+🚪 止蝕/賣出觸發:           0
+
+💰 開盤總權益 (Fri 10-09 22:00):   $100,784.92
+💰 收市前總權益 (Fri 10-09 23:00): $101,105.63
+💰 周末凍結權益 (Mon 10-12 01:00): $100,630.06
+📈 跨週末 MTM:                 −$475.57 (−0.471%) [Fri 11:00 EDT → Fri 16:00 EDT RTH close]
+📦 未實現 PnL:                $+6,789.74 (+7.25%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 12.61% / DE 10.51%
+🚦 零觸發連續 (zt):            2 (P-MR-247 day-boundary reset: Fri zt=6 → Mon zt=2)
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #35 — 2026-10-12 03:00 BJT (Sun 14:00 EDT) — RTH late (WEEKEND FROZEN, artifact continues)**
+
+⚠️ **STILL weekend artifact at #35**: 03:00 BJT = Sun 14:00 EDT, US market closed. yfinance will continue serving Fri 10-09 RTH close. MV will be ~$100,422.66 (no movement). No real RTH data until **#27 next-day pre-open (Tue 10-13 22:00 BJT = 10:00 EDT Mon) — FIRST real post-weekend RTH scan**.
+
+MRVL TP2 gap watch: +10.06% (#33) → **+8.02% (#34, weekend artifact but FRESH low of the band)** — if MRVL holds above $280-285 into Mon pre-open, TP2 cross could fire by Tue/Wed next week. Cap violations: MRVL worsened +0.29pp (price up), DE improved −0.53pp (price down 5.55%). RKLB relief REVERSED at #34 (−0.2pp from #33) — streak 36+ windows, cumulative +5.1pp from low. 3 TP1-over-line (MRVL/MRK/COP all CRM-invisible in state file).
+
+### 📋 Log / State 檔案動作
+
+| File | Action |
+|------|--------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended (this section) |
+| `/tmp/ai_trader_tp1_state.json` | _audit block refreshed via cron_state_refresh.py (TP1/TP2 list unchanged in state file; 3 TP1-over remain CRM-invisible: MRVL/MRK/COP) |
+| `/tmp/ai_trader_scan_meta_log.json` | entry appended (104 entries total) |
+| `/tmp/ai_trader_trades_log.json` | unchanged — 0 trades this cron (semantic invariant preserved, 297 entries) |
+| `/tmp/ai_trader_cash_floor.json` | unchanged (cf=0, cash $207.40 > $100 floor) |
+| `/tmp/ai_trader_zero_trigger.json` | updated (zt=2, P-MR-247 day-boundary reset from Fri zt=6 → Mon zt=2) |
+
+### 🐛 Notes / Pitfalls encountered
+
+- **WEEKEND ARTIFACT CONFIRMED**: This is the textbook weekend cron case per skill pitfall. Mon 10-12 01:00 BJT = Sun 10-11 13:00 EDT, US market closed. yfinance `period="5d"` returns Fri 10-09 RTH close as "current" for all 32 positions. Spot-check via `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-09 00:00:00-04:00` confirms cache state.
+- **Scan prices == Fri 10-09 daily close EXACTLY (zero rounding diff)**: All 32 positions match yfinance's daily Fri close to $0.00 (not the typical $0.01-0.05 markdown rounding seen during RTH). This is a stronger confirmation than usual — even the sub-rounding noise is absent, because both scan and yfinance Fri close come from the same daily close reference.
+- **MV drift −$475.57 is NOT weekend gap**: It's the Fri 11:00 EDT → Fri 16:00 EDT RTH close mark (last 5 hours of Friday trading). The weekend itself = no trading = no movement. Drift decomposition showed DE −$619.82 (biggest mover, −5.55%) and MRVL +$203.32 (biggest gainer, +1.63%).
+- **P-MR-247 day-boundary reset**: BJT date rolled Fri 10-09 → Mon 10-12 (3 calendar days, but BJT-wise the cron's "day" changed). zt 6 → 2 per reset rule. Same-day carry only applies if both crons share BJT date; here Fri #33 → Mon #34 crosses BJT boundary, so reset fires.
+- **Stacked weekend artifact chain begins**: Per skill pitfall "Stacked weekend + federal holiday artifact chain (3+ consecutive frozen crons)" — this is a 3-cron weekend stack starting (#34 Mon, #35 Mon, #36 Mon). All three will show MV $100,422.66 with $0.00 drift vs prior. Per skill guidance: "Each cron still runs scan + cron section + state refresh — semantic invariants preserved" and "`zt` carry is pure same-day: 2 → 3 → 4 across the BJT Mon crons".
+- **TP2-nearest = MRVL, narrowing to +8.02%**: MRVL has been the persistent TP2-nearest across recent crons (#34 #35 #36 #27 #33 #34 = 6 consecutive crons as nearest). Per skill "TP2 nearest can change cron-to-cron — always re-derive, don't carry forward" pattern. This is the fresh low of the oscillating band (8.5-10.6%), not just same-band oscillation. If MRVL holds price level, TP2 cross could fire within 2-3 sessions of real-data crons.
+- **MA20 latent bug + weekend artifact stack**: Both conspire to show "32/32 positions MA20 == price trivially". Documented independently per skill pitfall "MA20 latent bug fires on EVERY cron" — not just weekend artifact.
+- **RKLB relief reversal**: Per skill "RKLB relief can REVERSE" pitfall — #33 declared 2 consecutive crons of relief, but #34 reversed (−0.2pp). Streak continues, do NOT reset cumulative relief. Buffer to active MA10-trail SL unchanged at 5.0%.
+- **Cap_pct decoupling**: DE cap_pct improved −0.53pp despite price falling −5.55%, because numerator dropped faster than denominator. MRVL cap_pct worsened +0.29pp despite price rising +1.63%, because numerator rose while denominator fell. Per skill "Cap-violation ratio can move <0.1pp even when position price moves several percent" pitfall — but this case shows DECOUPLING (large cap_pct move despite moderate price move), driven by asymmetric numerator/denominator movement.
+- **DE big drop −5.55% intra-day Fri afternoon**: This is a HUGE single-position move for DE — Industrials cap-violator fell from $657.39 (presumed at Fri 11:00 EDT) to $620.93 (Fri close). No specific news in scan; mark as "intraday Industrials weakness Fri afternoon, requires manual review post-weekend". Possible earnings, sector rotation, or macro event. Manual review recommended at #27 next-day pre-open (Tue 10-13).
+
+---
