@@ -29446,3 +29446,138 @@ MRVL TP2 gap watch: +10.06% (#33) → **+8.02% (#34, weekend artifact but FRESH 
 - **DE big drop −5.55% intra-day Fri afternoon**: This is a HUGE single-position move for DE — Industrials cap-violator fell from $657.39 (presumed at Fri 11:00 EDT) to $620.93 (Fri close). No specific news in scan; mark as "intraday Industrials weakness Fri afternoon, requires manual review post-weekend". Possible earnings, sector rotation, or macro event. Manual review recommended at #27 next-day pre-open (Tue 10-13).
 
 ---
+
+## Cron #35 — 2026-10-12 03:00 BJT (Sun 10-11 15:00 EDT) — RTH late (WEEKEND FROZEN, artifact continues, US market closed)
+
+### ⚠️ Weekend artifact (continuation from #34) — yfinance still serving Fri 2026-10-09 RTH close
+
+This cron fires at Mon 10-12 03:00 BJT = Sun 10-11 15:00 EDT. The US market remains **closed** (Sunday, federal holiday stack on Columbus Day Mon 10-12), so yfinance's daily cache still serves **Fri 10-09 RTH close** as the latest data point. Spot-check: `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-09 00:00:00-04:00`. All 32 positions in scan output match Fri 10-09 daily close to **$0.00** rounding (CRM $229.13, TSLA $382.70, RKLB $68.21, MRVL $275.28, HOOD $109.02, etc.) — IDENTICAL to #34 scan output.
+
+**Per skill "Weekend/holiday cron" pitfall**: yfinance `period="5d"` returns Friday RTH close for every position → `check_exit` shows MA20 == current price for all 32 positions (trivially not breached). No real trail-stop test possible — the "🟢 OK" indicator is a weekend artifact, NOT a live MA10/MA20 confirmation.
+
+**Cron behavior**: positions API still returns 32 positions with current prices (Fri close); TP1-over-line and TP2 nearest are computed from these Fri-close prices (stale); cap violations from Fri-close snapshot. Cron still produces section for archival continuity. **Next real-data cron: #36 (Mon 10-12 03:30 BJT = Sun 14:30 EDT — STILL weekend artifact), then #27 (Tue 10-13 22:00 BJT pre-open = 10:00 EDT Mon, FIRST real Mon RTH data)**.
+
+**Stacked weekend + federal holiday artifact chain**: Per skill pitfall "Stacked weekend + federal holiday artifact chain (3+ consecutive frozen crons)" — Mon 10-12 is Columbus Day (US federal holiday). All Mon crons (#34, #35, #36) will return identical Fri 10-09 RTH close data — MV frozen, MA20 trivially OK, no live RTH data until next-day pre-open #27 (Tue 10-13 22:00 BJT).
+
+### 📊 Metrics snapshot
+
+```
+📦 持倉數:                    32
+💰 Cash:                      $207.40
+💰 Total MV:                  $100,422.66 (IDENTICAL to #34, both frozen at Fri 10-09 close)
+💰 Total Equity:              $100,630.06
+💰 Unrealized PnL:            $+6,789.74 (+7.25%)
+🚦 zt:                        3 (same-BJT-day carry from #34 zt=2 → +1; both Mon 10-12 BJT)
+🚦 cf:                        0
+📈 Cron-to-cron MV drift:     $+0.00 (+0.000%) — null, weekend artifact, all 32 positions frozen
+```
+
+**Drift window note**: Per skill weekend-cron pitfall + stacked artifact chain guidance, **drift decomposition is null for #35** — explicitly state "$0.00 drift, no positions moved, weekend + federal holiday stack". Per skill guidance: "a one-line 'null decomposition' is the honest report and matches what the next FIFO recompute will see." No Top-5 table (would show all zeros = noise).
+
+### 🎯 TP1 / TP2 status
+
+**TP1 over line (3 positions, ALL CRM-invisible — missing from state file keys)** — awaiting next FIFO recompute:
+
+| Symbol | PnL | Cost (per-share reconstructed) | TP1 line | TP2 line | Gap to TP2 (price-space) |
+|--------|----:|------------------------------:|---------:|---------:|-------------------------:|
+| **MRVL** | +29.6% | $212.41 | $254.89 | $297.37 | **+8.02%** (UNCHANGED from #34; weekend artifact — all numbers frozen at Fri close) |
+| MRK | +23.1% | $118.28 | $141.93 | $165.59 | +13.73% (UNCHANGED from #34; weekend artifact) |
+| COP | +22.3% | $109.65 | $131.58 | $153.51 | +14.47% (UNCHANGED from #34; weekend artifact) |
+
+**TP2 nearest**: **MRVL** at **+8.02%** price-space gap (cur $275.28 vs TP2 $297.37) — **unchanged from #34** (same Fri-close baseline). Per skill "TP2 nearest can change cron-to-cron — always re-derive, don't carry forward" pattern, this is the natural carry-forward in a frozen-artifact cron (same prices → same nearest). When real data resumes at #27 next-day pre-open, TP2 gap may shift dramatically depending on Mon/Tue RTH movement.
+
+⚠️ Caveat: All TP1/TP2 numbers based on **Fri 10-09 RTH close prices** (weekend + Columbus Day artifact stack). Real values at #27 next-day pre-open (Tue 10-13 22:00 BJT) may differ significantly if weekend news or Mon/Tue RTH movement occurs. **TP2 fire status: NO TP2 fires this cron** — TP2 nearest (+8.02%) still well under TP2 line.
+
+### 🚨 Cap violations (>10%)
+
+| Symbol | Cap % | MV | Δ vs #34 | Status |
+|--------|------:|----:|---------:|--------|
+| **MRVL** | **12.61%** | $12,662.88 | **+0.00pp (UNCHANGED)** | 20th consecutive cron |
+| **DE** | **10.51%** | $10,555.81 | **+0.00pp (UNCHANGED)** | 20th consecutive cron |
+
+Both cap violations persist with **identical metrics to #34** (weekend artifact — no price movement, no MV movement, no cap_pct movement). 20th consecutive cron for both — no breach threshold crossed, no change from prior cron.
+
+### 🟢 Active MA10/MA20 trail-stop status
+
+⚠️ **WEEKEND + COLUMBUS DAY FROZEN — MA10/MA20 trail-stop test NON-FUNCTIONAL this cron**: 
+- Scan prices = Fri 10-09 RTH close (yfinance cache stopped at Fri close, weekend + federal holiday artifact)
+- MA20 == current price for ALL 32 positions (trivially not breached)
+- The "🟢 OK" indicator is **NOT a live MA20 breach confirmation** — both weekend/holiday artifact AND `period="5d"` latent bug conspire here (per skill pitfall "MA20 latent bug fires on EVERY cron")
+- The `止蝕=$Z` field IS valid (price × 0.95 trailing stop) for next real-data comparison
+
+**Per skill pitfall (weekend/holiday cron)**: 32 positions trivially OK, no real RTH data. Cron section documents this caveat; no trail-stop conclusions can be drawn. Real MA10/MA20 trail-stop test resumes at **#27 next-day pre-open (Tue 10-13 22:00 BJT = 10:00 EDT Mon)**.
+
+### 📈 RKLB streak tracking
+
+- **#35: −12.6%** (vs #34 −12.6%, **+0.0pp UNCHANGED** — weekend artifact, no movement)
+- **Cumulative relief from #34 low −17.7%**: **+5.1pp cumulative** (unchanged from #34, frozen at Fri close)
+- Streak counter: **35+ windows** continuous deterioration since #27 pre-open (2026-09-08) — **streak continues** (no reset, but no new data either)
+- Buffer to active MA10-trail SL: $68.21 vs $64.80 = **5.0% buffer** (unchanged, at warning threshold per skill pitfall)
+- **Diagnostic**: Per skill "RKLB relief can REVERSE" pitfall — #34 already reversed (#33 → #34 = −0.2pp). #35 has no new data (weekend artifact). Streak continues as-is. Need 3+ consecutive crons of delta > 0 to declare "streak break imminent" — currently no fresh data to evaluate.
+- **No auto-exit on relief alone** — manual review only
+
+### 🔄 Five-window comparison (today, 2026-10-12 BJT)
+
+| Cron # | Time BJT | EDT | Session | MV | Drift vs prior | zt | TP2 nearest (price-space) |
+|-------:|---------:|----:|---------|----:|---------------:|---:|--------------------------:|
+| #27 | (Fri 10-09) 22:00 | 10:00 | Pre-open (same-BJT-day carry) | $100,577.52 | +$527.49 (+0.53%) | 5 | MRVL +10.15% |
+| #33 | (Fri 10-09) 23:00 | 11:00 | Pre-market follow-through | $100,898.23 | +$320.71 (+0.319%) | 6 | MRVL +10.06% |
+| #34 | (Mon 10-12) 01:00 | (Sun 13:00) | RTH mid-session (WEEKEND FROZEN) | $100,422.66 | −$475.57 (−0.471%) | 2 | MRVL +8.02% |
+| **#35** | **(Mon 10-12) 03:00** | **(Sun 15:00)** | **RTH late (WEEKEND FROZEN — artifact continues)** | **$100,422.66** | **$+0.00 (+0.000%)** | **3** | **MRVL +8.02%** |
+| #36 | (Mon 10-12) 03:30 | (Sun 15:30) | RTH close (WEEKEND FROZEN — artifact continues) | (next) | — | 4 | (next) |
+
+**Stacked weekend + federal holiday artifact chain (cron #2 of 3)**: Per skill "Stacked weekend + federal holiday artifact chain" pitfall — this is the 2nd cron of the Mon 10-12 weekend + Columbus Day artifact stack (#34 Mon, #35 Mon, #36 Mon). All three will show MV $100,422.66 with $0.00 drift vs prior. Per skill guidance: "Each cron still runs scan + cron section + state refresh — semantic invariants preserved" and "`zt` carry is pure same-day: 2 → 3 → 4 across the BJT Mon crons".
+
+### 📊 Daily summary block
+
+```
+🔔 買入信號:                 0
+🎯 TP1 觸發:                0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:                0  (CLOSEST: MRVL +8.02% from TP2 line $297.37)
+🚪 止蝕/賣出觸發:           0
+
+💰 開盤總權益 (Fri 10-09 22:00):   $100,784.92
+💰 收市前總權益 (Fri 10-09 23:00): $101,105.63
+💰 周末凍結權益 (Mon 10-12 03:00): $100,630.06
+📈 跨週末 MTM:                 $0.00 (+0.000%) [weekend artifact, frozen at Fri close]
+📦 未實現 PnL:                $+6,789.74 (+7.25%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 12.61% / DE 10.51%
+🚦 零觸發連續 (zt):            3 (same-BJT-day carry from #34 zt=2 → +1)
+```
+
+### 🔮 Next cron preview
+
+**Next cron: #36 — 2026-10-12 03:30 BJT (Sun 15:30 EDT) — RTH close -30min (WEEKEND FROZEN, artifact continues)**
+
+⚠️ **STILL weekend artifact at #36**: 03:30 BJT = Sun 15:30 EDT, US market closed. yfinance will continue serving Fri 10-09 RTH close. MV will be ~$100,422.66 (no movement). No real RTH data until **#27 next-day pre-open (Tue 10-13 22:00 BJT = 10:00 EDT Mon) — FIRST real post-weekend + post-Columbus-Day RTH scan**.
+
+**Stacked artifact chain countdown**: #34 Mon → **#35 Mon (this cron)** → #36 Mon → #27 Tue next-day pre-open (FIRST real data). All three Mon crons = identical Fri-close artifact.
+
+MRVL TP2 gap watch (frozen at Fri close): +10.06% (#33) → +8.02% (#34) → **+8.02% (#35, unchanged)** — when real data resumes at #27, gap will re-anchor to Mon RTH close. Cap violations: MRVL 12.61% / DE 10.51% (unchanged). RKLB streak: 35+ windows (frozen), cumulative +5.1pp from low (unchanged). 3 TP1-over-line (MRVL/MRK/COP, all CRM-invisible in state file).
+
+### 📋 Log / State 檔案動作
+
+| File | Action |
+|------|--------|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | appended (this section) |
+| `/tmp/ai_trader_tp1_state.json` | _audit block refreshed via cron_state_refresh.py (TP1/TP2 list unchanged in state file; 3 TP1-over remain CRM-invisible: MRVL/MRK/COP) |
+| `/tmp/ai_trader_scan_meta_log.json` | entry appended (104 entries total) |
+| `/tmp/ai_trader_trades_log.json` | unchanged — 0 trades this cron (semantic invariant preserved, 297 entries) |
+| `/tmp/ai_trader_cash_floor.json` | unchanged (cf=0, cash $207.40 > $100 floor) |
+| `/tmp/ai_trader_zero_trigger.json` | updated (zt=3, same-BJT-day carry from #34 zt=2 → +1) |
+
+### 🐛 Notes / Pitfalls encountered
+
+- **WEEKEND + COLUMBUS DAY ARTIFACT (continuation)**: This is cron #2 of the stacked artifact chain per skill pitfall. Mon 10-12 = Columbus Day (US federal holiday). yfinance `period="5d"` returns Fri 10-09 RTH close as "current" for all 32 positions. Spot-check via `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-09 00:00:00-04:00` confirms cache state.
+- **Scan prices == Fri 10-09 daily close EXACTLY (zero rounding diff)**: All 32 positions match yfinance's daily Fri close to $0.00 (not the typical $0.01-0.05 markdown rounding seen during RTH). This is identical to #34 scan output — the strongest possible confirmation of weekend artifact.
+- **MV drift $0.00 IS the stacked weekend artifact**: All Mon crons (#34 → #35 → #36) will show MV $100,422.66 with $0.00 drift vs prior. Per skill "Stacked weekend + federal holiday artifact chain" guidance: "Drift decomposition is null for #35 and #36 — explicitly state '$0.00 drift, no positions moved' rather than fabricating a Top-5 table". A one-line "null decomposition" is the honest report.
+- **Same-BJT-day zt carry (2 → 3)**: Mon 10-12 crons share BJT date. Per skill P-MR-247 reset rule: "Day boundary is BJT-based, NOT UTC-based" and "09-08 22:00 zt=5 → 09-08 23:00 zt=6 (same-day carry)" pattern. Here #34 zt=2 → #35 zt=3 is same-day carry. #36 zt=3 → #36 zt=4 same-day carry. P-MR-247 reset only fires if BJT date rolls; Mon 10-12 crons all share 10-12 BJT date, so no reset between them.
+- **TP2-nearest = MRVL (unchanged)**: Same Fri-close baseline as #34 → MRVL still at +8.02%. Per skill "TP2 nearest can change cron-to-cron — always re-derive, don't carry forward" — this is the natural carry-forward in frozen-artifact crons. Real TP2 nearest re-derivation resumes at #27 next-day pre-open.
+- **MA20 latent bug + weekend/holiday artifact stack**: Both conspire to show "32/32 positions MA20 == price trivially". Documented independently per skill pitfall "MA20 latent bug fires on EVERY cron" — not just weekend artifact.
+- **RKLB streak frozen at #34 state**: No new data at #35 (weekend artifact). Streak counter remains 35+ windows, cumulative relief +5.1pp, buffer 5.0%. Streak-tracking decision deferred to #27 next-day pre-open when real data resumes.
+- **Cap violations frozen**: Both MRVL 12.61% and DE 10.51% unchanged from #34 (zero movement, zero cap_pct movement). Per skill "Stacked weekend + federal holiday artifact chain" guidance: "Cap violations and TP1-over-line are FROZEN at Fri close levels for the entire stack — no need to re-explain them every cron; a single sentence 'unchanged from prior cron (artifact)' suffices".
+- **DRIFT DECOMPOSITION NULL**: Per skill pitfall "Drift decomposition residual — authoritative drift is FIFO MV delta" and "Null-drift case (artifact crons)": when MV drift is exactly $0.00 (stacked weekend/holiday artifact), do NOT fabricate a Top-5 table. State explicitly "Drift decomposition: null, all 32 positions frozen at Fri RTH close, no live trading during this window".
+
+---
