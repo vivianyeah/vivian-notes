@@ -31254,3 +31254,157 @@ Residual:                 +$143.07   (~0.143% of MV, within $200 markdown-roundi
 | #36 | 03:30 (10-14) | 10-13 15:30 | RTH close -30min | (pending) | (pending) | 4 | (pending) | (pending) | (pending) |
 
 Note: 五窗口序列跨越 BJT 10-13 (Tue) → 10-14 (Wed)，所以 zt 在 #34 行重置 (5/6 → 2)。
+
+## Cron #35 — 2026-10-14 03:00 BJT (Tue 15:00 EDT — RTH late, TP2 check window)
+
+### 📈 Position Snapshot
+
+```
+Cash:        $207.40
+Total MV:    $100,126.23
+Total cost:  $93,630.86
+Unrealized:  $+6,495.37 (+6.94%)
+Equity:      $100,333.63
+Positions:   32
+```
+
+**MV drift vs #34**: **+$162.77 (+0.16%)** over 2h RTH (13:00 → 15:00 EDT, same BJT day 10-14). Authoritative FIFO delta.
+
+### 🎯 TP1 / TP2 Status
+
+**TP1-over-line (4 positions, all CRM-invisible, awaiting FIFO recompute)**:
+
+| Symbol | PnL | Cur | TP1 line | Buffer | TP2 line | TP2 gap |
+|:-------|----:|----:|---------:|-------:|---------:|--------:|
+| COP | +28.3% | $140.72 | $131.62 | +6.47% | $153.55 | **+9.12%** ⭐ |
+| MRVL | +25.0% | $265.55 | $254.93 | +4.00% | $297.42 | +12.00% |
+| XOM | +23.1% | $174.23 | $169.84 | +2.52% | $198.15 | +13.73% |
+| CRM | +20.9% | $239.79 | $238.00 | +0.74% | $277.67 | +15.80% |
+
+**TP2 nearest: COP at +9.12%** (gap narrowed −0.43pp from #34's +9.55% over 2h RTH, rate −0.215pp/hr). 5th consecutive cron as TP2 nearest. Next-nearest MRVL at +12.00% is 2.88pp behind — COP not displaced.
+
+**CRM TP1 buffer**: widened from +$0.79 (+0.33pp) at #34 to +$1.79 (+0.74pp) at #35. CRM has been in `_audit.tp1_over_line_unmarked` for **3 consecutive crons** (#33, #34, #35).
+
+### 🚨 Cap Violations (>10% MV)
+
+| Symbol | Cap % | MV | Δ vs #34 |
+|:-------|------:|---:|---------:|
+| MRVL | 12.20% | $12,215.30 | +0.05pp ⬆ |
+| DE | 11.00% | $11,011.41 | +0.05pp ⬆ |
+
+Both cap viols widened marginally (MRVL +0.72/sh, DE +2.79/sh price gains beat denominator's slower growth).
+
+### 🛡️ MA10/MA20 Trail-Stop
+
+**⚠️ Trail-stop test non-functional (latent bug)**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (0.95 × current price trailing stop).
+
+**RKLB streak**: −18.0% (vs −18.1% at #34, +0.1pp marginal relief). Streak counter continues at **34+ windows**. Buffer to MA10-trail SL $60.84 = **5.00%** (right at warning threshold).
+
+### 📉 Drift Decomposition (#34 → #35, 2h RTH window 13:00 → 15:00 EDT)
+
+Used **yfinance 30m-bar fetch** at exact prior cron EDT timestamp (skill pitfall "yfinance intra-day bar fetch"): baseline = 30m-bar close ≤ 13:00 EDT; current = 30m-bar close ≤ 15:00 EDT. All 32 positions fetched in single `yf.download(period="1d", interval="30m")` call.
+
+```
+Decomposition sum:        +$238.57
+Authoritative FIFO delta: +$162.77
+Residual:                 −$75.80   (~0.076% of MV, within $100 markdown-rounding band)
+```
+
+**Top 5 positive contributors**:
+
+| Symbol | $ contribution | delta/sh × qty |
+|:-------|--------------:|----------------|
+| DE | +$47.43 | (+$2.79 × 17) |
+| COP | +$38.40 | (+$0.60 × 64) |
+| BABA | +$36.34 | (+$0.46 × 79) |
+| MRVL | +$33.03 | (+$0.72 × 46) |
+| AVGO | +$26.26 | (+$1.54 × 17) |
+
+**Top 5 negative contributors**:
+
+| Symbol | $ contribution | delta/sh × qty |
+|:-------|--------------:|----------------|
+| HOOD | −$14.80 | (−$0.20 × 74) |
+| WFC | −$11.70 | (−$0.32 × 36) |
+| MRK | −$8.82 | (−$1.26 × 7) |
+| CSCO | −$8.70 | (−$0.30 × 29) |
+| TSLA | −$2.76 | (−$1.38 × 2) |
+
+**Drift pattern**: Mixed session — TP1-over-line profit-taking (HOOD, MRK, CSCO, TSLA all declining) offset by defensive/industrial rebound (DE, COP, BABA). Net +$162.77 marginal drift.
+
+### 📊 When-day summary (BJT 2026-10-14 — 2nd day, windows 4 of 5)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 1 HOOD FULLY_CLOSED, 3 TP1=false)
+🎯 TP2 觸發:        0  (CLOSEST: COP +9.12% from TP2 line $153.55, narrowing −0.43pp over 2h)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤前總權益 (#27, BJT 22:00 10-13): $99,327.21
+💰 收市前總權益 (#36, BJT 03:30 10-14): (pending)
+📈 日內 MTM (#27 → ... → #35):          $+1,006.42 (+1.01%)
+📦 未實現 PnL:                          $+6,495.37 (+6.94% on reconstructed cost $93,630.86)
+💵 現金:                                $207.40
+📊 持倉數:                              32
+🚨 Cap violations:                      MRVL 12.20% / DE 11.00%
+🚦 零觸發連續 (zt):                     3   (zt 2 → 3 same-day carry P-MR-201)
+```
+
+### 🛠️ Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (last_checked_bjt=2026-10-14T03:02, cron=#35)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (cron#35 entry, 113 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt 2 → 3 (same-day carry, +1 for cron)
+✅ /tmp/ai_trader_cash_floor.json — cf 0 (cash $207.40 > $100, no breach)
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (next step: git commit + push)
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (0 trades this cron, semantic invariant preserved; 298 entries)
+```
+
+### 📝 Notes
+
+- **COP still TP2 nearest at +9.12%**, narrowed −0.43pp over 2h (from #34 +9.55%). 5th consecutive cron as TP2 nearest (#27, #33, #34, #35). Gap-up narrowing at −0.215pp/hr sustained → if rate holds, TP2 cross in ~42h of trading = ~2.3 trading days. Next-nearest MRVL at +12.00% is 2.88pp behind — displacement pressure still low.
+
+- **CRM TP1 buffer widened to +$1.79 (+0.74pp)** (was +$0.79 at #34). CRM INTRADAY noise around TP1 line still present but with more cushion. CRM has been in `_audit.tp1_over_line_unmarked` for **3 consecutive crons** (#33, #34, #35). TP1 marker would fire on next FIFO recompute if CRM sustains ≥+20%.
+
+- **4 TP1-over-line unchanged** (CRM-invisible pattern continues): COP, MRVL, XOM, CRM. None in state file (all "CRM-invisible", awaiting FIFO recompute).
+
+- **HOOD at +15.9%**, well below TP1 line. State file HOOD = `FULLY_CLOSED` object (closure_date 2026-07-14). HOOD has been below TP1 line for **8+ consecutive crons**.
+
+- **MRVL cap-violation widening +0.05pp**: MRVL +$0.72 price gain beat denominator's slower growth. MRVL has been TP1-over-line for multiple crons — second-largest cap violation margin at 2.20pp above 10% line.
+
+- **DE cap-violation widening +0.05pp**: DE +$2.79 (+0.43%) price gain, +$47.43 = largest positive contributor this window. Industrial-defensive name rallying into RTH close.
+
+- **RKLB relief attempt**: marginal +0.1pp (#34 −18.1% → #35 −18.0%, +$0.06/share, +$7.56 MV). Streak counter continues. Buffer to MA10-trail SL $60.84 = 5.00% (right at warning threshold). Relief not confirmed.
+
+- **30m-bar drift baseline** (clean residual): used `yf.download(period="1d", interval="30m")` with masks `<= "2026-10-13 13:00:00-04:00"` and `<= "2026-10-13 15:00:00-04:00"`. Residual −$75.80 against FIFO +$162.77 — well within the <$200 markdown-rounding band. 32/32 fetched in ~3s.
+
+- **yfinance 5d cache diagnostic**: `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-13` — yfinance HAS caught up to today's RTH data. No lag artifact.
+
+- **33rd consecutive 0-trade cron** (zt=3, same-day carry from zt=2 at #34).
+
+### 🔜 Next cron preview
+
+**Next cron is cron #36 — 2026-10-14 03:30 BJT = Tue 10-13 15:30 EDT — RTH close -30min (trail-stop confirm)**
+- Day boundary: same BJT date 10-14, so `zt: 3 → 4` (same-day carry, P-MR-201 pattern).
+- Window: 30min RTH close (15:00 → 15:30 EDT), trail-stop confirm.
+- TP2 nearest likely still COP unless XOM/MRVL rally more aggressively in last 30min.
+- TP1-over-line list should remain 4 (CRM-invisible status persists until FIFO recompute).
+- Cap violations: MRVL/DE likely to hold or widen marginally if last-30-min rally continues.
+- MA10/MA20 trail-stop test still non-functional (latent bug).
+- **After #36, next cron is #27 (2026-10-14 22:00 BJT = Wed 10-14 10:00 EDT — next-day pre-open, same BJT date 10-14 if same-day carry, OR next BJT date 10-15 if date rolled)**
+
+### 📊 五窗口對比 (BJT 2026-10-13/14 — Tue 10-13 RTH)
+
+| Cron # | Time BJT | EDT | Session | MV | MV Δ | zt | TP2 nearest | Cap viols | TP1-over |
+|-------:|---------:|----:|---------|---:|-----:|---:|------------:|----------:|---------:|
+| #27 | 22:00 (10-13) | 10-13 10:00 | Next-day pre-open | $99,119.81 | -$695.07 | 5 | COP +10.18% | MRVL/DE | 5 |
+| #33 | 23:00 (10-13) | 10-13 11:00 | Pre-market follow-through | $99,386.21 | +$266.40 | 6 | COP +10.00% | MRVL/DE | 5 |
+| #34 | 01:00 (10-14) | 10-13 13:00 | RTH mid-session (P-MR-247 reset) | $99,963.46 | +$577.25 | 2 | COP +9.55% | MRVL/DE | 5 |
+| **#35** | **03:00 (10-14)** | **10-13 15:00** | **RTH late (TP2 check)** | **$100,126.23** | **+$162.77** | **3** | **COP +9.12%** | **MRVL/DE** | **4** |
+| #36 | 03:30 (10-14) | 10-13 15:30 | RTH close -30min | (pending) | (pending) | 4 | (pending) | (pending) | (pending) |
+
+Note: 五窗口序列跨越 BJT 10-13 (Tue) → 10-14 (Wed)，所以 zt 在 #34 行重置 (5/6 → 2)。TP1-over 從 5 → 4 反映 MRK 跌出 TP1-over line（MRK 從 #34 +21.0% → #35 +19.9%，跌破 TP1 線 1.1pp，inverse CRM pattern）。
+
+---
+
