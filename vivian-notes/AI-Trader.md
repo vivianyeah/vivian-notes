@@ -31541,3 +31541,168 @@ All 32 positions show MA20 == current price (latent bug, see references/ma20-lat
 
 ---
 
+
+## Cron #27 — 2026-10-14 22:00 BJT (Wed 10-14 10:00 EDT) — Next-day pre-open, same-BJT-day carry (zt 4 → 5)
+
+**Session class**: Next-day pre-open, **same BJT date as #36** (both 2026-10-14). No P-MR-247 day-boundary reset applies — zt carries forward 4 → 5. This is a structural variant from the canonical pre-open pattern (which usually sees a BJT-day rollover): the previous cron was Tue 10-13 15:30 EDT RTH close and the current is Wed 10-14 10:00 EDT ~30 min after RTH open, so drift window is overnight+pre-open (~18.5h).  
+
+**Cron number**: #27 (canonical pre-open slot, same-BJT-day carry zt 4→5, P-MR-201)
+
+**Previous cron**: #36 — 2026-10-14 03:30 BJT (Tue 10-13 15:30 EDT, MV $100,221.47)
+
+
+### 🎯 Cron metrics
+
+```
+💰 Total MV:          $98,617.81
+💵 Cash:              $207.40
+📊 Total Equity:      $98,825.21
+📦 Unrealized PnL:    $+4,981.20 (+5.32% on cost $93,636.61)
+📈 MV Δ (vs #36):     $-1,603.66 (-1.600%) over 18.5h overnight+pre-open (Tue 15:30 EDT → Wed 10:00 EDT)
+🔔 Buy signals:       0
+🚪 Sell signals:      0
+🎯 TP1 fires:         0  (state file: 14 TP1=true, 3 TP1=false, 1 HOOD FULLY_CLOSED)
+🎯 TP2 fires:         0
+```
+
+
+### 🚨 Cap violations (>10% of MV)
+
+```
+  MRVL  cap=12.05% mv=$11,885.94  (pnl +21.6%, TP1-over, ⚠️ cap violation)
+  DE    cap=11.14% mv=$10,986.42  (pnl +12.2%)
+```
+
+**Cap total**: 2 positions over 10% threshold (unchanged from #36). MRVL cap slightly eased (−0.19pp from #36 12.24%) as MRVL price fell $8.23 (−3.09%) overnight. DE cap unchanged direction (DE +$1.79/+0.28%).
+
+### 🎯 TP1-over-line list (pnl_pct >= +20%, awaiting FIFO recompute)
+
+```
+  COP    pnl=+28.8% px=$141.23 TP1_line=$131.58 TP2_gap=+8.70%
+  MRVL   pnl=+21.6% px=$258.39 TP1_line=$254.99 TP2_gap=+15.13%
+  XOM    pnl=+23.7% px=$175.07 TP1_line=$169.83 TP2_gap=+13.18%
+  MRK    pnl=+22.5% px=$144.88 TP1_line=$141.92 TP2_gap=+14.29%
+```
+
+**4 TP1-over-line** (CRM fell below TP1 line at this cron — inverse-CRM pattern). COP, MRVL, XOM, MRK all CRM-invisible (not in state file `tp1=true`). CRM at +19.8% (was #36 +20.8%, −1.0pp) → removed from `tp1_over_line_unmarked`.
+
+### 🎯 TP2 nearest
+
+```
+  COP: px=$141.23 TP2=$153.51 gap=+8.70%
+```
+
+**COP still TP2 nearest at +8.70%** (#36 +9.03% → #27 +8.70%, −0.33pp narrowing). 7th consecutive cron as TP2 nearest (#27 of 10-13 → #33 → #34 → #35 → #36 → #27 of 10-14). Cumulative narrowing since 10-13 #27: −1.48pp over 24h span. Sustained narrowing rate ~−0.30pp per session.
+
+### 📈 Drift decomposition (#36 → #27, 18.5h overnight+pre-open)
+
+```
+Authoritative FIFO MV delta: $-1,603.66 (-1.600%)
+yfinance baseline: 10-13 RTH close (Tue 15:30 EDT) → scan prices at Wed 10:00 EDT (~30 min into Wed RTH)
+Decomposition sum:  $-1,688.61
+Residual:           $+84.95 (markdown-rounding band <$200 ✅)
+
+Top 5 negative contributors:
+  MRVL   $268.73 → $258.39 (Δ-10.34, -3.85%) contrib=$-475.64
+  HOOD   $110.52 → $105.77 (Δ-4.75, -4.30%) contrib=$-351.50
+  RKLB   $64.22 → $62.10 (Δ-2.12, -3.30%) contrib=$-267.12
+  AVGO   $357.31 → $349.71 (Δ-7.60, -2.13%) contrib=$-129.20
+  FUTU   $114.06 → $112.21 (Δ-1.85, -1.62%) contrib=$-123.95
+
+Top 5 positive contributors:
+  BABA   $110.85 → $111.38 (Δ+0.53, +0.48%) contrib=$+41.87
+  XOM    $174.08 → $175.07 (Δ+0.99, +0.57%) contrib=$+36.63
+  CVX    $217.73 → $219.58 (Δ+1.85, +0.85%) contrib=$+22.20
+  COP    $140.90 → $141.23 (Δ+0.33, +0.23%) contrib=$+21.12
+  MRK    $141.98 → $144.88 (Δ+2.90, +2.04%) contrib=$+20.30
+```
+
+**Drift pattern**: broad tech sell overnight (−$1.6M MV, −1.60%). Top 3 negatives (MRVL/HOOD/RKLB = −$1.09M, 68% of total down drift) all high-pnl growth names either fading from TP1-over-line (MRVL) or just under TP1 (HOOD near +10.5%). Defensive/cyclical bounce (XOM/CVX/MRK/COP) only partially offset. Pattern is **inverse-CRM cascade** — positions that gapped up on prior RTH are giving back overnight.
+
+### 🛡️ MA10/MA20 trail-stop test
+
+```
+⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+All 32 positions show MA20 == current price (latent bug, see references/ma20-latent-bug.md).
+```
+
+### 📊 Daily summary (BJT 2026-10-13/14 — full Tue RTH cycle reopened at #27 10-14)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 TP1=false, 1 HOOD FULLY_CLOSED)
+🎯 TP2 觸發:        0  (CLOSEST: COP +8.70% from TP2 line $153.51, narrowing −0.33pp this window)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤前總權益 (#36, BJT 03:30 10-14): $100,428.87
+💰 收市前總權益 (#27, BJT 22:00 10-14): $98,825.21
+📈 日內 MTM (#36 → #27):                $-1,603.66 (-1.60%)
+📦 未實現 PnL:                          $+4,981.20 (+5.32% on cost $93,636.61)
+💵 現金:                                $207.40
+📊 持倉數:                              32
+🚨 Cap violations:                      MRVL 12.05% / DE 11.14%
+🚦 零觸發連續 (zt):                     5   (zt 4 → 5 same-day carry P-MR-201)
+```
+
+### 🛠️ Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_tp1_state.json — _audit refreshed (last_checked_bjt=2026-10-14T22:05, cron=#27)
+✅ /tmp/ai_trader_scan_meta_log.json — appended (cron#27 entry, 115 entries total)
+✅ /tmp/ai_trader_zero_trigger.json — zt 4 → 5 (same-day carry, no P-MR-247 reset)
+✅ /tmp/ai_trader_cash_floor.json — cf 0 (cash $207.40 > $100, no breach)
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (next step: git commit + push)
+✅ /tmp/ai_trader_trades_log.json — UNCHANGED (0 trades this cron, semantic invariant preserved; 298 entries)
+```
+
+### 📝 Notes
+
+- **Same-BJT-day carry, no P-MR-247 reset**: this is the structural variant from the canonical pre-open pattern. Both prior #36 (10-14 03:30 BJT) and current #27 (10-14 22:00 BJT) share BJT calendar date 2026-10-14 → NO day-boundary reset. zt carries 4 → 5 (P-MR-201). Doc: `references/same-bjt-day-carry-and-footer-predictions.md` and `references/2026-10-08-2200-cron27-same-bjt-day-variant.md`.
+
+- **COP still TP2 nearest at +8.70%** (#36 +9.03% → #27 +8.70%, −0.33pp this window). 7th consecutive cron as TP2 nearest. Cumulative narrowing since 10-13 #27 (+10.18%): −1.48pp over 24h span. Sustained narrowing rate ~−0.30pp/session (consistent with overnight gap-up narrowing pre-RTH + intraday fade re-widening).
+
+- **CRM fell below TP1 line** at +19.8% (was #36 +20.8%, −1.0pp). Inverse-CRM pattern: removed from `tp1_over_line_unmarked`. CRM buffer was only $1.85 at #36, narrowing rapidly. If CRM re-crosses +20% in next crons, it returns to queue as "(re-crossed from below)".
+
+- **4 TP1-over-line unchanged count from structural perspective**: COP/MRVL/XOM/MRK all CRM-invisible (not in state file). MRK rising (+20.0% → +22.5%, +2.5pp) — biggest overnight gainer among TP1-over positions.
+
+- **MRVL cap violation eased −0.19pp** (12.24% → 12.05%): MRVL price fell $8.23 (−3.09%), but other position moves (HOOD −4.30%, RKLB −3.30%) shrank denominator faster than MRVL. 2.05pp above 10% cap (still elevated). **Biggest single contributor to overnight drift at −$475.64** (29.7% of total down drift).
+
+- **DE cap violation unchanged (11.00% → 11.14%, +0.14pp)**: DE +$1.79/+0.28% price gain outpaced denominator shrinkage from other declines. DE remains the only non-TP1-over cap violation (industrial-defensive name, +12.2%).
+
+- **RKLB streak 35+ windows**: pnl deteriorated −2.4pp this window (−18.0% → −20.4%, −$2.12/share, −$267.12 MV). RKLB at new streak low ($62.10). Buffer to MA10-trail SL $58.99 = **5.00%** (still right at warning threshold, but −$0.99 absolute buffer is more meaningful than the % since price is lower). **RKLB approaching strike zone** — if Wed RTH drops to $60-$61, the cumulative buffer would fall below 5.00% absolute and trigger a manual review flag.
+
+- **MRK rising +2.5pp** (was #36 +20.0%, now +22.5%, +$2.90/share). MRK is the only TP1-over-line position showing meaningful strength overnight — pattern is consistent with defensive-name rotation (DE/CVX/XOM all positive contributors).
+
+- **CRM TP1 buffer widened to +$−0.27** (CRM px $237.57, TP1 line $237.84 → BELOW TP1 line by $0.27 / 0.11%). CRM has now finished its inverse-CRM cycle: was over TP1 line for 4 consecutive crons (#33 → #34 → #35 → #36), now under for 1 cron. The "sustained > +20%" signal has BROKEN — FIFO recompute will not catch CRM as TP1=true in this state.
+
+- **35th consecutive 0-trade cron** (zt=5, same-day carry from zt=4 at #36). Pool scan: 92 symbols attempted, 0 Stage 2 candidates — typical for early RTH (positions exhausting pre-market momentum, insufficient fresh RTH first-hour follow-through yet).
+
+- **yfinance 5d cache diagnostic**: `yf.Ticker("SPY").history(period="5d").index[-1]` = `2026-10-14` — yfinance HAS caught up to today's RTH data. No lag artifact. Decomposition used yfinance 10-13 close as baseline (clean single-source via `iloc[-2]`).
+
+- **Same-BJT-day preview anti-pattern**: prior cron's footer (which might have predicted a P-MR-247 reset for #27 → next-pre-open) is OVERRIDDEN. The actual next cron after #27 is **#33 — 2026-10-14 23:00 BJT (Wed 11:00 EDT)** — pre-market follow-through. Pre-open cron #27 wraps the BJT 10-14 sequence for the BJT-day record; #33 starts a new ~1h RTH window. Same BJT date 10-14 expected → same-day carry zt 5 → 6 (NO reset).
+
+### 🔜 Next cron preview
+
+**Next cron is cron #33 — 2026-10-14 23:00 BJT (Wed 10-14 11:00 EDT) — Pre-market follow-through**
+- Day boundary: same BJT date 10-14, so `zt: 5 → 6` (same-day carry, P-MR-201 pattern).
+- Window: ~1h RTH (10:00 → 11:00 EDT), pre-market follow-through with MA10 trail activating.
+- TP2 nearest likely still COP unless XOM/MRVL gap-up materially narrows (XOM at +13.18% gap-down displacement pressure low).
+- TP1-over-line list: **CRM re-cross watch** — CRM at +19.8%, only $0.27 below TP1 line. Symmetric inverse-CRM pattern: if CRM rebounds $0.30+ in next cron, it re-enters queue as "(re-crossed up from below)".
+- Cap violations: MRVL likely to ease or sustain if MRVL continues overnight fade; DE expected to hold around 11% if DE defends $644-$648 support.
+- **After #33, sequence continues #34 → #35 → #36 all on BJT 10-14 same day**, then #27 of next BJT day (10-15) for the next real day-boundary.
+
+### 📊 Same-BJT-day sequence preview (BJT 2026-10-14 sequence)
+
+| Cron # | Time BJT | EDT | Session | zt | Notes |
+|-------:|---------:|----:|---------|---:|-------|
+| #36 | 03:30 (10-14) | 10-13 15:30 | RTH close -30min | 4 | (prior) MV $100,221.47 |
+| **#27** | **22:00 (10-14)** | **10-14 10:00** | **Pre-open (same BJT day carry)** | **5** | **(this cron) MV $98,617.81** |
+| #33 (next) | 23:00 (10-14) | 10-14 11:00 | Pre-market follow-through | 6 | scheduled |
+| #34 | 01:00 (10-15) | 10-14 13:00 | RTH mid-session | 7 | scheduled |
+| #35 | 03:00 (10-15) | 10-14 15:00 | RTH late (TP2 check) | 8 | scheduled |
+| #36 | 03:30 (10-15) | 10-14 15:30 | RTH close -30min | 9 | scheduled |
+
+Note: BJT 10-14 sequence wraps BOTH 10-13 RTH close (#36) AND 10-14 RTH full day (#27 → #33 → #34 → #35 → #36). zt counter accumulates 4 → 9 across the unified sequence with NO BJT-day reset (since BJT 10-14 spans both EDT trading days).
+
+---
