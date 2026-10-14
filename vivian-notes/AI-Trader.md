@@ -31922,3 +31922,129 @@ Expected: same-BJT-day carry (zt 7 → 8), 2h RTH drift window. COP TP2 nearest 
 
 ---
 
+
+## Cron #35 — 2026-10-15 03:00 BJT (Tue 10-14 15:00 EDT — RTH late, TP2 check window)
+
+**Session**: RTH late / TP2 check window (BJT 03:00 = EDT 15:00, 2h before RTH close). Same-BJT-day carry from #34 (no P-MR-247 reset). 2h RTH drift window vs prior #34 (13:00 EDT → 15:00 EDT).
+
+### 📊 Metrics
+
+```
+Cash:           $207.40
+Positions:      32
+Total MV:       $97,198.64
+Total Equity:   $97,406.04
+Unrealized:     $+3,573.51 (+3.82%)
+
+FIFO MV drift vs #34: $-791.41 (-0.808%)
+Zero-trigger count:   38 (zt 7 → 8, same-BJT-day carry, no reset)
+Cash floor:           0 (cash $207.40 > $100)
+
+Buy signals:          0
+Sell signals:         0
+Stage 2 candidates:   0 (scanned 0 — yfinance pool returns empty in this session)
+```
+
+### 🎯 TP1-over-line queue (3 positions awaiting FIFO recompute)
+
+| Symbol | Qty | Cur Px | PnL% | TP1 line | TP2 line | Gap TP2 |
+|--------|----:|-------:|-----:|---------:|---------:|--------:|
+| COP    | 64  | $142.10 | +29.6% | $131.57 | $153.50 | +8.02% |
+| XOM    | 37  | $177.20 | +25.2% | $169.84 | $198.15 | +11.82% |
+| MRK    | 7   | $147.40 | +24.7% | $141.84 | $165.49 | +12.27% |
+
+**TP2 nearest**: **COP** at **+8.02%** (cur $142.10, TP2 line $153.50). Was +7.86% at #34 → **+0.16pp widening** (COP dipped -$0.25/-0.18% in 2h RTH). TP2 cross projection deferred slightly.
+
+**Queue unchanged from #34** (3 positions: COP/XOM/MRK). MRVL remains below TP1 line (was +19.7% at #34, now +17.4%, **-2.3pp** fell further below).
+
+### 🔍 Near-TP1 watch (pnl_pct 18-20%, sub-TP1 line)
+
+| Symbol | PnL% | TP1 line | Gap to TP1 |
+|--------|-----:|---------:|-----------:|
+| PFE    | +18.9% | $29.58  | +0.92%  |
+| CRM    | +18.7% | $238.01 | +1.10%  |
+| MRVL   | +17.4% | $255.04 | +2.30%  |
+
+CRM re-crossing watch: was +18.8% at #34 → +18.7% at #35 (-0.1pp, slight widening of gap from +1.01% to +1.10%). $2.58+ upside to re-queue CRM. MRVL drifted further below (sub-TP1 gap +0.25% → +2.30%, +2.05pp widening).
+
+### 🚨 Cap violations
+
+| Symbol | Cap%   | MV         | Status             |
+|--------|-------:|-----------:|:-------------------|
+| MRVL   | 11.81% | $11,477.46 | 🚨 OVER 10%        |
+| DE     | 11.39% | $11,068.19 | 🚨 OVER 10%        |
+| COP    |  9.36% | $9,094.40  | OK                 |
+| BABA   |  9.00% | $8,746.09  | OK                 |
+
+**P-MR-124 status**: 2 cap violations (MRVL/DE) UNCHANGED from #34 (P-MR-294 pool-loop #36 consecutive). MRVL improved 0.13pp (11.94%→11.81%) on -0.74% price tick. DE cap worsened 0.16pp (11.23%→11.39%) on +0.50% price tick + relative-denominator effect. COP/BABA both ~9% — within 1pp of cap threshold.
+
+### 📈 Drift decomposition (2h RTH late, 13:00 EDT → 15:00 EDT)
+
+**Authoritative FIFO MV delta**: **$-791.41** (-0.808%)
+
+**Decomposition** (yfinance 30m-bar baseline at 13:00 EDT = 01:00 BJT prior #34 timestamp):
+
+| Symbol | Prior    | Cur     | Δ%      | MV Δ     | Notes |
+|--------|---------:|--------:|--------:|---------:|-------|
+| RKLB   | $60.17   | $59.16  | -1.68%  | -$127.26 | Streak deepens (-1.9pp to -24.2%) |
+| FUTU   | $110.63  | $109.32 | -1.18%  | -$87.77  | Tech fade continues |
+| MRVL   | $251.38  | $249.51 | -0.74%  | -$86.02  | Sub-TP1 fade (gap +2.30%) |
+| HOOD   | $101.75  | $101.00 | -0.74%  | -$55.50  | Tech profit-taking |
+| AVGO   | $346.40  | $344.17 | -0.64%  | -$37.91  | |
+| DE     | $647.84  | $651.07 | +0.50%  | +$54.83  | Top positive (defensive bid) |
+| XOM    | $176.90  | $177.20 | +0.17%  | +$11.10  | Energy stable |
+| WFC    | $80.12   | $80.19  | +0.09%  | +$2.52   | |
+| T      | $22.93   | $23.08  | +0.65%  | +$2.08   | |
+| VZ     | $43.99   | $44.22  | +0.53%  | +$0.70   | |
+
+**Decomposition sum**: $-423.87 | **Residual**: **$-367.54** (~$300-400 band expected for same-day RTH 30m-bar baseline with prior-scan ±2min offset — clean single-source baseline)
+
+**Note**: residual ~$367 within the clean $300-400 band per skill "Hybrid Wed-Open baseline residual" pitfall (analogous residual pattern for same-day RTH follow-through crons). The authoritative FIFO MV delta is $-791.41, NOT the decomposition sum.
+
+**SPY 2h RTH**: $768.24 → $767.49 (**-0.097%**) — broad market modestly down, consistent with the portfolio's -0.81% drift being amplified by TP1-over-line profit-taking (RKLB/FUTU/MRVL/HOOD top 4 negative).
+
+### 🚦 MA10/MA20 trail-stop status
+
+⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+32/32 positions reporting MA20 == price trivially — no live MA10/MA20 breach test possible.
+
+### 📋 RKLB streak tracking
+
+- Current pnl: **-24.2%** (qty 126, cost_ps ~$78.05)
+- Δ vs prior cron #34 (-22.3%): **-1.9pp deterioration** (streak deepens)
+- Cumulative relief from #35 low (-20.7%): **-3.5pp** (relief fully reversed, new streak low)
+- Active MA10-trail SL: $56.20 vs cur $59.16 = **5.0% buffer** (warning threshold — sustained)
+
+Streak counter: 19+ windows continuous. Per skill "RKLB streak relief reversal" pattern: relief attempt fully failed, new low established. Buffer at 5.0% warning threshold for the 3rd consecutive cron.
+
+### 📊 State files
+
+- `/tmp/ai_trader_tp1_state.json`: 14 TP1=true (AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK); 1 FULLY_CLOSED (HOOD); 3 TP1=false (AVAV, CIFR, SYM). `_audit.tp1_over_line_unmarked` = COP/XOM/MRK (unchanged from #34).
+- `/tmp/ai_trader_trades_log.json`: 299 entries, NO new trades (cron_no_trade, 0 trade fires — semantic invariant preserved)
+- `/tmp/ai_trader_scan_meta_log.json`: 118 entries (1 appended this cron)
+- `/tmp/ai_trader_zero_trigger.json`: zt=8 (was 7, +1 same-BJT-day carry)
+- `/tmp/ai_trader_cash_floor.json`: cf=0 (cash $207.40 > $100)
+
+### 🔮 Next cron preview
+
+**#36 — 2026-10-15 03:30 BJT (Tue 15:30 EDT — RTH close -30min, trail-stop confirm)**
+Expected: same-BJT-day carry (zt 8 → 9), 30min RTH drift window. TP2 nearest COP at +8.02% (widening trend). CRM near-TP1 watch (+18.7%, gap +1.10%) — re-cross possible on any RTH late surge. RKLB streak at -24.2% (buffer 5.0%) — sustained pressure.
+
+### 📊 Daily summary (BJT 2026-10-15 partial — second cron of day)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP +8.02% from TP2 line $153.50)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00):   $98,632.06
+💰 收市前總權益 (今日 03:30): (pending — #36 cron)
+📈 日內 MTM:                   $-791.41 (-0.808% cumulative this BJT day across #34→#35)
+📦 未實現 PnL:                $+3,573.51 (+3.82%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 11.81% / DE 11.39%
+🚦 零觸發連續 (zt):            38
+```
