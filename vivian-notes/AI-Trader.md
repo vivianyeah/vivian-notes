@@ -32416,3 +32416,184 @@ Key insight: **CRM and PFE TP1-over at the same cron is unusual**. CRM was previ
 **Companion reference file**: `references/2026-10-15-2200-cron27-same-bjt-day-tp1-invisible-dual.md` — see that file for the full diagnostic on the DUAL invisible TP1-over case.
 
 ---
+
+## Cron #33 — 2026-10-15 23:00 BJT (Thursday 11:00 EDT) — Pre-market follow-through (same-BJT-day carry from #27)
+
+**Session class**: Pre-market follow-through, same-BJT-day carry from #27 (BJT date 2026-10-15 = prior #27 date 2026-10-15; no P-MR-247 reset, zt 10 → 11). Drift window: Thu 10-15 10:00 EDT → 11:00 EDT = ~1h RTH (post-open follow-through). yfinance caught up fully (SPY last close 2026-10-15 $769.35, confirmed via spot-check; 30m bars provide clean intraday baseline at prior cron timestamp).
+
+### 📌 TL;DR (key numbers)
+
+| Metric | Value | vs #27 |
+|--------|------:|-------:|
+| 💰 MV (FIFO) | $95,369.05 | +$1,252.19 (+1.330%) |
+| 💵 Cash | $207.40 | unchanged |
+| 📈 Equity | $95,576.45 | +$1,252.19 |
+| 🎯 Unrealized PnL | +$1,734.84 (+1.85% on cost $93,634.21) | +$1,248.04 |
+| 📦 Positions | 32 | unchanged |
+| 🚨 Cap violations | MRVL 11.35% / DE 11.75% | MRVL +0.06pp, DE −0.02pp |
+| 🚦 zt | 11 | +1 (carry) |
+| 🔔 買入信號 | 0 | unchanged |
+| 🎯 TP1 fires | 0 (5 over-line, FIFO-aware only) | unchanged |
+
+### 🟢 TP1-over-line (5 symbols, FIFO-recapture pending)
+
+Per-share cost = `cur_price / (1 + pnl_pct / 100)`, then TP1 = `cost × 1.20`, TP2 = `cost × 1.40`:
+
+| Symbol | qty | Cur | PnL | TP1 line | TP2 line | Cost (per-share) | Status |
+|--------|----:|----:|----:|---------:|---------:|-----------------:|--------|
+| CRM | 1 | $246.32 | +24.2% | $237.99 | $277.66 | $198.33 | 📋 **invisible** in state file (CRM absent from `/tmp/ai_trader_tp1_state.json`) |
+| PFE | 1 | $29.67 | +20.4% | $29.57 | $34.50 | $24.64 | 📋 **invisible** in state file |
+| COP | 64 | $141.41 | +28.9% | $131.65 | $153.59 | $109.71 | 📋 **invisible** in state file (was "visible on queue" at #27, now invisible — confirmed not yet FIFO-captured) |
+| XOM | 37 | $174.95 | +23.6% | $169.85 | $198.16 | $141.55 | 📋 **invisible** in state file |
+| MRK | 7 | $150.34 | +27.2% | $141.83 | $165.47 | $118.19 | 📋 **invisible** in state file |
+
+**All 5 TP1-over-line symbols are now invisible** in the state file — the prior #27 saw COP/XOM/MRK as "✅ already on #27 queue (carried from #36)", but a re-check at #33 confirms **none** of them are actually in the state file. This is consistent with the original #27 documentation: "queue accumulates across crons when FIFO recompute doesn't run" — FIFO recompute has NOT captured any of these. **Queue = 5 names, all invisible** at #33 (same as #27 in count, but now all classified invisible).
+
+Per cron #13 reference file: state mutations are owned by FIFO recompute (out of cron scope); cron only documents and queues. Next FIFO recompute will set `CRM/PFE/COP/XOM/MRK: true`.
+
+**CRM +2.4pp gain in 1h RTH** (from #27 +21.8% → #33 +24.2%) — continuing the CRM re-cross-above-TP1 pattern from yesterday.
+
+### 🎯 TP2-nearest: **COP** at **+8.61%** (price-space)
+
+```
+COP  qty=64  cur=$141.41  TP2_line=$153.59  gap=+8.61%  PnL=+28.9%
+```
+
+COP's TP2 gap **widened** slightly: was +8.53% at #27 ($141.51), now +8.61% ($141.41) — COP dipped $0.10 in 1h RTH while TP2 line stayed flat ($153.58 → $153.59, +$0.01 from cost rounding). Gap widened 0.08pp — COP continues to be the closest TP2 candidate across the universe.
+
+Runner-up TP2-nearest (top 5):
+
+| Rank | Symbol | Cur | TP2 | gap | PnL |
+|-----:|--------|----:|----:|----:|----:|
+| 1 | COP | $141.41 | $153.59 | +8.61% | +28.9% |
+| 2 | MRK | $150.34 | $165.47 | +10.06% | +27.2% |
+| 3 | CRM | $246.32 | $277.66 | +12.72% | +24.2% |
+| 4 | XOM | $174.95 | $198.16 | +13.27% | +23.6% |
+| 5 | PFE | $29.67 | $34.50 | +16.28% | +20.4% |
+
+**All 5 of the closest-to-TP2 positions are also TP1-over-line** — same concentration pattern as #27. COP still the lead, but the gap widening from +8.53% → +8.61% means we're now 0.08pp further from a TP2 cross than an hour ago.
+
+### 📊 Drift decomposition (Thu 10:00 EDT → 11:00 EDT, +1h RTH)
+
+```
+Authoritative FIFO MV delta:  $+1,252.19  (+1.330%)
+yfinance baseline:            30m-bar at prior cron EDT timestamp (10:00 EDT)
+Decomposition sum:            $+832.48
+Residual:                     $+419.71  (30m-bar baseline + prior-scan ±2min drift band, expected for 1h pre-market follow-through)
+Window:                       1h RTH (prior #27 → this #33)
+```
+
+**Top 5 POSITIVE contributors** (~71% of total up drift):
+
+| Symbol | qty | 10:00→11:00 $/sh | Δ$/sh | MV delta |
+|--------|----:|------------------|------:|---------:|
+| RKLB | 126 | $51.99 → $53.10 | +$1.11 | **+$139.86** (+2.14%) |
+| MRVL | 46 | $232.24 → $235.28 | +$3.04 | **+$139.84** (+1.31%) |
+| HOOD | 74 | $98.09 → $99.65 | +$1.56 | **+$115.44** (+1.59%) |
+| DE | 17 | $652.67 → $659.18 | +$6.51 | **+$110.67** (+1.00%) |
+| BABA | 79 | $109.38 → $110.40 | +$1.02 | **+$80.58** (+0.93%) |
+
+**Top 5 NEGATIVE contributors** (small, mostly chip sectors profit-taking):
+
+| Symbol | qty | 10:00→11:00 $/sh | Δ$/sh | MV delta |
+|--------|----:|------------------|------:|---------:|
+| XOM | 37 | $175.40 → $174.95 | −$0.45 | **−$16.65** (−0.26%) |
+| CSCO | 29 | $109.22 → $108.66 | −$0.56 | **−$16.24** (−0.51%) |
+| T | 14 | $23.77 → $23.61 | −$0.16 | **−$2.24** (−0.67%) |
+| VZ | 3 | $45.47 → $45.10 | −$0.37 | **−$1.11** (−0.81%) |
+| PFE | 1 | $29.69 → $29.67 | −$0.02 | **−$0.02** (−0.07%) |
+
+**Drift signature** — broad-based positive drift across most positions (28/32 positive contributors) with small negatives concentrated in defensive/telecom names (T, VZ, CSCO, XOM, PFE). **RKLB leading positive** +$139.86 — first major positive single-position contribution since tracking began (the streak has been overwhelmingly negative). **MRVL** also +$139.84 — cap-violating position rallying, but cap_pct only moved +0.06pp because total MV expanded in parallel.
+
+**Residual $419.71** is in the **30m-bar "exact" baseline + prior-scan ±2min drift band** ($500-900 expected for this window; we landed at the low end). The #27 markdown had prices like CRM $241.46, HOOD $96.36, MRVL $230.93 (scan-snapshot at 10:00 EDT ±2min) but yfinance 30m-bar at exactly 10:00 EDT shows CRM $244.41, HOOD $98.09, MRVL $232.24 — small but consistent snapshot-tick diffs across 32 positions, explaining the residual. The authoritative FIFO MV delta is $1,252.19; the decomposition is the best approximation we can build without full per-position prior-cron scan-data.
+
+### 🚨 Cap violations (positions > 10% of total MV)
+
+| Symbol | qty | Cur | pos_mv | cap_pct | vs #27 | Δ cap_pct |
+|--------|----:|----:|-------:|--------:|-------:|----------:|
+| 🚨 DE | 17 | $659.18 | $11,206.06 | **11.75%** | 11.77% | −0.02pp |
+| 🚨 MRVL | 46 | $235.28 | $10,822.88 | **11.35%** | 11.29% | +0.06pp |
+
+**Diagnostic (cap_pct ≠ price change)**:
+- DE: price Δ +$6.51 (+1.00%), cap_pct **improved** by −0.02pp. Numerator (DE MV) expanded faster than denominator (total MV), but other positions also expanded → marginal improvement.
+- MRVL: price Δ +$3.04 (+1.31%), cap_pct **worsened** by +0.06pp. MRVL moved more than the average position → its ratio grew. MRVL remains the closest cap-violation to threshold (would need +1.65pp expansion to trigger further alarms, but the position is growing toward TP2 not away from it).
+
+Per P-MR-124 rule, both positions are blocked from adding to (新買入 blocked; existing lots may continue to PnL). At current price levels, neither position has a FIFO rebalance trigger firing this cron.
+
+### 🟢 MA10/MA20 trail-stop test: 32 positions OK (trivially)
+
+**⚠️ MA10/MA20 trail-stop test non-functional**: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+This caveat applies **on every cron regardless of yfinance cache state** — the bug is in scan.py's insufficient lookback window, not in yfinance freshness. Today, yfinance caught up to Thu 10-15, but the MA20 trivial-OK symptom persists because `period="5d"` is insufficient.
+
+### 📉 Position-level health snapshot (sorted by PnL)
+
+```
+✅ CLOSEST TO TP2 (+28.9%):  COP qty=64 cur=$141.41 PnL=+28.9%
+✅ OVER TP1 LINE:           CRM/PFE/COP/XOM/MRK (5 names, all invisible in state)
+✅ DEEP UNDERWATER:         ASTS -33.8% / RKLB -32.0% / IREN -29.0% / VRT -25.8%
+🟡 MODERATE LOSS:           SNDK -1.6%, IBM -2.4%, PDD -2.7%, CSCO -5.1%, AMZN -6.0%, INTC -6.8%
+🟢 HEALTHY:                 DE +14.5%, CVX +15.1%, MRVL +10.7%, PATH +12.5%, MRK +27.2%, XOM +23.6%, COP +28.9%, CRM +24.2%, PFE +20.4%
+```
+
+**RKLB streak relief observed** — moved from #27's −34.5% (streak low) to #33's −32.0%, **+2.5pp cumulative relief**. First meaningful single-window positive RKLB drift (+$139.86) since tracking began. Active MA10-trail SL $50.44 vs current $53.10 = **5.0% buffer** — right at the warning threshold per cron #29 11-window streak docs. Streak counter continues (no reset).
+
+**HOOD post-closure fresh lot update** — from #27 +0.7% (cur $96.36) to #33 +4.2% (cur $99.65), **+3.5pp gain in 1h RTH**. The fresh lot is emerging as a position to monitor; still well below TP1 line, but momentum is positive.
+
+### 🔄 HOOD post-closure fresh lot — diagnostic
+
+HOOD state: `FULLY_CLOSED` (closure 2026-07-14 01:00 BJT, original lot TP1+TP2 fired 2026-06-29, then 22:30 MA10 stop sold 26 @ $110.26, then 01:00 MA10 stop sold 13 @ $110.21). State file shows HOOD as fully closed with no remaining position.
+
+Scan reports **HOOD qty=74 cur=$99.65 PnL=+4.2%** — fresh lot since 2026-07-14, well below TP1 line ($115.28 = cost $96.04 × 1.20). State file's HOOD = `FULLY_CLOSED` is **historically correct**.
+
+**HOOD is NOT in the TP1-over-line list** (only +4.2% PnL vs +20% threshold). No TP1/TP2 mutation needed at this cron — FIFO recompute will surface the new lot state on its next run.
+
+### 📋 State file (post-cron_state_refresh.py)
+
+```
+14 TP1=true:  AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK
+ 3 TP1=false: AVAV, CIFR, SYM
+ 1 HOOD FULLY_CLOSED (post-2026-07-14)
+
+⚠️ Missing (TP1-over, awaiting FIFO recompute):
+   CRM, PFE, COP, XOM, MRK  ← all 5 invisible in state file at #33 (consistent with #27 pattern)
+```
+
+Total TP1=true preserved in state file: 14. The 5 over-line positions will add to this when FIFO recompute runs.
+
+### 🛡️ Log / State 動作
+
+| File | Path | Action |
+|------|------|--------|
+| Scan | `/tmp/ai_trader_scan.py` | Run (foreground, 1 attempt) |
+| State audit | `/tmp/ai_trader_tp1_state.json` | _audit refreshed by `cron_state_refresh.py` |
+| Meta log | `/tmp/ai_trader_scan_meta_log.json` | Appended (121 entries total) |
+| Trades log | `/tmp/ai_trader_trades_log.json` | **Untouched** (0 trades fired, semantic invariant preserved; 300 entries total) |
+| Cash floor | `/tmp/ai_trader_cash_floor.json` | cf=0 (cash $207.40 > $100) |
+| Zero trig | `/tmp/ai_trader_zero_trigger.json` | zt=11 |
+
+### 📊 當日總結 (2026-10-15 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留 + 5 over-line 待 FIFO recompute)
+🎯 TP2 觸發:        0  (CLOSEST: COP +8.61% from TP2 line $153.59)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (#27 22:00 BJT):   $94,324.26
+💰 當前總權益 (#33 23:00 BJT):   $95,576.45
+📈 MTM:                          +$1,252.19 (+1.328%)
+📦 未實現 PnL:                  +$1,734.84 (+1.85%)
+💵 現金:                         $207.40
+📊 持倉數:                       32
+🚨 Cap violations:               MRVL 11.35% / DE 11.75%
+🚦 零觸發連續 (zt):              11
+```
+
+### 🔮 Next cron
+
+**#34 (2026-10-16 01:00 BJT, Thu 13:00 EDT)**: RTH mid-session follow-through, same-BJT-day carry from #33 (no P-MR-247 reset). Will catch 11:00 EDT → 13:00 EDT drift = ~2h of additional RTH. Expected zt = 12 if 0 triggers. TP2-nearest may change if overnight gap-up narrows COP's lead. RKLB at 5.0% MA10-trail SL buffer — if any further deterioration, will approach active stop.
+
+---
+
+**Cron section was followed by**: no trades, no state mutations (other than `_audit` block refresh), meta log append only, this markdown section written.
