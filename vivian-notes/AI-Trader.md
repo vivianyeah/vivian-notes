@@ -33024,3 +33024,186 @@ RKLB streak tracking: −29.6% (vs #35 −29.6%, **0.0pp delta but price +0.55 �
 ```
 
 **Key insight:** RTH close -30min snapshot shows **TP1-over-line energy profit-taking (COP/XOM/CVX −$78.79 combined)** offset by **tech rebound (MRVL/HOOD/AVGO +$206.07 combined)**. Net +0.34% on 30min window. COP TP2 gap STALLED at +8.70% (no longer imminent; stabilization signal). RKLB streak plateau at −29.6% (counter cycled; relief oscillation). All 5 TP1-over-line remain CRM-invisible pending FIFO recompute. zt=4 same-day carry — P-MR-247 reset expected at tomorrow's 22:00 BJT pre-open #27.
+## Cron #27 — 2026-10-16 22:00 BJT (Fri 10-16 10:00 EDT) — Next-day pre-open (same-BJT-day carry from #36, no P-MR-247 reset)
+
+**Session:** Next-day pre-open (same-BJT-day carry from #36 03:30 BJT 2026-10-16; **SAME BJT CALENDAR DAY** as prior #36 → no P-MR-247 day-boundary reset; zt = prev 4 → 5). Window: ~18.5h overnight (Thu 10-15 15:30 EDT → Fri 10-16 ~10:00 EDT).
+
+**yfinance state:** caught up; SPY last close = 2026-10-16 (Fri), 5d history `['10-12','10-13','10-14','10-15','10-16']`. Scan prices are LIVE Fri RTH open (~10:00 EDT midway tick).
+
+### 📊 Scan summary (32 positions, 5-monitor coverage)
+
+```
+💰 Cash:              $207.40
+💼 MV:               $95,913.50
+🏦 Total equity:     $96,120.90
+📈 Unrealized P&L:   $+2,289.94 (+2.45% vs cost)
+📊 Positions:         32
+🔼 TP1-over-line:    5  (COP +31.1% / XOM +24.3% / MRK +24.2% / CRM +23.4% / PFE +20.0%)
+🎯 TP2 nearest:      COP +6.79%  (cur $143.82 vs TP2 line $153.58)  ← narrowed −1.91pp
+🚨 Cap violations:    2  (DE 11.55% / MRVL 11.23%)  ← MRVL −0.28pp improved
+🚦 zt (zero-trigger): 5  (5th consec, same-BJT-day carry from #34 zt=2 → #35 zt=3 → #36 zt=4 → #27 zt=5)
+```
+
+### 🌡️ Five-window canonical comparison (BJT day 2026-10-16)
+
+| Cron | BJT Date+Time | EDT | Session | MV | Δ vs prior | zt | TP2 nearest |
+|-----:|:---:|:---:|:---|---:|---:|---:|:---|
+| #34  | 2026-10-16 01:03 | 10-15 13:00 | RTH mid-session (P-MR-247 day-boundary reset) | $95,423.13 | +$54.08 (+0.057%) | 2 | COP +8.69% |
+| #35  | 2026-10-16 03:00 | 10-15 15:00 | RTH late (TP2 trigger check window) | $95,904.79 | +$481.66 (+0.505%) | 3 | COP +8.19% |
+| #36  | 2026-10-16 03:30 | 10-15 15:30 | RTH close -30min | $96,394.61 | +$489.82 (+0.511%) | 4 | COP +8.70% |
+| **#27** | **2026-10-16 22:00** | **10-16 10:00** | **Next-day pre-open (same-BJT-day carry, 18.5h overnight)** | **$95,913.50** | **−$481.11 (−0.499%)** | **5** | **COP +6.79%** |
+
+**Same-BJT-day pre-open (no P-MR-247 reset):** BJT date 2026-10-16 for both #36 (03:30 BJT) and #27 (22:00 BJT). Per skill `references/same-bjt-day-pre-open-cron.md`, no day-boundary reset applies; zt carries pure-same-day (4 → 5). The 18.5h overnight gap is intra-day from BJT perspective, but the underlying market window is Thu 15:30 EDT → Fri 10:00 EDT (overnight).
+
+### 🔍 Drift decomposition (cron #36 → cron #27, 18.5h Thu RTH close → Fri pre-open)
+
+**Window:** 2026-10-15 15:30 EDT → 2026-10-16 ~10:00 EDT (~18.5h overnight, Fri pre-open).
+
+**Prior baseline:** yfinance `history(period="5d").iloc[-2]` = Thu 10-15 RTH close (cleanest single-source baseline). All 32 positions fetched.
+
+**Authoritative FIFO MV delta:** **−$481.11 (−0.499%)** from $96,394.61 → $95,913.50.
+
+**Decomposition sum:** −$673.36. **Residual: +$192.25** (~$200 band: hybrid Wed-Open baseline / snapshot-tick diff per skill; ~18.5h overnight gap produces larger yfinance snapshot diffs than intra-day windows — accepted, not a bug).
+
+```
+=== Top-5 POSITIVE contributors (overnight, Thu close → Fri ~10:00 EDT) ===
+  COP   qty= 64 prior=$141.73 cur=$143.82 Δp=$+2.09  drift=$+133.76  (+1.47% energy gap-up)
+  XOM   qty= 37 prior=$174.68 cur=$175.93 Δp=$+1.25  drift=$ +46.25  (+0.72% energy)
+  WFC   qty= 36 prior=$ 82.75 cur=$ 83.79 Δp=$+1.04  drift=$ +37.44  (+1.26% financial)
+  CVX   qty= 12 prior=$219.32 cur=$222.11 Δp=$+2.79  drift=$ +33.48  (+1.27% energy)
+  DE    qty= 17 prior=$650.67 cur=$651.70 Δp=$+1.03  drift=$ +17.51  (+0.16% defensive)
+
+=== Top-5 NEGATIVE contributors ===
+  MRVL  qty= 46 prior=$241.24 cur=$234.09 Δp=$-7.15  drift=$-328.90  (−2.96% semis/AI pullback)
+  RKLB  qty=126 prior=$ 55.25 cur=$ 53.91 Δp=$-1.34  drift=$-168.84  (−2.43% spacetech)
+  FUTU  qty= 67 prior=$109.80 cur=$107.76 Δp=$-2.04  drift=$-136.68  (−1.86% China-exposed)
+  AVGO  qty= 17 prior=$344.33 cur=$338.77 Δp=$-5.56  drift=$ -94.52  (−1.61% semis)
+  SNDK  qty=  1 prior=$1394.83 cur=$1336.34 Δp=$-58.49 drift=$ -58.49  (−4.19% storage)
+
+  Top-5 neg subtotal:  $-787.43
+  Top-5 pos subtotal:  $+268.44
+  Top-10 net:          $-518.99  (≈ decomp −$673 minus 22/32 mixed contributors)
+```
+
+**Pattern:** Same-BJT-day pre-open overnight gap shows **energy sector bid (COP/XOM/CVW/DE)** vs **semis/storage pullback (MRVL/RKLB/SNDK/AVGO)**. MRVL −$328 alone drives ~68% of net decline. RKLB streak continues **−30.9%** (5.0% SL buffer; counter −1.3pp deterioration from #36 −29.6%, NOT relief).
+
+### 🎯 TP1 / TP2 / Cap diagnostics
+
+**TP1-over-line (5 names, all from #36 queue, plus CRM-invisible pattern):**
+
+| Symbol | #36 pnl | #27 pnl | Δ | TP1 line | TP2 line | Status |
+|---|---:|---:|---:|---:|---:|:---|
+| COP | +28.8% | +31.1% | **+2.3pp** | $131.64 | $153.58 | widening; +6.79% gap to TP2 |
+| XOM | +22.9% | +24.3% | +1.4pp | $169.84 | $198.15 | widening |
+| MRK | +24.2% | +24.2% | flat | $141.93 | $165.59 | unchanged |
+| CRM | +24.0% | +23.4% | −0.6pp | $237.83 | $277.47 | narrowing but still >20% |
+| PFE | +20.1% | +20.0% | −0.05pp | $29.57 | $34.50 | at threshold |
+
+All 5 remain **CRM-invisible** to `/tmp/ai_trader_tp1_state.json` (state still has no `COP`, `XOM`, `MRK`, `PFE` keys; only the legacy `HOOD: FULLY_CLOSED` post-closure entry + 14 `TP1=true` flags from prior FIFO recompute runs). Queue persists for next FIFO recompute.
+
+**PFE just at threshold (+20.0%):** borderline next-cron fall-back-below risk if energy bid pauses.
+
+**TP2 nearest (TOP 6 closest below TP2 line):**
+
+| Symbol | Gap (price-space) | Pnl | Action |
+|---|---:|---:|---|
+| **COP** | **+6.79%** | +31.1% | **TP2 nearest** — narrowed −1.91pp from #36 +8.70% |
+| XOM | +12.63% | +24.3% | second nearest |
+| MRK | +12.72% | +24.2% | third nearest |
+| CRM | +13.45% | +23.4% | fourth |
+| PFE | +16.67% | +20.0% | fifth |
+| CVX | +21.11% | +15.6% | monitoring |
+
+COP TP2 gap **narrowed −1.91pp overnight** (Thu close $141.30 → Fri open $143.82, gap dropped from +8.70% → +6.79%). At current pace (1.91pp / 18.5h = **0.103pp/hr**), TP2 cross projection = 65.8h = **~2.7 trading days** to TP2 line. Compare with #35 → #36 widening rate (+0.51pp in 30min = +1.02pp/hr) and #34 → #35 (+0.50pp in 2h = +0.25pp/hr) — overnight gap-up accelerated the narrowing. Monitor #33 at Fri 23:00 BJT pre-market.
+
+**Cap-violation table (full 32-position):**
+
+| Symbol | Cap % | MV | Pnl | Status |
+|---|---:|---:|---:|:---|
+| DE | **11.55%** ⚠️ | $11,078.90 | +13.2% | persistent violation (P-MR-124 block) |
+| MRVL | **11.23%** ⚠️ | $10,768.14 | +10.2% | persistent violation (improved −0.28pp despite price −2.96%) |
+| COP | 9.60% | $9,204.48 | +31.1% | sub-violation (monitor) |
+| BABA | 9.16% | $8,784.01 | +0.9% | sub-violation (monitor) |
+| HOOD | 8.00% | $7,670.84 | +8.3% | |
+| FUTU | 7.53% | $7,219.92 | +7.2% | |
+| RKLB | 7.08% | $6,792.66 | −30.9% | |
+| XOM | 6.79% | $6,509.41 | +24.3% | |
+| AVGO | 6.00% | $5,759.09 | −11.9% | |
+| CSCO | 3.28% | $3,141.28 | −5.4% | |
+| (Other 22 ≤ 3.28%) | | | | |
+
+**Cap vs #36:**
+- **DE**: 11.55% → 11.55% (**±0.00pp**, stagnant — DE price +0.16% matched portfolio denominator move exactly)
+- **MRVL**: 11.51% → 11.23% (**−0.28pp improvement**, despite MRVL price −2.96% — counter-intuitive; denominator shrank faster than MRVL's numerator because other positions decayed more)
+- **No new violations** entered (COP 9.60%, BABA 9.16%, HOOD 8.00% all stayed below 10%)
+
+### 🛡️ MA10/MA20 trail-stop diagnostic
+
+**⚠️ MA10/MA20 trail-stop test non-functional:** scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status "🟢 OK" shown above for all 32 positions is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop).
+
+**Computed-by-yfinance spot-check (partial):**
+
+| Symbol | scan-reported MA20 | yfinance `period="6mo"` MA20 | Diff |
+|---|---:|---:|---:|
+| CRM | $244.57 | (live later) | (latent bug, not real) |
+
+Per skill `references/ma20-latent-bug.md`, this latent bug fires on every cron regardless of yfinance freshness. Apply until scan.py line ~99 is patched.
+
+**MA10-trail SL = current price × 0.95** (the `止蝕=$Z` field is valid):
+
+Positions at 5.0% SL buffer warning threshold (active SL within 5% of current price):
+- **RKLB**: cur $53.91, MA10-trail SL $51.21 → **5.0% buffer exactly** (active SL risk if MRVL −0.30% analogy). 27+ window streak continues at −30.9%; −1.3pp deterioration from #36 −29.6% — relief oscillation ended.
+- **ASTS**: cur $43.83, MA10-trail SL $41.64 → **5.0% buffer** (consistent with #36); −30.7% pnl.
+- **IREN**: cur $28.91, MA10-trail SL $27.46 → **5.0% buffer**; −26.5% pnl.
+- **VRT**: cur $210.69, MA10-trail SL $200.16 → **5.0% buffer**; −25.5% pnl.
+
+These 4 positions are at 5.0% SL buffer — none breached yet but any further deterioration triggers `check_exit`.
+
+### 📈 Stage 2 candidates / buy signals
+
+```
+Stage 2 候選:  0 只
+買入信號:     0 只
+成功分析:    0 只 / 92 隻 pool
+```
+
+Pool scan: 0 of 92 watched symbols passed Stage 2 breakout-pullback filter. No new entries queued.
+
+### 🧮 Diagnostic checks
+
+| Check | Result |
+|---|---|
+| yfinance cache state | Fri 10-16 present; 5d `['10-12','10-13','10-14','10-15','10-16']` |
+| Drift window | 18.5h overnight (Thu 15:30 EDT → Fri 10:00 EDT) |
+| Drift residual | +$192.25 (hybrid Wed-Open baseline band; cleanest single-source yfinance iloc[-2]) |
+| Day-boundary reset | None (same BJT calendar date 2026-10-16 for #36 and #27) |
+| P-MR-247 reset | N/A |
+| zt | 5 (same-day carry 4 → 5) |
+| TP1 fires | 0 (5 names in queue, CRM-invisible to state file) |
+| TP2 fires | 0 (COP closest at +6.79%) |
+| Cap violations | 2 (DE 11.55% / MRVL 11.23%, both persistent) |
+| yfinance RTH lag | NONE — scan prices live Fri data |
+| MA20 latent bug | fires (32/32 MA20 == current price trivially; expected every cron) |
+
+### 📌 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED (0-trade cron; counts before = counts after)
+✅ /tmp/ai_trader_tp1_state.json   — _audit block refreshed via cron_state_refresh.py (TP1=14, FULLY_CLOSED=1, fresh queue=5)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 1 entry (#27); 124 → 125 entries
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (pre-open same-BJT-day carry, no P-MR-247 reset)
+```
+
+**TP1=true count** (FIFO recompute authoritative): 14 (`AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK` per state file). **Unchanged** from #36. Queue to next FIFO recompute: 5 (COP, XOM, MRK, CRM, PFE — all CRM-invisible).
+
+### ⏭️ Next cron preview
+
+**Cron #33 — 2026-10-16 23:00 BJT (Fri 10-16 11:00 EDT) — Pre-market follow-through (same-BJT-day carry, +1h RTH)** — 1h after #27 = Fri 11:00 EDT pre-market. Watch:
+- **MRVL cap trajectory**: −2.96% drop brings cap ratio to 11.23% (was 11.51%); a further −2% would push toward 11.0% threshold zone.
+- **COP TP2 narrowing**: at current 0.103pp/hr narrowing rate, expect COP gap ≈ +6.6% at #33 (1h RTH). If energy continues bid, TP2 cross projection shortens toward ~50h.
+- **RKLB streak**: at 27+ window −30.9% with 5.0% SL buffer. A +0.5pp relief (to −30.4%) would mark first relief attempt since #34 plateau; sustained 3-window relief > 1pp = potential streak break signal.
+- **PFE at threshold**: +20.0% exactly; any 0.1pp drop removes from queue.
+
+---
+
+**Key insight:** Same-BJT-day pre-open (no P-MR-247 reset) shows **overnight energy bid** (COP +$134, XOM +$46, CVX +$33, DE +$18 — all positive) offsetting **semis/storage gap-down** (MRVL −$329, RKLB −$169, FUTU −$137, AVGO −$95, SNDK −$58). MRVL alone accounts for ~68% of the −$481 overnight decline. Cap violations unchanged (DE 11.55% / MRVL 11.23%); COP TP2 nearest narrowed −1.91pp to +6.79% suggesting energy bid continues into Fri RTH. RKLB streak continues deterioration at −30.9% (5.0% SL buffer; no relief). All 5 TP1-over-line same symbols from #36 queue (CRM-invisible to state). 5th consecutive zero-trigger (zt=5 same-BJT-day carry).
