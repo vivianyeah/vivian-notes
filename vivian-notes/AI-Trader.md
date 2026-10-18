@@ -33604,3 +33604,202 @@ Pool scan: 0 of 92 watched symbols passed Stage 2 breakout-pullback filter. No n
 ---
 
 **Key insight:** Weekend artifact cron #34 (BJT Mon 10-19 01:00 = Sun 10-18 13:00 EDT) shows **Fri 11:00 → Fri 16:00 RTH final-5-hour drift = −$1,478.49 (−1.546%)** captured by current scan (the only real drift available — Sat/Sun contribute $0.00). **Broad-based risk-off** dominates Top-5 negative (MRVL semis −$359, HOOD broker −$283, RKLB spacetech −$275, FUTU −$176, BABA −$128) with **only modest energy bid** (COP +$152). **CRM re-confirms TP1 line** (+21.4% vs #33 +20.8%) — sustained in queue despite prior cron concerns. **COP TP2 nearest deceleration** (0.016pp/hr vs #33 0.25pp/hr) signals energy bid exhausting into Fri close. **Cap violations unchanged set** (DE 11.59% persistent / MRVL 11.13% persistent), DE slightly worsened, MRVL slightly improved. **RKLB streak low new** at −34.9% (−2.8pp further deterioration vs #33 −32.1%; 5.0% SL buffer; 29+ windows; no relief). **Dual artifact stack**: scan.py MA20 latent bug + weekend closure = 32/32 positions cannot be evaluated for live MA10/MA20 trail-stop. **P-MR-247 day-boundary reset** applied (BJT rolled 10-16 → 10-19 across weekend); zt=2 fresh start for BJT Mon 10-19 stack. **Stage 2 pool: 0 candidates**. 1st cron in fresh BJT 10-19 stack; 1st cron after weekend artifact gap (no Sat/Sun cron fired).
+## Cron #35 — 2026-10-19 03:00 BJT (Sun 10-18 15:00 EDT) — RTH late (TP2 trigger check window, **WEEKEND ARTIFACT STACK**)
+
+**Session:** BJT Monday 2026-10-19 03:02 = **Sun 2026-10-18 15:00 EDT (US market closed, weekend artifact stack — 2nd of 3 crons in BJT Mon 10-19 stack)**. 2h after #34 (Mon 10-19 01:00 BJT = Sun 10-18 13:00 EDT). **yfinance cache identical to #34** — Fri 10-16 RTH close for all 32 positions. Same cron number sequence as #35 nominal slot (per skill "next-day pre-open cron" pitfall — sequential counter).
+
+**Per skill "Weekend/holiday cron" pitfall**: this is the **canonical weekend artifact stack case**. Same Fri 10-16 RTH close prices across #34 → #35 → #36; MV drift across the entire stack is expected to be $0.00 unless yfinance catches up to a Mon 10-19 RTH open (impossible during Sun EDT). Real Mon RTH data only available at next live RTH scan.
+
+**yfinance state:** ⚠️ **CACHE STALE**. SPY 5d `['10-12','10-13','10-14','10-15','10-16']` — last entry Fri 10-16. No Sat/Sun/Mon 10-19 RTH data (US market closed). Scan prices = **Fri RTH close identical to #34** for all 32 positions (NOT live Sun data — yfinance cannot serve weekend data).
+
+### 📊 Scan summary (32 positions, weekend-frozen snapshot)
+
+```
+💰 Cash:              $207.40
+💼 MV:               $94,164.86  (≡ #34 identical, weekend-frozen)
+🏦 Total equity:     $94,372.26
+📈 Unrealized P&L:   $+526.05 (+0.56% vs cost)
+📊 Positions:         32
+🔼 TP1-over-line:    5  (COP +33.6% / XOM +26.4% / MRK +23.4% / CRM +21.4% / PFE +20.0%) ← unchanged
+🎯 TP2 nearest:      COP +4.79%  (cur $146.51 vs TP2 line $153.53)  ← ARITHMETIC ERROR CORRECTION vs #34
+🚨 Cap violations:    2  (DE 11.59% / MRVL 11.13%)  ← unchanged
+🚦 zt (zero-trigger): 3  (same BJT Mon carry 2 → 3)
+💵 Cash floor (cf):   0
+```
+
+> **TP2 nearest arithmetic correction**: #34 markdown narrative showed COP +6.46%, but actual math `(TP2 − cur) / cur × 100 = (153.53 − 146.51) / 146.51 × 100 = 4.79%` was always +4.79%. The #34 +6.46% was an arithmetic error in narrative. **#35 carries the correct +4.79%; net delta vs #34 = +0.00pp** (weekend-frozen, identical prices). The `tp2_nearest` audit block was already correct at both crons (scan-meta-log convention: `−4.8%` at #34, `−4.8%` at #35).
+
+### 🌡️ Five-window canonical comparison
+
+| Cron | BJT Date+Time | EDT | Session | MV | Δ vs prior | zt | TP2 nearest |
+|-----:|:---:|:---:|:---|---:|---:|---:|:---|
+| #33  | 2026-10-16 23:00 | 10-16 11:00 | Pre-market follow-through (Fri, same-BJT-day carry) | $95,643.35 | −$270.15 (−0.282%) | 6 | COP +6.51% (price-space) |
+| #34  | 2026-10-19 01:00 | 10-18 13:00 | RTH mid-session (WEEKEND ARTIFACT — Sun US market closed; Fri 11:00→Fri 16:00 RTH final 5h drift) | $94,164.86 | −$1,478.49 (−1.546%) | 2 (P-MR-247 reset) | COP +4.79% (was mislabeled +6.46% in #34 narrative) |
+| **#35** | **2026-10-19 03:00** | **10-18 15:00** | **RTH late (WEEKEND ARTIFACT — Sun US market closed; identical Fri 10-16 snapshot)** | **$94,164.86** | **$0.00 (0.000%)** | **3 (same-BJT Mon carry)** | **COP +4.79% (price-space; ≡ #34 audit, +0.00pp delta)** |
+
+**Weekend artifact stack semantics** (#34 → #35 → #36, BJT Mon 10-19 = Sun 10-18 EDT):
+- All three crons see Fri 10-16 RTH close data (yfinance cache stale, US market closed)
+- MV drift across the stack is $0.00 (no live prices to mark)
+- zt pure-same-day carry: 2 → 3 → 4 (no P-MR-247 reset mid-stack)
+- TP1/TP2/cap-violation state FROZEN at Fri 10-16 close levels
+- First live RTH data expected at next pre-open cron (Tue 10-20 22:00 BJT = Mon 10-19 22:00 EDT if scheduler catches up, or otherwise at Tue 10-20 23:00 BJT pre-market follow-through)
+
+### 🔍 Drift decomposition (cron #34 → cron #35, weekend-stack intra-cron)
+
+**Authoritative FIFO MV delta:** **$0.00 (0.000%)** from $94,164.86 → $94,164.86. Both crons are byte-identical Fri 10-16 RTH close snapshots per yfinance cache.
+
+**No drift contributors** — all 32 positions carry identical prices between #34 and #35:
+| Symbol | #34 price | #35 price | Δ | Note |
+|---|---:|---:|---:|:---|
+| (all 32) | (Fri 10-16 close) | (Fri 10-16 close) | $0.00 | weekend-frozen |
+
+**Residual:** N/A (no decomposition needed for $0.00 drift).
+
+**Per skill "Stacked weekend + federal holiday artifact chain" pitfall**: this is the canonical 3-cron weekend artifact stack case (#34 → #35 → #36, BJT Mon 10-19 = Sun 10-18 EDT). The skill notes that on stacks of this kind, "MV drift is $0.00 across the entire stack, and `zt` carry is purely same-day (no day-boundary reset until the next pre-open)." This matches exactly.
+
+### 🎯 TP1 / TP2 / Cap diagnostics
+
+**TP1-over-line queue (5 names — unchanged set vs #34)**:
+
+| Symbol | #34 pnl | #35 pnl | Δ | TP1 line | TP2 line | Status |
+|---|---:|---:|---:|---:|---:|:---|
+| COP | +33.6% | +33.6% | ±0.0pp | $131.60 | $153.53 | weekend-frozen |
+| XOM | +26.4% | +26.4% | ±0.0pp | $169.92 | $198.24 | weekend-frozen |
+| MRK | +23.4% | +23.4% | ±0.0pp | $141.93 | $165.58 | weekend-frozen |
+| CRM | +21.4% | +21.4% | ±0.0pp | $237.92 | $277.58 | re-confirmed TP1 line, frozen |
+| PFE | +20.0% | +20.0% | ±0.0pp | $29.58 | $34.51 | at threshold (unchanged) |
+
+**All 5 CRM-invisible** to `/tmp/ai_trader_tp1_state.json` (state file has no `COP`, `XOM`, `MRK`, `CRM`, `PFE` keys; only 14 historical `TP1=true` flags + HOOD's `FULLY_CLOSED` object). Queue persists.
+
+**TP2 nearest (TOP 5 closest below TP2 line) — prices frozen at Fri 10-16 close**:
+
+| Symbol | Gap (price-space) | Pnl | Action |
+|---|---:|---:|:---|
+| **COP** | **+4.79%** | +33.6% | **TP2 nearest** — net delta vs #34 = **+0.00pp** (weekend-frozen identical prices; #34 markdown narrative's "+6.46%" was an arithmetic error; correct value at both crons is +4.79%) |
+| XOM | +10.76% | +26.4% | second nearest (price-space) |
+| MRK | +13.45% | +23.4% | third nearest |
+| CRM | +15.32% | +21.4% | fourth |
+| PFE | +16.67% | +20.0% | fifth |
+
+**COP TP2 cross projection** (per skill "CRM TP2 widening rate tracking"): at the recent narrowing rate (1.75pp per 14h in the artifact-chain period, but mostly weekend), TP2 line cross projection = **+4.79% × 14h / 1.75pp = ~38h = 1.6 trading days** at the **artifact-chain narrow rate**. However, this rate is from a 3-day weekend period — **real RTH rate** will only be visible when Mon 10-19 RTH data lands. **The artifact-rate projection is unreliable**; treat the +4.79% gap as "stalled, no narrowing during weekend" until next live data.
+
+**Cap-violation table (full 32-position, two-pass: total_mv finalized = $94,164.86)**:
+
+| Symbol | Cap % | MV | Pnl | Status |
+|---|---:|---:|---:|:---|
+| DE | **11.59%** ⚠️ | $10,911.62 | +11.5% | persistent violation (unchanged vs #34 11.59%) |
+| MRVL | **11.13%** ⚠️ | $10,480.18 | +7.2% | persistent violation (unchanged vs #34 11.13%) |
+| COP | 9.96% | $9,376.64 | +33.6% | sub-violation, marginal widening (no entry since P-MR-124 cap block) |
+| BABA | 9.15% | $8,619.69 | −1.0% | sub-violation |
+| HOOD | 7.77% | $7,316.38 | +3.3% | |
+| FUTU | 7.51% | $7,067.16 | +4.9% | |
+| XOM | 7.03% | $6,622.26 | +26.4% | |
+| RKLB | 6.80% | $6,405.84 | −34.9% | |
+| AVGO | 5.94% | $5,588.75 | −14.5% | |
+| CSCO | 3.31% | $3,114.31 | −6.2% | |
+| (Other 21 ≤ 3.31%) | | | | |
+
+**Cap vs #34:**
+- **DE**: 11.59% → 11.59% (**+0.00pp**; weekend-frozen identical prices for DE at $641.86)
+- **MRVL**: 11.13% → 11.13% (**+0.00pp**; weekend-frozen identical prices for MRVL at $227.83)
+- **No new violations** entered; no violations exited (DE and MRVL both persistent, unchanged from #34)
+- **P-MR-124 cap-violation block**: active. Cannot add to DE or MRVL.
+
+### 🛡️ MA10/MA20 trail-stop diagnostic
+
+**⚠️ MA10/MA20 trail-stop test non-functional (DUAL ARTIFACT STACK, unchanged from #34)**:
+1. **scan.py `period="5d"` MA20 latent bug** — every position falls back to `ma20 = price`, so MA20 == price for all 32 positions
+2. **Weekend artifact** — US market closed Sat/Sun; daily bars for Mon 10-19 won't exist until Mon RTH close
+
+Both symptoms stack: scan cannot perform a real MA10/MA20 trail-stop test. Trail-stop status "🟢 OK" shown for all 32 is meaningless. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop) but those are also **frozen at Fri RTH close**, identical to #34.
+
+**MA10-trail SL = current price × 0.95** (the `止蝕=$Z` field is valid; from Fri RTH close, identical to #34):
+
+Positions at 5.0% SL buffer warning threshold (active SL within 5% of current price, all unchanged from #34):
+- **RKLB**: cur $50.84, MA10-trail SL $48.30 → **5.0% buffer exactly**; **−34.9% pnl** (streak low preserved from #34; 29+ window streak continues; no relief attempt since #34 plateau)
+- **ASTS**: cur $40.66, MA10-trail SL $38.63 → **5.0% buffer**; −35.7% pnl (unchanged from #34)
+- **IREN**: cur $26.99, MA10-trail SL $25.64 → **5.00% buffer**; −31.4% pnl (unchanged from #34)
+- **WFC**: cur $83.87, MA10-trail SL $79.68 → **5.00% buffer**; +9.5% pnl (unchanged)
+- **HOOD**: cur $98.87, MA10-trail SL $93.93 → **5.00% buffer**; +3.3% pnl (unchanged)
+- **MRK**: cur $145.95, MA10-trail SL $138.65 → **5.00% buffer**; +23.4% pnl (TP1-over, unchanged)
+- **IBM**: cur $232.14, MA10-trail SL $220.53 → **5.00% buffer**; −2.4% pnl (unchanged)
+- **FUTU**: cur $105.48, MA10-trail SL $100.21 → **5.00% buffer**; +4.9% pnl (unchanged)
+
+**All 8 prior 5.0% buffer positions still at 5.0% (no breaches, no changes; weekend-frozen identical prices).**
+
+**RKLB streak tracking** (per skill "RKLB relief can REVERSE" pitfall):
+- #34 (Mon 10-19 BJT = Sun 13:00 EDT, weekend artifact): **−34.9%** (streak low new)
+- **#35 (Mon 10-19 BJT = Sun 15:00 EDT, weekend artifact, 2h later)**: **−34.9%** (**±0.0pp vs #34**; weekend-frozen identical prices)
+- **Cumulative relief vs streak low −34.9% (= #34 = #35)**: ±0.0pp (no relief possible during weekend, prices frozen)
+- Streak counter: 30+ windows continuous; **no relief attempt since #34 plateau** (because no live RTH data yet — first relief attempt requires Mon 10-19 RTH data which won't arrive until next live cron)
+
+### 📈 Stage 2 candidates / buy signals
+
+```
+Stage 2 候選:  0 只
+買入信號:     0 只
+成功分析:    0 只 / 92 隻 pool
+```
+
+Pool scan: 0 of 92 watched symbols passed Stage 2 breakout-pullback filter. No new entries queued. **Weekend artifact means pool scan also returns Fri RTH close data** — no live RTH breakout detection possible until Mon RTH opens.
+
+### 🧮 Diagnostic checks
+
+| Check | Result |
+|---|---|
+| yfinance cache state | **STALE: Fri 10-16 RTH close only**; SPY 5d `['10-12','10-13','10-14','10-15','10-16']` (≡ #34) |
+| US market status | **CLOSED** (Sun 10-18 EDT, weekend) |
+| Drift window | 2h BJT (Mon 10-19 01:00 → Mon 10-19 03:00 BJT), but no RTH trading occurred |
+| Drift residual | N/A ($0.00 drift, no decomposition needed) |
+| Day-boundary reset | None (same BJT calendar date 2026-10-19 for #34 and #35; in-stack carry) |
+| P-MR-247 reset | N/A (#34's reset still applicable for this BJT day; zt=2→3 in-stack carry) |
+| zt | 3 (in-stack pure-same-day carry from #34's zt=2) |
+| cf | 0 (cash $207.40, above $100 floor) |
+| TP1 fires | 0 (5 names in queue, all CRM-invisible to state file; frozen identical to #34) |
+| TP2 fires | 0 (COP closest at +4.79% price-space, **±0.00pp vs #34's correct value**; #34 markdown narrative +6.46% was arithmetic error) |
+| Cap violations | 2 persistent (DE 11.59% / MRVL 11.13%, both **+0.00pp** vs #34 weekend-frozen) |
+| yfinance RTH lag | **N/A** — weekend, no live data expected until Mon 09:30 EDT RTH open |
+| MA20 latent bug | fires (32/32 MA20 == current price trivially; **stacked with weekend artifact**, ≡ #34) |
+| Weekend artifact | **YES** (canonical per skill "Weekend/holiday cron" pitfall, 2nd of 3 stacked crons) |
+
+### 📌 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED (0-trade cron; 300 entries before and after; semantic invariant preserved)
+✅ /tmp/ai_trader_tp1_state.json   — _audit block refreshed via cron_state_refresh.py (TP1=14, FULLY_CLOSED=1, fresh queue=5)
+   • last_checked_bjt: 2026-10-19T03:04:02+08:00
+   • cron: #35 (RTH late (TP2 trigger check window, weekend artifact stack))
+   • tp2_nearest: COP -4.8% (cur $146.51 vs TP2 $153.53)
+   • tp1_over_line_unmarked: [COP, XOM, MRK, CRM, PFE] (5 names; unchanged vs #34)
+   • zt: 3 (in-stack carry from #34 zt=2; same BJT calendar day 2026-10-19)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 1 entry (#35); 128 → 129 entries
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (weekend artifact cron, 2nd of stack)
+✅ /tmp/ai_trader_cash_floor.json   — cf=0, last_bjt_date=2026-10-19 (preserved)
+✅ /tmp/ai_trader_zero_trigger.json — zt=3, last_bjt_date=2026-10-19 (in-stack carry from #34 zt=2)
+```
+
+**TP1=true count** (FIFO recompute authoritative): 14 (`AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK` per state file). **Unchanged** from #34 (no FIFO recompute between crons over weekend). Queue to next FIFO recompute: 5 (COP, XOM, MRK, CRM, PFE — all CRM-invisible).
+
+### ⏭️ Next cron preview
+
+**Cron #36 — 2026-10-19 03:30 BJT (Sun 10-18 15:30 EDT) — RTH close -30min (trail-stop confirm)** — 30min after #35, **3rd and final cron of BJT Mon 10-19 weekend artifact stack**. Expected:
+- **MV drift vs #35 = $0.00** (weekend-frozen, identical Fri 10-16 prices in yfinance cache)
+- **zt = 4** (in-stack carry 3 → 4)
+- **All TP1-over/cap/MRK/RKLB state frozen** at Fri 10-16 close levels
+- **TP2 nearest COP arithmetic correction from #34 applies here too**: the #34 narrative's "+6.46%" was an arithmetic error; correct value is +4.79% (unchanged at all 3 stack crons)
+- **Per skill "Stacked weekend + federal holiday artifact chain" pitfall**: 3-cron weekend stack #34 → #35 → #36 will all show identical Fri 10-16 RTH close data
+
+**After #36 (last slot in BJT Mon 10-19 stack), next cron = #27 next-day pre-open.** Per skill "next-day pre-open cron" pitfall, next live RTH data expected at:
+- **Best case**: **#27 — 2026-10-20 22:00 BJT (Tue 10-20 10:00 EDT)** if BJT Tue 22:00 cron fires Mon 10-19 EDT evening = Mon 10-19 22:00 EDT (10:00 EDT + 12h to 22:00 EDT = wait, EDT is Mon 10-19 10:00 → 22:00 EDT = Mon 10-19 evening, which would be Tue 10-20 BJT 10:00. So #27 fires Tue 10-20 22:00 BJT = Mon 10-19 22:00 EDT). **Mon 10-19 RTH close data** should be available in yfinance by then (yfinance catches up ~30min AFTER 16:00 EDT close = Mon 10-19 ~16:30 EDT = Tue 10-20 04:30 BJT, well before 22:00 BJT).
+- **Fall-back case**: If scheduler skips Mon 10-19 22:00 EDT (i.e., Tue 10-20 22:00 BJT is the next firing slot), then next live RTH data is at **#33 — 2026-10-21 23:00 BJT (Wed 10-21 11:00 EDT)** — 2 BJT days with no live data accumulating.
+
+**Key TP1-over-line positions to monitor at first live cron**:
+- **CRM at +21.4%**: at Fri 10-16 close. Mon RTH open will determine if CRM holds above or falls below TP1 line.
+- **PFE at +20.0%**: exactly at threshold. Any drop → removes from queue.
+- **COP at +33.6%, XOM at +26.4%, MRK at +23.4%**: in queue; Mon RTH will set the new pace.
+
+**Key RKLB streak to monitor**: at streak low −34.9% frozen at Fri 10-16 close. **First Mon RTH open will determine if the streak relief attempt begins** (per skill: any positive delta would be the first relief since #34 plateau). Watch for "3+ consecutive crons with delta > 0 before declaring streak break imminent" per skill "RKLB streak relief continuation" pitfall.
+
+---
+
+**Key insight:** Weekend artifact stack cron #35 (BJT Mon 10-19 03:02 = Sun 10-18 15:00 EDT) is the **2nd of 3 stacked weekend crons** (#34 → #35 → #36), all seeing identical Fri 10-16 RTH close data per yfinance stale cache. **MV drift vs #34 = $0.00 (0.000%)** — no live RTH trading occurred in the 2h BJT window (Sun EDT, US market closed). **All metrics frozen at Fri 10-16 close levels**: MV $94,164.86 / Equity $94,372.26 / Unrealized +$526.05 (+0.56%) / 5 TP1-over-line (CRM re-confirmed at +21.4%) / 2 cap violations persistent (DE 11.59% / MRVL 11.13%) / RKLB streak low −34.9% / zt=3 in-stack carry. **One arithmetic correction**: #34 markdown narrative claimed COP TP2 gap "+6.46%" but the math was always +4.79% — the audit block was correct (`−4.8%` scan-meta-log convention); only the markdown narrative had the typo. **#35 carries the correct +4.79% price-space (+0.00pp delta vs #34's correct value)**. TP2 cross projection is **frozen / unreliable** during weekend artifact (real RTH narrowing rate only visible when Mon 10-19 RTH data lands). **Dual artifact stack** (scan.py `period="5d"` MA20 latent bug + weekend closure) prevents any live MA10/MA20 trail-stop evaluation. **Stage 2 pool: 0 candidates** (weekend-frozen; no live RTH breakout detection). 2nd cron in 3-cron BJT Mon 10-19 weekend artifact stack (per skill "Stacked weekend + federal holiday artifact chain" pitfall).
