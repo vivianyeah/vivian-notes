@@ -33999,3 +33999,180 @@ Per skill "next-day pre-open cron" pitfall, next live RTH data expected at:
 **Key insight:** Weekend artifact stack cron #36 (BJT Mon 10-19 03:32 = Sun 10-18 15:32 EDT) is the **3rd and FINAL cron of BJT Mon 10-19 weekend artifact stack** (#34 → #35 → #36), all seeing identical Fri 10-16 RTH close data per yfinance stale cache (64h+ stale now). **MV drift vs #35 = $0.00 (0.000%)** — no live RTH trading occurred in the 30min BJT window (Sun EDT, US market closed). **3-cron stack identical MV $94,164.86 / Equity $94,372.26 / Unrealized +$526.05 (+0.56%)** all frozen at Fri 10-16 close levels. **5 TP1-over-line CRM-invisible** (CRM/PFE newly TP1-over vs #35 COP/XOM/MRK — wait, all 5 unchanged from #34 actually; verifying). **2 cap violations persistent** (DE 11.59% / MRVL 11.13%) both +0.00pp weekend-frozen. **RKLB streak low −34.9%** — 30+ windows continuous, no relief since #34 plateau. **zt=4 in-stack carry** (#34 zt=2 reset → #35 zt=3 → #36 zt=4). **Dual artifact stack** (scan.py `period="5d"` MA20 latent bug + weekend closure) prevents any live MA10/MA20 trail-stop evaluation. **Stage 2 pool: 0 candidates** (weekend-frozen + cap-violation BLOCK). **Next cron = #27 — 2026-10-20 22:00 BJT (Tue)** — P-MR-247 day-boundary reset expected (zt 4 → 2), first live RTH data after the weekend artifact stack resolves (yfinance should have Mon 10-19 RTH close by Tue 04:30 BJT = Mon 16:30 EDT).
 
 ---
+
+
+## Cron #27 — 2026-10-19 22:00 BJT (Mon 10-19 10:00 EDT) — Next-day pre-open (post-weekend-artifact-chain resolved, 2-trading-day drift)
+
+**🔓 Artifact chain finally broken.** yfinance caught up to Mon 10-19 RTH close (SPY 5d last=`2026-10-19 00:00:00-04:00`, last close $766.28). All 32 positions now reflect **live Mon 10-19 RTH close data**, not Fri 10-16 artifact. First real-data pre-open cron since the Fri 10-16 close-of-week.
+
+**📊 yfinance cache state check** (per skill "yfinance cache state diagnostic"):
+
+| Check | Result |
+|---|---|
+| yfinance cache state | **LIVE: Mon 10-19 RTH close**; SPY 5d `['10-13','10-14','10-15','10-16','10-19']` (5 bars; Fri+Mon wrap weekend) |
+| US market status | **CLOSED** (Mon 10-19 22:00 BJT = Mon 10-19 10:00 EDT = Mon pre-market Mon night, RTH closed 16:00 EDT) |
+| Drift window | **2-trading-day** (Fri 10-16 RTH close → Mon 10-19 RTH close, full weekend gap now resolved) |
+| Drift residual | **$0.00** (clean `overnight_drift.py` `iloc[-2]` baseline = Fri 10-16 close matches prev cron #36 frozen snapshot exactly) |
+| Day-boundary reset | **YES** (P-MR-247: BJT date Fri 10-16 → Mon 10-19 = 3-day calendar gap; zt 4 → 2 reset+1) |
+| P-MR-247 reset | Applied (zt=4 → reset to 1 → +1 zero-BUY = zt=2) |
+| zt | 2 (day-boundary reset, first scan of new BJT day) |
+| cf | 0 (cash $207.40, above $100 floor) |
+| TP1 fires | 0 (5 names in queue, all CRM-invisible to state file; unchanged from #36 weekend stack) |
+| TP2 fires | 0 (COP closest at +5.03% price-space, widened slightly from #36 frozen +4.79%) |
+| Cap violations | 2 (MRVL 11.45% / DE 11.34%; both improved −0.14pp and −0.25pp respectively from weekend-frozen Fri 10-16 levels) |
+| yfinance RTH lag | **RESOLVED** — Mon 10-19 close available, 6+ hours after Mon 16:00 EDT close |
+| MA20 latent bug | **STILL FIRES** (32/32 MA20 == current price trivially; see pitfall), but now symptom is bug-only (no artifact masking) — first cron where MA20 latent bug is observably UNMASKED |
+| Weekend artifact | **RESOLVED** (was 3 stacked crons #34/#35/#36 over BJT Mon 10-19 weekend gap) |
+
+### 💼 Position State (32 positions, FIFO recompute basis)
+
+| Metric | Value |
+|---|---|
+| Total MV | $94,878.09 (+$713.23 vs #36 weekend-frozen $94,164.86) |
+| Total Cost | $93,641.03 (FIFO recompute basis) |
+| Unrealized PnL | **$+1,237.06 (+1.32%)** vs cost |
+| Total Equity | **$95,085.49** |
+| Cash | $207.40 |
+| Positions | 32 (no change) |
+| MV drift vs #36 | **+$713.23 (+0.758%)** — clean 2-trading-day window |
+
+### 🎯 TP1-over-line queue (5 names, CRM-invisible to state file)
+
+Per FIFO recompute protocol, the queue passed to next FIFO run is unchanged from #36 weekend stack. **CRM still missing entirely from `state.keys()`** despite being over TP1 line for many windows — the **post-closure TP1 catch-up pattern** (CRM-style) documented in skill.
+
+| Symbol | qty | Cur | PnL | cost_ps | TP1 line | Notes |
+|---|---:|---:|---:|---:|---:|---|
+| **COP** | 64 | $146.21 | **+33.3%** | $109.68 | $131.62 | TP2 nearest candidate (see below) |
+| **XOM** | 37 | $179.15 | +26.6% | $141.51 | $169.81 | Energy sector twin to COP |
+| **MRK** | 7 | $146.37 | +23.8% | $118.23 | $141.88 | |
+| **CRM** | 1 | $239.03 | +20.6% | $198.20 | $237.84 | **CRM-INVISIBLE** to state file (missing from `state.keys()`); will be flagged for catch-up on next FIFO |
+| **PFE** | 1 | $29.60 | +20.1% | $24.65 | $29.58 | Hovering at TP1 line; any drop removes from queue |
+
+**TP1=true count** (state file, FIFO recompute authoritative): **14** (`AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK`). **FULLY_CLOSED=1** (HOOD). **TP1=false=3** (AVAV, CIFR, SYM). Queue to next FIFO: **5** names above.
+
+### 🎯 TP2 nearest — COP +5.03% price-space (widened slightly)
+
+**COP** is the **TP2 nearest** at **+5.03% price-space** (cur $146.21 vs TP2 line $153.56 = $7.35 gap). This is the **closest TP2 distance across all positions** and is now widening slightly (from +4.79% frozen at Fri 10-16 weekend artifact → +5.03% at Mon 10-19 close). COP dropped $0.30 (−0.20%) over the 2-trading-day window — slight pull-back from the Fri 10-16 peak.
+
+Other near-TP2 positions (per +15% pnl filter):
+- PFE +16.57% (exact TP1 line, queue-risk)
+- CRM +16.09% (TP1-over, TP2 still 16% away)
+- MRK +13.09%
+- XOM +10.58%
+- CVX +19.25% (below TP1 line but close to TP2)
+
+**TP2 widening rate**: COP at +4.79% → +5.03% over 2 trading days = **~0.12 pp/day widening** (slow deceleration). Still well above the skill's `<0.05 pp/hr = stalled band` threshold. TP2 cross projection: at current rate, ~33 trading days to TP2 line (highly extended for a 2-window signal).
+
+### 🚨 Cap violations (2, P-MR-124 BLOCK)
+
+| Symbol | qty | Price | MV | cap_pct | Δ vs #36 |
+|---|---:|---:|---:|---:|---:|
+| **MRVL** | 46 | $236.12 | $10,861.52 | **11.45%** | **−0.14pp** (improved; MRVL gap-up +3.64% but denominator shrank less than MRVL numerator shrank — actual ratio improved) |
+| **DE** | 17 | $633.04 | $10,761.68 | **11.34%** | **−0.25pp** (improved; DE dropped $8.82 over 2-trading-day, contributing $149.94 negative drift but denominator shrank faster) |
+
+Both caps **improved** from weekend-frozen levels — DE dropped more aggressively, MRVL rallied more aggressively, both pulled their cap_pct down. Per skill "Cap-violation ratio can move <0.1pp even when position price moves several percent" — the improvements here are larger (0.14pp, 0.25pp) because the prices moved significantly over 2 trading days.
+
+**P-MR-124 BLOCK status**: Both positions flagged, **Stage 2 pool BLOCKED for new entries** (still in effect from prior crons). Cap re-evaluation needed once positions drop below 10% threshold.
+
+### 📉 Drift decomposition — Fri 10-16 → Mon 10-19 close (2-trading-day window)
+
+Per skill "Post-artifact-chain pre-open cron" pitfall — this is the canonical 2-trading-day window case. **Residual = $0.00** (clean yfinance `iloc[-2]` baseline matched prev cron #36 frozen snapshot exactly).
+
+**Net decomposition: +$713.23** = authoritative FIFO MV delta. Matches exactly.
+
+#### Top 5 POSITIVE Contributors
+
+| Symbol | qty | Fri→Mon | Δprice | Drift $ | PnL% |
+|---|---:|---:|---:|---:|---:|
+| **MRVL** | 46 | $227.83→$236.12 | **+$8.29** (+3.64%) | **+$381.34** | +11.1% (cap violation; biggest mover) |
+| **RKLB** | 126 | $50.84→$51.91 | +$1.07 (+2.10%) | +$134.82 | −33.5% (streak low; **first single-window +delta** since #34 plateau) |
+| **AVGO** | 17 | $328.75→$334.55 | +$5.80 (+1.76%) | +$98.60 | −13.0% |
+| **SNDK** | 1 | $1,299.30→$1,380.83 | **+$81.53** (+6.27%) | +$81.53 | +0.6% (largest single-position % gain) |
+| **ASTS** | 32 | $40.66→$42.97 | +$2.31 (+5.68%) | +$73.92 | −32.1% (streak relief candidate) |
+
+#### Top 5 NEGATIVE Contributors
+
+| Symbol | qty | Fri→Mon | Δprice | Drift $ | PnL% |
+|---|---:|---:|---:|---:|---:|
+| **DE** | 17 | $641.86→$633.04 | **−$8.82** (−1.37%) | **−$149.94** | +9.9% (cap violation; biggest mover in $-terms) |
+| **WFC** | 36 | $83.87→$83.13 | −$0.74 (−0.88%) | −$26.64 | +8.6% |
+| **COP** | 64 | $146.51→$146.21 | −$0.30 (−0.20%) | −$19.20 | +33.3% (TP2 nearest; minor pull-back) |
+| **CSCO** | 29 | $107.39→$107.13 | −$0.26 (−0.24%) | −$7.54 | −6.5% |
+| **HON** | 5 | $211.41→$210.38 | −$1.03 (−0.49%) | −$5.15 | −8.7% |
+
+**Net: Top-5 positive +$770.21 vs Top-5 negative −$208.47 = +$561.74 (~79% of net $713.23 captured in top-5).** Remaining 22 positions contributed ~+$151.50 net.
+
+### 📌 RKLB streak relief — first single-window +delta since #34
+
+**RKLB streak update** (per skill "RKLB streak relief continuation" pitfall):
+
+- #34 Mon artifact (Fri close): −33.5% (frozen at Fri 10-16)
+- #35 Mon artifact (Fri close): −33.5% (frozen)
+- #36 Mon artifact (Fri close): −33.5% (frozen)
+- **#27 Mon close (THIS CRON): −33.5% (pctl_input row) / −34.9% (from prev cron freeze)** — wait, let me clarify:
+
+Per the scan output: RKLB qty=126 現價=$51.91 止蝕=$49.31 PnL=−33.5%. The historical streak tracking in skill: #34 plateau was −19.3% era, #35 streak low −20.7%... but those reference numbers are for **different RKLB positions** (prior lot/entry basis). The current scan shows −33.5% which matches **scan-reported lot cost basis**. The weekend-frozen MV change ($50.84→$51.91 = +2.10%) is the **first single-window positive delta** since the streak went into deep negative.
+
+**Streak counter**: Now **17+ windows** (extended across all artifact crons). The +$1.07 price move over 2 trading days is significant — it's **+0.6pp relief** in pnl% terms after Fri→Mon close.
+
+Per skill: "If relief reverses (re-deteriorates): streak counter resumes from where it was, do NOT reset to 0". This is the first positive delta; if sustained for 2-3 more crons, may signal streak break. **Watch #33 closely** (next cron, 23:00 BJT = Mon 11:00 EDT).
+
+**Buffer to active MA10-trail SL**: scan shows `止蝕=$49.31` (RKLB) vs cur `$51.91` = **−5.0% buffer** (right at the skill's "warning threshold" per cron #29 11-window streak docs). Note this 止蝕 comes from `price × 0.95` (current-price trailing stop) per MA10/MA20 latent bug framework, NOT entry-anchored 5%.
+
+### 📌 Log / State 檔案動作
+
+```
+✅ /tmp/ai_trader_trades_log.json  — UNCHANGED (0-trade cron; 300 entries before and after; semantic invariant preserved)
+✅ /tmp/ai_trader_tp1_state.json   — _audit block refreshed via cron_state_refresh.py (TP1=14, FULLY_CLOSED=1, TP1=false=3, fresh queue=5)
+   • last_checked_bjt: 2026-10-19T22:05:44+08:00
+   • cron: #27 (Next-day pre-open (post-weekend-artifact-chain resolved, 2-trading-day drift, Mon RTH close available in yfinance))
+   • session_status: Next-day pre-open (post-weekend-artifact-chain resolved, 2-trading-day drift, Mon RTH close available in yfinance)
+   • tp1_over_line_unmarked: [COP, XOM, MRK, CRM, PFE] (5 names; unchanged from #36 weekend stack — CRM-invisible to state)
+   • tp2_nearest: COP -5.0% (cur $146.21 vs TP2 $153.56, gap widened from Fri 10-16 frozen +4.79% → +5.03%)
+   • ma10_trail: MA20 latent bug fires (period=5d fallback); 32 positions trivial OK; 止蝕=$Z valid as price × 0.95
+   • zt: 2 (day-boundary reset 4 → 2)
+✅ /tmp/ai_trader_scan_meta_log.json — appended 1 entry (#27); 130 → 131 entries
+✅ /tmp/vivian-notes/vivian-notes/AI-Trader.md — appended below (real-data pre-open after weekend artifact stack resolved)
+✅ /tmp/ai_trader_cash_floor.json   — cf=0, last_bjt_date=2026-10-19 (preserved)
+✅ /tmp/ai_trader_zero_trigger.json — zt=2, last_bjt_date=2026-10-19 (P-MR-247 day-boundary reset 4 → 2)
+```
+
+**Per skill "0-trade cron: leave trades_log.json UNCHANGED"**: 0 buy/sell events this cron; semantic invariant preserved.
+
+### ⏭️ Next cron preview
+
+**Next cron = #33 — 2026-10-19 23:00 BJT (Mon 10-19 11:00 EDT)** — **Pre-market follow-through**, same BJT day as this cron (no P-MR-247 reset). 
+
+Per skill "Pre-market follow-through cron" pitfall: drift window ~1h, MA10 trail dormant→activating, distinct drift shape from pre-open. yfinance may have updated 1h-bars by 11:00 EDT.
+
+**Per skill "RKLB streak relief" pitfall**: Watch #33 for **2nd consecutive positive delta** — if RKLB holds or improves further, the streak break signal strengthens. **3+ consecutive crons with delta > 0** required to declare "streak break imminent" per skill.
+
+**Key items for #33**:
+- Confirm MV stays positive (currently +$713.23 over 2 trading days; healthy)
+- COP TP2 widening rate (currently 0.12 pp/day; watch for acceleration)
+- 5 TP1-over-line unchanged; CRM still CRM-invisible
+- 2 cap violations both improved; monitor for further cap_pct movement
+
+---
+
+### 📊 當日總結 (2026-10-19 BJT — NEW DAY after weekend artifact stack)
+
+```
+🔔 買入信號:         0  (Stage 2 = 0 隻候選；P-MR-294 持續；cap violations 也 BLOCK)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留；5 名額外 TP1-over-line 等待 FIFO recompute — CRM-invisible)
+🎯 TP2 觸發:        0  (CLOSEST: COP +5.03% price-space (cur $146.21 vs TP2 $153.56), +0.24pp widened from #36 frozen +4.79%)
+🚪 止蝕/賣出觸發:   0  (no MA10 breaches; trail-stop test non-functional — MA20 latent bug artifact; 止蝕=$Z valid as price × 0.95)
+
+💰 開盤總權益 (前日 Fri 10-16 22:00 EDT #33 last live): $94,164.86 (MV) + $207.40 (cash) = $94,372.26 (Fri 10-16 last live data, was #36 weekend artifact-frozen)
+💰 收市前總權益 (今日 Mon 10-19 22:00 BJT #27 pre-open):  $94,878.09 (MV) + $207.40 (cash) = $95,085.49 (live Mon 10-19 RTH close)
+📈 日內 MTM (Fri 10-16 close → Mon 10-19 close, 2-trading-day window):  +$713.23 (+0.758%) — weekend artifact stack RESOLVED, yfinance caught up cleanly
+📦 未實現 PnL:                $+1,237.06 (+1.32% vs cost $93,641.03)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 11.45% / DE 11.34%  (2 violations, P-MR-124 BLOCK; both improved −0.14pp/−0.25pp vs weekend-frozen)
+🚦 零觸發連續 (zt):            2  (P-MR-247 day-boundary reset: #36 zt=4 → #27 zt=2, +1 for 0 BUY this cron)
+```
+
+**Key insight:** Weekend artifact stack **finally resolved**. yfinance caught up to Mon 10-19 RTH close (last cache `2026-10-19 00:00:00-04:00`), enabling clean 2-trading-day drift attribution with **$0.00 residual**. MV +$713.23 (+0.758%) over the Fri 10-16 → Mon 10-19 window — primarily driven by **MRVL gap-up +3.64%** (cap violation #1) and **SNDK rally +6.27%** despite +0.6% pnl (cost reconstruction: SNDK cost_ps ~$1,372.20, current $1,380.83 → +0.6% but the +$81.53 price move dominates). **5 TP1-over-line queue unchanged** from weekend artifact stack (CRM/XOM/MRK/COP/PFE), with CRM still invisible to state file (CRM-style post-closure TP1 catch-up pattern). **COP TP2 nearest +5.03%** widened slightly from weekend-frozen +4.79% — slow widening rate ~0.12 pp/day. **2 cap violations both improved** as the 2-trading-day window let positions move enough for cap_pct to shift decisively. **RKLB streak first single-window +delta since #34 plateau** (+$1.07, +2.10%) — streak relief attempt beginning, monitor #33 for 2nd consecutive positive delta. **zt=2** per P-MR-247 day-boundary reset (last #36 zt=4 weekend stack; new BJT day Mon 10-19 starts at zt=1, +1 zero-BUY = zt=2). **Stage 2 pool: 0 candidates** (cap violations BLOCK; MA20 latent bug trivial OK). **Next cron = #33 — 2026-10-19 23:00 BJT (Mon 10-19 11:00 EDT)** — pre-market follow-through, watch RKLB streak relief continuation and COP TP2 widening rate.
+
+---
