@@ -34807,3 +34807,212 @@ HOOD entry in `tp1_state.json` is `FULLY_CLOSED` (closure_date 2026-07-14). All 
 - Stage 2 pool: expect 0 candidates unless overnight gap-up creates new breakouts
 
 ---
+
+
+## Cron #27 — 2026-10-20 22:00 BJT (Tue 10-20 10:00 EDT) — Next-day pre-open (🚨 scan.py `bb_lo` NameError bugfix, 26-day Stage 2 blackout ended)
+
+> **🚨 CRITICAL FINDING — the "0 buy signals" streak had a code bug, not market conditions.** `/tmp/ai_trader_scan.py` `get_price()` referenced an undefined variable `bb_lo` (line 78) inside a bare `except: return None`. Every one of the 93 pool tickers threw `NameError`, was swallowed, and returned `None` → `成功分析: 0 只`. **The Stage 2 pool has been dark since 2026-09-24** (~26 days / ~100 crons). Prior crons attributed this to "yfinance rate-limiting on `period='6mo'`" — that diagnosis was **wrong**; yfinance was healthy the whole time (verified 57/57 fetches OK during this run). Fixed this cron; `成功分析: 0 → 92/93`.
+
+### 📊 Scan vs Prior Cron (#36)
+
+| Metric | #36 (10-20 03:30 BJT) | **#27 (10-20 22:00 BJT)** | Δ |
+|--------|----------------------:|--------------------------:|---:|
+| Total MV | $94,605.78 | **$94,532.42** | **−$73.36 (−0.078%)** |
+| Cash | $207.40 | $207.40 | $0.00 |
+| Total equity | $94,813.18 | **$94,739.82** | **−$73.36** |
+| Total cost | $93,621.49 | $93,615.63 | −$5.86 (lot rounding) |
+| Unrealized PnL | +$984.29 (+1.05%) | **+$916.79 (+0.98%)** | −$67.50 |
+| Positions | 32 | 32 | 0 |
+| zt (zero-trigger) | 6 | **7** | +1 (P-MR-201 **same-day carry**, no reset) |
+| cf (cash-floor) | 0 | 0 | 0 |
+| **Pool analyzed** | **0 / 93** | **92 / 93** 🟢 | **+92 — bugfix** |
+| Stage 2 candidates | 0 (infrastructure) | **1** (BA ⭐5 RR=0.84) | pool-loop restored |
+| Buy signals | 0 | **0** | 0 (cash-floor blocks) |
+| Sell signals | 0 | 0 | 0 |
+| TP1-over-line | 4 | **5** | +1 (PFE) |
+| TP2 nearest | COP +5.74% | **COP +5.98%** | +0.24pp (widening) |
+| Cap violations | 2 | 2 | 0 (both improved ~0.14pp) |
+
+**zt semantics — same-BJT-day carry, NO P-MR-247 reset**: prior #36 was `2026-10-20 03:30 BJT`, this #27 is `2026-10-20 22:00 BJT` — **same BJT calendar date**, so `zt 6 → 7` via P-MR-201. Per skill reference `same-bjt-day-carry-and-footer-predictions.md`, the prior cron's footer prediction of a day-boundary reset is **wrong** for this slot.
+
+### 🚨 scan.py bug analysis and fix
+
+**Root cause** (`/tmp/ai_trader_scan.py`, `get_price()`, lines 68–79):
+
+```python
+bb_mid = ma20
+bb_std = math.sqrt(sum((c-bb_mid)**2 for c in closes[-20:])/20)
+bb_up  = bb_mid + 2*bb_std
+        # ← bb_lo NEVER DEFINED
+...
+if bb_lo < last < bb_up: score += 1     # line 78 → NameError
+```
+
+The whole function is wrapped in `except: return None`, so `NameError` → `None` → ticker counted as "failed". **Silent failure**: no traceback, no stderr, exit code 0.
+
+**Why it hid so long**:
+1. Bare `except` swallowed the exception — scan.py always printed a clean report
+2. The symptom (`成功分析: 0 只`) is **identical** to a legitimate zero-trigger pool-loop and to yfinance rate-limiting, so cron sections self-confirmed the wrong diagnosis across ~100 consecutive crons
+3. `ast.parse()` passes (it's a runtime NameError, not a syntax error), so no lint caught it
+
+**Fix applied** (line 71):
+```python
+bb_lo = bb_mid - 2*bb_std
+```
+
+**Verification**:
+- Backup: `/tmp/ai_trader_scan.py.bak-2026-10-20`
+- Pre-fix probe: `get_price_debug("AAPL")` → `('NameError', "name 'bb_lo' is not defined")`
+- Post-fix: `成功分析: 92/93` (only `$SQ` fails — **genuinely delisted**, per skill ref `yfinance-possibly-delisted-warning.md`)
+- Standalone diag re-run surfaced **BA ⭐5 RR=0.84** as a real Stage 2 qualifier
+
+**Blast radius**: 26 days of zero-trigger streak (zt 7 now, but the *real* zero-trigger count is far lower). Several crons (e.g. #27 @ 10-07) explicitly wrote *"Stage 2 pool scan returned 0/0 due to yfinance rate-limit errors… NOT a pool-loop signal, infrastructure failure. Pool counter unchanged."* — **that annotation is now known to be a misdiagnosis**; those crons had no valid pool data at all.
+
+### 🎯 Stage 2 pool — filter diagnostics restored (92 analyzed, 0–1 candidates)
+
+Failure-reason frequency across all 92 tickers:
+
+| Filter | Fails | % | Interpretation |
+|--------|------:|--:|----------------|
+| below MA20 | 56 | 61% | broad tape below 20d — dominant filter |
+| KDJ ≤ 0 | 55 | 60% | momentum crossover mostly negative |
+| MACD_hist ≤ 0 | 53 | 58% | bearish histogram |
+| RR < 0.8 | 38 | 41% | price near/above upper Bollinger → little upside to band |
+| RSI outside 25–75 | 26 | 28% | overbought/oversold tails |
+| stars < 4 | 13 | 14% | composite score too low |
+
+**Near-miss (passed ⭐≥4, failed exactly 1 criterion)** — 18 names, dominated by the **RR ≥0.8** gate because most of the tape is riding the upper Bollinger band:
+
+| Symbol | ⭐ | RR | RSI | MACD_hist | KDJ | Price | Single failing criterion |
+|--------|---:|---:|---:|----------:|----:|------:|---------------------------|
+| **GS** | 5 | 1.16 | 41.1 | +2.484 | +0.36 | $882.43 | below MA20 ($898.92) |
+| **VZ** | 5 | 1.05 | 48.2 | +0.102 | +5.73 | $44.81 | below MA20 ($44.87) — **$0.06 short** |
+| **TSLA** | 5 | 0.93 | 60.0 | −1.282 | +2.58 | $371.93 | MACD_hist ≤ 0 |
+| **BA** | 5 | 0.84 | 58.0 | +1.029 | +5.88 | $190.71 | **QUALIFIED in isolated diag** |
+| **AA** | 5 | 1.57 | 42.7 | +0.118 | +1.69 | $40.79 | below MA20 ($42.08) |
+| TGT | 5 | 0.38 | 48.4 | +0.058 | +4.60 | $155.89 | RR < 0.8 |
+| MRK | 5 | 0.37 | 54.0 | +0.103 | +4.37 | $147.88 | RR < 0.8 (held position) |
+| HON | 5 | 0.29 | 52.7 | +0.520 | +5.76 | $212.25 | RR < 0.8 (held position) |
+
+**Highest-RR names all fail RSI**: CIFR RR 26.31 (RSI 4.9), IREN 17.62 (13.4), ASTS 14.25 (26.3), CRWV 13.88 (22.6), RKLB 12.49 (20.9), NBIS 12.23 (25.8) — deeply oversold AI-compute names with enormous technical upside but RSI < 25 (outside the 25–75 filter band). **The RSI floor is what's blocking the AI-compute cluster**, not RR or MA20.
+
+**Scan-run vs diag-run discrepancy**: scan.py reported `Stage 2 候選: 0`; the standalone diagnostic reported `1 (BA)`. Cause: yfinance serves a **live in-progress daily bar** during RTH — BA's RR (0.84) sits right at the 0.80 threshold and flips between fetches. **Borderline names need a margin, not just a threshold pass.**
+
+### 🔔 Buy signals: 0 (blocked by cash, not by strategy)
+
+- **Stage 2 produced 1 candidate** (BA ⭐5 RR=0.84, $190.71) — first real candidate in 26 days
+- **Cash $207.40 < BA $190.71 × 100 = $19,071** → scan.py's own guard printed 現金不足 and skipped
+- Per the scan script's hard-coded `quantity: 100`, **cash of $207 supports zero new positions under the 100-share rule**. This is now the binding constraint on new entries, replacing cap-violation BLOCK.
+
+### 🎯 TP1-over-line manual queue (5 names, +1 vs #36)
+
+| Symbol | qty | Price | pnl% | TP1 line | TP2 line | TP2 gap | State |
+|--------|----:|------:|-----:|---------:|---------:|--------:|-------|
+| **COP** | 64 | $144.83 | +32.1% | $131.56 | **$153.49** | **+5.98%** | NOT_IN_STATE |
+| **XOM** | 37 | $177.92 | +25.7% | $169.85 | $198.16 | +11.38% | NOT_IN_STATE |
+| **MRK** | 7 | $147.74 | +25.0% | $141.83 | $165.47 | +12.00% | NOT_IN_STATE |
+| **PFE** | 1 | $29.91 | **+21.4%** | $29.57 | $34.49 | +15.32% | **MISSING from state** |
+| **CRM** | 1 | $242.66 | +21.1% | $237.95 | $277.61 | +15.61% | NOT_IN_STATE (CRM-invisible) |
+
+- **PFE is the new entrant** — held +21.4%, above the +20% TP1 line, but **entirely absent from `/tmp/ai_trader_tp1_state.json`**. This is the **CRM-invisible variant** (missing key, not just `false`) per skill pitfall "CRM-style post-closure TP1 catch-up" — silent additions are how TP1 lots get missed. PFE sat in the queue at #27 @ 10-07 (+21.9%) and **never got captured** by FIFO across 13 crons while missing from state.
+- **CRM thinned** +22.2% (#36) → **+21.1%**, only +1.1pp above the TP1 line — **at risk of falling below** at the next cron (inverse-CRM pattern watch).
+- **MRK** +21.8% → +25.0%, widening its cushion.
+- **COP TP2 gap WIDENED +0.24pp** (#36 +5.74% → #27 +5.98%) over a ~18.5h overnight window — 4th consecutive window of widening, confirming the reversal of the earlier narrowing trend. **TP2 cross projection keeps deferring.**
+- **No TP1/TP2 fires this cron** — cron does not mutate TP1 state; FIFO recompute owns it.
+
+### 🚨 Cap violations (2, P-MR-124 BLOCK)
+
+| Symbol | qty | Price | MV | cap_pct | Δ vs #36 |
+|--------|----:|------:|----:|--------:|---------:|
+| **MRVL** | 46 | $236.03 | $10,857.38 | **11.49%** | **−0.14pp** (improved) |
+| **DE** | 17 | $635.29 | $10,799.93 | **11.42%** | **+0.12pp** (worsened) |
+
+MRVL and DE swapped ranks for the #1 cap slot. Both moves >0.1pp, so they clear the sub-noise rule. **DE's price rose +1.32% while cap_pct worsened +0.12pp** — per the ratio-decoupling pitfall, the denominator shrank faster than DE's numerator grew (RKLB/IREN/ASTS declines). **P-MR-124 BLOCK remains active** for new entries — though with cash at $207, cash is now the harder constraint anyway.
+
+### 🔍 Drift decomposition (Mon 10-19 RTH close → Tue 10-20 10:07 EDT)
+
+**Window**: overnight + first 37min of Tue RTH (~18.6h, spans a full non-trading period).
+**Authoritative FIFO MV delta**: **−$73.36** (MV $94,605.78 → $94,532.42, −0.078%)
+**yfinance `iloc[-2]` decomp sum**: **+$232.64**
+**Residual**: **+$306.00** (0.32% of MV) — **hybrid-baseline band** ($200–400) per skill's consolidated residual thresholds: prior cron (#36) sampled a 15:30 EDT 30m-bar, not the Mon 16:00 EDT official close, so a timing offset sits between the two baselines.
+
+**Top 5 NEGATIVE** (AI-compute + space cluster dominates the downside):
+
+| Symbol | Δ$/sh | Δ% | MV Δ | qty | Notes |
+|--------|------:|----:|-----:|----:|-------|
+| **RKLB** | −$0.57 | −1.11% | **−$71.82** | 126 | streak continues, −1.1pp pnl deterioration |
+| **MRVL** | −$1.06 | −0.45% | −$48.76 | 46 | cap violation #1, cap_pct improved anyway |
+| **IREN** | −$1.34 | −4.83% | −$46.90 | 35 | AI-compute selloff, RSI 13.4 deeply oversold |
+| **ASTS** | −$1.22 | −2.91% | −$39.04 | 32 | space complex, RSI 26.3 |
+| **COP** | −$0.41 | −0.28% | −$26.24 | 64 | TP1-over-line, TP2 gap widened |
+
+**Top 5 POSITIVE**:
+
+| Symbol | Δ$/sh | Δ% | MV Δ | qty | Notes |
+|--------|------:|----:|-----:|----:|-------|
+| **HOOD** | +$2.10 | +2.18% | **+$155.40** | 74 | largest single mover; +2.3% since #36 |
+| **DE** | +$8.29 | +1.32% | +$140.93 | 17 | cap violation #2 (industrial defensive) |
+| **AVGO** | +$3.27 | +0.98% | +$55.59 | 17 | networking bounce |
+| **FUTU** | +$0.71 | +0.67% | +$47.57 | 67 | China broker |
+| **MRK** | +$4.11 | +2.86% | +$28.77 | 7 | TP1-over cushion widened |
+
+**Net Top-5: +$195.50**, remaining 22 positions +$37.14. **Pattern**: same sector split as the RTH mid-session pattern — **AI-compute/space down, financials/industrials/healthcare up**. HOOD +$155 (largest positive) and DE +$141 vs IREN/ASTS down: a **risk-off rotation within the portfolio**, not a broad-market move (SPY only +0.22% Mon→Tue).
+
+### ⚠️ MA10/MA20 trail-stop status
+
+> "⚠️ MA10/MA20 trail-stop test non-functional: scan.py position-check uses `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` fallback for every position. Trail-stop status '🟢 OK' is an artifact of insufficient lookback, NOT a live MA20 breach confirmation. The `止蝕=$Z` field IS valid (price × 0.95 trailing stop)."
+
+**Confirmed this cron: 32/32 positions report MA20 == price.** Spot-check via `period="6mo"` shows real MA20 diverging by up to **$240.79** (SNDK: real MA20 $1,604.35 vs scan-reported $1,363.56), **$45.24** (LRCX), **$35.20** (VRT), **$29.57** (DE). Only 6/32 sit below their real MA20 — a meaningful subset is in genuine downtrends the scan cannot see. **Still unpatched** (separate from today's `bb_lo` fix).
+
+### 🔍 RKLB fixed-SL vs active-SL divergence
+
+- **Fixed entry-anchored SL**: cost basis $78.12 → 5% SL = **$74.12**. Current $50.79 is **deeply breached** (fixed SL would have exited ~$27 earlier).
+- **Active scan SL (price × 0.95)**: **$48.25**, current $50.79 → **5.00% buffer** — at the warning threshold.
+- **PnL: −34.9%** (vs #36 −33.8%) → **−1.1pp deterioration**, streak continues uninterrupted.
+- **VERDICT: NO EXIT.** `check_exit` evaluates only the active MA20/MA20-fallback path, which is not breached. This is a **fixed-SL breach diagnostic, not a missed trade**.
+
+### 📝 Log / state file actions
+
+| File | Action |
+|------|--------|
+| `/tmp/ai_trader_scan.py` | **MODIFIED** — added `bb_lo = bb_mid - 2*bb_std` (line 71); backup `/tmp/ai_trader_scan.py.bak-2026-10-20` |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refreshed (no TP1/TP2 mutation — FIFO recompute owns that); **unchanged** otherwise |
+| `/tmp/ai_trader_scan_meta_log.json` | appended (135 → **136** entries) |
+| `/tmp/ai_trader_cash_floor.json` | updated (cf=0) |
+| `/tmp/ai_trader_zero_trigger.json` | updated (zt 6 → **7**) |
+| `/tmp/ai_trader_trades_log.json` | **UNCHANGED** (302 entries) — semantic invariant preserved, 0 buy/sell events |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | this section appended |
+
+### 🐛 Pitfalls encountered
+
+- **`bb_lo` NameError** — see bug analysis above. **Two lessons**: (a) a bare `except: return None` around a data-transform block turns a one-line typo into 26 days of silent no-ops; (b) identical symptoms (`成功分析: 0 只`) got the same wrong root-cause label ("yfinance rate-limit") written into ~100 cron sections, each one "confirming" the last. **Next cron: verify `成功分析: N/93` with N ≥ 85 before trusting any Stage 2 conclusion.**
+- **`$SQ` delisted warning persists** — legitimate (Block's former ticker), unrelated to the bug. Pool is 93 tickers, 92 analyzable.
+- **Same-BJT-day carry again** — #36 at 03:30 BJT and #27 at 22:00 BJT share BJT date 10-20, so no P-MR-247 reset. This recurs every time the pre-open lands in the same BJT day as the prior RTH-close slot.
+- **Live daily bar drift** — yfinance serves the in-progress Tue bar, so prices shift between the 22:00 scan run and my 22:07 verification run (MV moved $94,240.85 → $94,532.42 on the same snapshot). **All figures above come from the logged run at `/tmp/cron27_scan_stdout.log`** for internal consistency.
+- **Borderline-candidate flapping** — BA (RR 0.84) qualifies or fails depending on the fetch. Candidates should require margin above thresholds, not bare threshold passes.
+
+### 📊 當日總結 (2026-10-20 BJT)
+
+```
+🔔 買入信號:         0  (Stage 2 恢復後首次產生 1 候選 BA ⭐5 RR=0.84，
+                       但 cash $207.40 < $190.71×100 → 現金不足，未發出)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP −6.0% from TP2 line $153.49)
+🚪 止蝕/賣出觸發:   0  (RKLB 固定 SL 診斷性違規，但 active MA10 SL 未觸及)
+
+💰 前次 cron 總權益 (10-20 03:30 BJT): $94,813.18
+💰 當前總權益 (10-20 22:00 BJT):        $94,739.82
+📈 Cron-to-cron MTM:                     −$73.36 (−0.078%)
+📦 未實現 PnL:                         +$916.79 (+0.98%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                      MRVL 11.49% / DE 11.42%
+🚦 零觸發連續 (zt):                     7 (same-BJT-day carry, no reset)
+🐛 Stage 2 pool:                       92/93 analyzed (bugfix: was 0/93)
+```
+
+**Key insight**: The dominant finding this cron is **diagnostic, not directional**. The Stage 2 pool was dark for 26 days due to a one-line `bb_lo` NameError hidden by a bare `except` — and because the failure mode is indistinguishable from a legitimate zero-trigger at the console level, roughly a hundred consecutive cron sections documented a false root cause ("yfinance rate-limiting") without anyone verifying the fetches were actually healthy. Portfolio state is otherwise stable: MV essentially flat (−0.078%), both cap violations drifting toward 10%, COP still the TP2-nearest at +5.98% after a 4th straight widening window, 5 names queued for FIFO TP1 capture (PFE newly identified as **entirely missing** from the state file — the same silent-loss pattern as CRM, now confirmed on a second symbol). RKLB continues its 20+-window losing streak at −34.9% with a fixed-SL breach that the active-trailing rule does not act on. With Stage 2 restored, the next crons can finally see that the **RSI 25 floor**, not RR or MA20, is what keeps the deeply-oversold AI-compute cluster (CIFR RR 26.3, IREN 17.6, ASTS 14.3, CRWV 13.9, RKLB 12.5) out of the candidate set.
+
+**Next cron**: **#33 — 2026-10-20 23:00 BJT (Tue 10-20 11:00 EDT)** — pre-market follow-through, +1h RTH window, same BJT day → `zt 7 → 8` (P-MR-201, no reset). Watch: (1) **Stage 2 pool behavior now that filters actually run** — does BA hold RR ≥0.8, and does any RSI-oversold AI-compute name surface? (2) **CRM at +21.1%** — only +1.1pp above the TP1 line; does it re-cross or fall below? (3) **PFE +21.4%** — confirm it stays queued and flag for FIFO state capture. (4) **COP TP2 gap** — 5th window of widening, or stabilization? (5) **RKLB streak** — −34.9%, does the deterioration continue past −35%?
+
+---
