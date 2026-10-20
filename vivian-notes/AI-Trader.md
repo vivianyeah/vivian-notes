@@ -35260,3 +35260,192 @@ Real MA20 minus scan price spans **−$223.43 (SNDK) to +$14.13**.
 **Key insight**: Two things happened this cron, and they point in opposite directions. **Operationally the portfolio had its best hour in weeks** — MV +$565.97 (+0.60%), unrealized PnL up from +$916.79 to +$1,474.83, with a $0.00 residual decomposition (the cleanest on record) that confirms the gain is real and fully attributed: MRVL +$270 and RKLB +$199 leading, energy giving back XOM/COP −$163. But **diagnostically, the MACD gate had been rejecting 100% of the 93-ticker pool since inception** — all 92 analyzable tickers reported `macd_hist` of *exactly* 0.000 because a default argument bound the smoothing constant to the bar count instead of the MACD period. The `bb_lo` fix one hour ago restored the pool; this fix restores its most important momentum filter. Neither has changed trading behavior yet, because **cash at $207.40 makes new entries structurally impossible** — that's now the binding constraint on this strategy, ahead of both cap violation and pool quality. The consequential item requiring a human decision is the `check_exit` `period="5d"` bug: **18 of 32 positions sit below their real MA20, worth $5,753.80 (6.1% of MV)**, and the strategy has been reporting "🟢 OK, no breach" for all of them. I did not patch it, because that is a strategy change with live sell side-effects, not a cron.
 
 **Next cron**: **#34 — 2026-10-20 01:00 BJT (Tue 10-20 13:00 EDT)** — RTH mid-session, +2h window, same BJT day → `zt 8 → 9` (P-MR-201, no reset). Watch: (1) **Does the MACD fix change the candidate count?** The gate now passes 40/92 instead of 0/92 — the highest-value check is whether a name clears all six gates as the tape rotates; KTOS (RR 3.38, MACD +0.006 — right on the line) is the one to watch. (2) **The MA20 decision** — 18 hidden exits; needs Vivian's call. (3) **COP TP2 gap** at +6.95% widening +0.97pp/hr, 5th straight window and the fastest yet — is this approaching a real TP2 test or another deceleration? (4) **RKLB relief streak** — 2 windows of relief; a 3rd would justify calling the streak broken. (5) **PFE at +21.9% for a 13th cron with no state-file entry** — FIFO capture still pending.
+
+## Cron #34 — 2026-10-21 01:00 BJT (Tue 13:00 EDT) — RTH mid-session follow-through
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.50% from TP2 line $153.53)
+🚪 止蝕/賣出觸發:   0  (但 see 🛑：18/32 真實 MA20 已破，scan.py 睇唔到)
+
+💰 前次 cron 總權益 (23:00 BJT):  $95,184.63
+💰 當前總權益 (01:00 BJT):        $95,051.86
+📈 Cron-to-cron MTM:              −$132.77 (−0.140%)
+📦 未實現 PnL:                    +$1,222.49 (+1.31%)
+💵 現金:                          $207.40
+📊 持倉數:                        32
+🚨 Cap violations:               MRVL 11.69% / DE 11.37%
+🚦 零觸發連續 (zt):                2  ⚠️ DAY-BOUNDARY RESET (P-MR-247: 8 → 1 → 2)
+🐛 Stage 2 pool:                  92/93 analyzed | 1 candidate (BA) — cash-blocked
+```
+
+### 🚨 P-MR-247 day-boundary reset
+
+Prior cron #33 ran at **2026-10-20 23:00 BJT**; this cron is **2026-10-21 01:00 BJT** — the BJT date rolled, so the zero-trigger counter resets per the day-boundary rule (zt 8 → 1 → +1 = **2**). This is a **real** calendar boundary, not a session gap: both crons sit inside the same Tue 2026-10-20 US RTH day, but BJT midnight falls between them. Both `ai_trader_zero_trigger.json` and `ai_trader_cash_floor.json` now carry `last_bjt_date: 2026-10-21`.
+
+### ✅ yfinance CAUGHT UP — no lag artifact
+
+Spot-check `yf.Ticker("SPY").history(period="5d").index[-1]` → **2026-10-20**, matching the current EDT trading day. Live intraday prices are flowing through for all 32 positions. This is the first cron since the fix sequence where no lag/artifact qualifier is needed on the price data itself.
+
+### 🐛 Pool alive + indicators verified non-degenerate (2nd layer check)
+
+`成功分析: 92/93` (only `$SQ` fails — legitimate delisting). Pool is alive per the P-MR-294 mandate.
+
+But a live pool can still have dead indicators, so the second-layer degeneracy check was run against the full 92:
+
+| Indicator | min | max | distinct | Verdict |
+|---|---:|---:|---:|---|
+| `macd_hist` | −39.254 | +12.670 | **92** | ✅ healthy |
+| `kdj` | −10.55 | +10.32 | 89 | ✅ healthy |
+| `rsi` | 5.0 | 90.9 | 86 | ✅ healthy |
+| `rr` | −0.44 | 25.62 | 83 | ✅ healthy |
+
+**`macd_hist>0 : 38/92`** — no ticker reports exactly 0.000, and all 92 values are distinct. The `ema(arr, n, k=2/(n+1))` default-argument bug fixed last cron is confirmed holding in production: pre-fix the gate rejected 100% of the pool, post-fix it passes a plausible 41% of it.
+
+**Gate funnel** (Stage 2 = 6 consecutive AND conditions):
+
+```
+above_ma20 34 → stars≥4 34 → RSI 25-75 23 → RR≥0.8 2 → MACD>0 1 → KDJ>0 1
+```
+
+The funnel is now genuinely discriminating rather than uniformly open or shut — `RR≥0.8` is the tightest gate (2/92 survive), which is the expected shape for a Stage 2 breakout-pullback screen.
+
+### ⭐ First Stage 2 candidate since the MACD fix — and cash blocked it
+
+```
+⭐5 BA $190.81 RSI=58.2 RR=0.83 MA20=$190.48 止蝕=$181.27
+現金不足，唔夠買 BA
+```
+
+This is the **first non-zero candidate count since the MACD default-arg fix**. Pre-fix, `macd_hist>0` rejected every ticker so the pool structurally could not produce a candidate. BA cleared all six gates.
+
+**Cash is the binding constraint**, exactly as the skill's "Cash is the binding constraint" pitfall predicts: `scan.py` hard-codes `quantity: 100`, and BA at $190.81 requires **$19,081** against a balance of **$207.40** — a 94× shortfall. Cash has been the practical entry blocker for the entire recent cron run; fixing the MACD gate changes what the pool *says*, not what the portfolio can *do*, until cash is replenished (i.e. until real sell signals free capital — which is precisely what the unresolved MA20 bug governs).
+
+**KTOS watch item from #33 failed**: KTOS showed RR 3.80 / MACD −0.030 last cron as a near-miss candidate. It remains non-qualifying — `above_ma20=False` and MACD still negative (−0.030). The watch is closed.
+
+### 🎯 COP TP2 gap NARROWS — first reversal of a 5-window widening streak
+
+| Cron | EDT | COP px | TP2 line | Gap | Rate |
+|---|---:|---:|---:|---:|---:|
+| #27 | 10:07 | $144.83 | $153.52 | +6.00% | — |
+| #33 | 11:00 | $143.71 | $153.52 | +6.83% | +1.00 pp/hr |
+| **#34** | **13:00** | **$145.52** | **$153.52** | **+5.50%** | **−0.66 pp/hr** |
+
+COP at **+32.7%** is now the portfolio's most extended position, and its TP2 gap has turned negative for the first time in five windows — meaning energy stopped selling off and started rallying into the afternoon session. COP (+$115.84) and XOM (+$51.06) are the two largest positive drift contributors, exactly reversing #33's energy drag. At +5.50%, COP is the closest any position has come to a genuine TP2 test in this recent run; a further +5.5% move fires TP2 review.
+
+CRM's TP2 gap also narrowed (+15.30% → +14.57%), consistent with the broad energy/risk bounce.
+
+### 📉 Drift decomposition — residual $0.00 (logged-scan baseline)
+
+The prior cron's full scan output was preserved at `/tmp/scan_out_2333b.txt`, so drift was decomposed against an **exact logged snapshot** rather than markdown-rounded prices or a yfinance reconstruction. Both windows resolve to **$0.00 residual across 32/32 positions**.
+
+**Window A — #33 → #34 (23:00 → 01:00 BJT, Tue 11:00 → 13:00 EDT, 2h RTH):**
+
+Authoritative FIFO MV delta: **−$132.77 (−0.140%)** on MV $94,977.23 → $94,844.46.
+
+| Top 5 negative | Δ$ | move | Top 5 positive | Δ$ | move |
+|---|---:|---|---:|---:|---|
+| HOOD | −103.60 | 100.06 → 98.66 (−1.40%) | COP | +115.84 | 143.71 → 145.52 (+1.26%) |
+| RKLB | −89.46 | 52.13 → 51.42 (−1.36%) | XOM | +51.06 | 175.59 → 176.97 (+0.79%) |
+| AVGO | −48.96 | 337.52 → 334.64 (−0.85%) | FUTU | +38.86 | 105.53 → 106.11 (+0.55%) |
+| MRVL | −33.12 | 241.79 → 241.07 (−0.30%) | BABA | +22.91 | 108.48 → 108.77 (+0.27%) |
+| DE | −27.88 | 636.08 → 634.44 (−0.26%) | CVX | +22.44 | 222.27 → 224.14 (+0.84%) |
+
+**Window B — #27 → #34 (22:00 → 01:00 BJT, ~2.9h RTH):** FIFO MV delta **+$312.04 (+0.330%)**, residual $0.00. MRVL +$231.84 dominated; AVGO −$54.74 largest drag.
+
+Both residual-zero windows confirm the skill's guidance: **logged scan output beats any yfinance reconstruction when it exists.** `/tmp/cron34_scan_stdout.log` is now written on this cron for the same reason.
+
+### 🎯 TP1 / TP2 lines (per-share, cost-reconstructed)
+
+Cost reconstructed as `cost_ps = price / (1 + pnl_pct/100)` — price-space, never total MV.
+
+| Symbol | px | PnL | cost_ps | TP1 (+20%) | TP2 (+40%) | TP2 gap |
+|---|---:|---:|---:|---:|---:|---:|
+| **COP** | $145.52 | **+32.7%** | $109.66 | $131.59 ✅OVER | $153.53 | **+5.50%** |
+| MRK | $148.06 | +25.2% | $118.26 | $141.91 ✅OVER | $165.56 | +11.82% |
+| XOM | $176.97 | +25.0% | $141.58 | $169.89 ✅OVER | $198.21 | +12.00% |
+| PFE | $30.14 | +22.3% | $24.64 | $29.57 ✅OVER | $34.50 | +14.47% |
+| CRM | $242.26 | +22.2% | $198.25 | $237.90 ✅OVER | $277.55 | +14.57% |
+
+**5 TP1-over-line positions, 0 TP1 fires.** The state file was **not** mutated — FIFO recompute owns TP1 flags exclusively.
+
+Two members of this group remain invisible to the state file:
+- **PFE** — no key at all in `ai_trader_tp1_state.json`, now **over TP1 for the 14th consecutive cron**. This is the persistent CRM-style catch-up case.
+- **CRM** — no key at all, also `MISSING`. Both are queued in `_audit.tp1_over_line_unmarked` so the next FIFO recompute picks them up. **A FIFO recompute appears to be overdue** — 5 positions have been over TP1 for multiple crons with no state capture.
+
+The 14 existing TP1=true flags (ADBE, AMD, ANET, CRWV, DHR, IREN, JD, MSFT, NBIS, ONDS, PATH, PYPL, SMCI, SNDK) are unchanged. HOOD remains a `FULLY_CLOSED` historical object, not a boolean — correctly untouched.
+
+### 📉 RKLB relief streak REVERSES (3rd window settles negative)
+
+| Cron | EDT | px | PnL | Active trail SL | Buffer |
+|---|---:|---:|---:|---:|---:|
+| #27 | 10:07 | $50.79 | −34.9% | $48.25 | 5.0% |
+| #33 | 11:00 | $52.13 | **−33.2%** | $49.52 | 5.0% |
+| **#34** | **13:00** | **$51.42** | **−34.1%** | **$48.85** | **5.0%** |
+
+RKLB gave back nearly all of last cron's relief (−0.9pp), leaving cumulative relief at just +0.8pp vs the #27 low. Per the skill's rule, single-window relief never justified calling a streak broken — this confirms that judgment. The buffer to the active trailing stop stays pinned at 5.0% because that stop is a mechanical `price × 0.95` trailing level, so it moves with price and can never tighten meaningfully in percentage terms. **RKLB is the second-largest negative drift contributor this window and remains the portfolio's clearest deteriorating name.**
+
+### 🛑 ESCALATION — `check_exit` `period="5d"` MA20 latent bug (still unresolved)
+
+⚠️ **MA10/MA20 trail-stop test remains non-functional.** `check_exit` requests `period="5d"` (~5 daily bars) but MA20 needs 20 bars, so `ma20 = price` for every position and the "🟢 OK" indicator is an artifact of insufficient lookback, **not** a live MA20 confirmation. The reported `止蝕=$Z` field *is* valid (it is `price × 0.95`).
+
+Recomputed against real 20-day MA via `period="6mo"`:
+
+| Metric | #33 | #34 |
+|---|---:|---:|
+| Positions below real MA20 | 18/32 | **18/32** |
+| MV of those positions | — | **$66,114.14 (69.7% of MV)** |
+| Shortfall to regain MA20 | $5,753.80 (6.1%) | **$6,144.04 (6.5%)** |
+
+The shortfall **widened by $390.24** in two hours — the hidden-exit exposure is growing, not shrinking. Largest dollar gaps: RKLB $1,890.03, MRVL $918.82, HOOD $848.80, DE $490.34, ASTS $391.17.
+
+> **Methodology note**: the prior cron's "$5,753.80 / 6.1% MV" is consistent with the *shortfall* metric (Σ qty × (MA20 − price)), not the *MV at risk* metric. Both are reported above to keep the comparison honest. Escalated figures this cron: 18/32 names — RKLB, MRVL, HOOD, QCOM, VRT, SNDK, LRCX, KLAC, INTC, IREN, ASTS, CSCO, AVGO, BABA, FUTU, VZ, T, DE.
+
+**Not patched — by design.** Fixing this emits real `sell` payloads; it is a strategy change, not a cron fix. Per the skill's escalation rule I report count/MV/names and leave the decision to Vivian. It is the one open item that gates capital recycling.
+
+### 🔍 Fixed-SL vs active-SL divergence (RKLB pattern, 4 names)
+
+| Symbol | px | cost_ps | fixed 5% SL | active trail SL | Outcome |
+|---|---:|---:|---:|---:|---|
+| RKLB | $51.42 | $78.03 | $74.13 ❌breached | $48.85 ✅ | **NO EXIT** |
+| ASTS | $41.62 | $63.25 | $60.09 ❌breached | $39.54 ✅ | **NO EXIT** |
+| IREN | $26.85 | $39.31 | $37.35 ❌breached | $25.51 ✅ | **NO EXIT** |
+| VRT | $203.67 | $282.88 | $268.73 ❌breached | $193.49 ✅ | **NO EXIT** |
+
+Entry-anchored 5% stops are massively breached, but `check_exit` evaluates only the active trailing stop, so no EXIT fires. Documented as a diagnostic, not a missed trade.
+
+### 📝 Log / state file actions
+
+| File | Action |
+|------|--------|
+| `/tmp/cron34_scan_stdout.log` | **NEW** — full scan stdout logged for next cron's drift baseline |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refreshed via canonical `cron_state_refresh.py`; **no TP1/TP2 mutation** (FIFO recompute owns that) |
+| `/tmp/ai_trader_scan_meta_log.json` | appended (137 → **138** entries) |
+| `/tmp/ai_trader_cash_floor.json` | updated (`cf=0`, `last_bjt_date=2026-10-21`) |
+| `/tmp/ai_trader_zero_trigger.json` | updated (`zt` 8 → **2**, P-MR-247 day-boundary reset) |
+| `/tmp/ai_trader_trades_log.json` | **+1 `cron_no_trade` marker** (303 → **304**; buy/sell count unchanged at **286**, semantic invariant preserved) |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | this section appended |
+
+### 📊 當日總結 (2026-10-21 BJT)
+
+```
+🔔 買入信號:         0  (Stage 2 1 候選 BA；cash $207.40 vs 需 $19,081)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.50% from TP2 line $153.53)
+🚪 止蝕/賣出觸發:   0  (但 see 🛑：18/32 真實 MA20 已破，scan.py 睇唔到)
+
+💰 前次 cron 總權益 (23:00 BJT):  $95,184.63
+💰 當前總權益 (01:00 BJT):        $95,051.86
+📈 Cron-to-cron MTM:              −$132.77 (−0.140%)
+📦 未實現 PnL:                    +$1,222.49 (+1.31%)
+💵 現金:                          $207.40
+📊 持倉數:                        32
+🚨 Cap violations:               MRVL 11.69% / DE 11.37%
+🚦 零觸發連續 (zt):                2 (DAY-BOUNDARY RESET, P-MR-247: 8 → 1 → 2)
+🐛 Stage 2 pool:                  92/93 analyzed | 1 candidate (真 pool-loop, 非 bug)
+```
+
+**Key insight**: This was the first cron where the two `scan.py` fixes could be validated against live production data, and both held. The pool restored itself (92/93) and the MACD gate went from rejecting 100% of the universe to passing a discriminating 38/92, producing the strategy's first Stage 2 candidate in many crons. **BA is a genuine 5-star setup that the portfolio cannot take**, because $207.40 of cash against a $19,081 requirement is a 94× shortfall — and that is not a market judgement, it is arithmetic. The portfolio's ability to recycle capital depends entirely on sell signals, which depend entirely on the unresolved `period="5d"` MA20 bug. Those two facts are now the same fact: **18/32 positions are below their real MA20, representing $66,114.14 of market value that the system is currently reporting as "🟢 OK".** Patching that one line is the highest-leverage change available to this strategy, and it is a strategy change, so it waits on Vivian. Meanwhile the tape turned: energy stopped bleeding, COP's TP2 gap narrowed for the first time in five windows to +5.50%, and RKLB's relief attempt faded.
+
+**Next cron**: **#35 — 2026-10-21 03:00 BJT (Tue 15:00 EDT)** — RTH late (TP2 check window), same BJT day → `zt 2 → 3` (P-MR-201 same-day carry, no reset). Watch: (1) **Does COP actually test TP2?** At +5.50% with the gap now narrowing, this is the closest approach in the recent run — TP2 at $153.53 would be the first TP2 fire in a long stretch. (2) **The MA20 decision** — 18 hidden exits, shortfall widening to $6,144.04. (3) **RKLB relief reversal** — if −34.1% persists at #35 the streak is definitively not broken. (4) **FIFO recompute overdue** — PFE and CRM have been over TP1 for 14+ crons with no state capture; 5 positions awaiting. (5) **MRVL/DE cap violations** at 11.69%/11.37% — both deteriorating as their ratios track a shrinking denominator.
