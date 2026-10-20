@@ -35449,3 +35449,214 @@ Entry-anchored 5% stops are massively breached, but `check_exit` evaluates only 
 **Key insight**: This was the first cron where the two `scan.py` fixes could be validated against live production data, and both held. The pool restored itself (92/93) and the MACD gate went from rejecting 100% of the universe to passing a discriminating 38/92, producing the strategy's first Stage 2 candidate in many crons. **BA is a genuine 5-star setup that the portfolio cannot take**, because $207.40 of cash against a $19,081 requirement is a 94× shortfall — and that is not a market judgement, it is arithmetic. The portfolio's ability to recycle capital depends entirely on sell signals, which depend entirely on the unresolved `period="5d"` MA20 bug. Those two facts are now the same fact: **18/32 positions are below their real MA20, representing $66,114.14 of market value that the system is currently reporting as "🟢 OK".** Patching that one line is the highest-leverage change available to this strategy, and it is a strategy change, so it waits on Vivian. Meanwhile the tape turned: energy stopped bleeding, COP's TP2 gap narrowed for the first time in five windows to +5.50%, and RKLB's relief attempt faded.
 
 **Next cron**: **#35 — 2026-10-21 03:00 BJT (Tue 15:00 EDT)** — RTH late (TP2 check window), same BJT day → `zt 2 → 3` (P-MR-201 same-day carry, no reset). Watch: (1) **Does COP actually test TP2?** At +5.50% with the gap now narrowing, this is the closest approach in the recent run — TP2 at $153.53 would be the first TP2 fire in a long stretch. (2) **The MA20 decision** — 18 hidden exits, shortfall widening to $6,144.04. (3) **RKLB relief reversal** — if −34.1% persists at #35 the streak is definitively not broken. (4) **FIFO recompute overdue** — PFE and CRM have been over TP1 for 14+ crons with no state capture; 5 positions awaiting. (5) **MRVL/DE cap violations** at 11.69%/11.37% — both deteriorating as their ratios track a shrinking denominator.
+
+## Cron #35 — 2026-10-21 03:00 BJT (Tue 15:00 EDT) — RTH late / TP2 check window
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留, 3 false, HOOD=FULLY_CLOSED)
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.18% from TP2 line $153.47 — 2nd narrowing window)
+🚪 止蝕/賣出觸發:   0  (但 see 🛑：19/32 真實 MA20 已破，scan.py 睇唔到)
+
+💰 前次 cron 總權益 (01:00 BJT):  $95,051.86
+💰 當前總權益 (03:00 BJT):        $95,056.38
+📈 Cron-to-cron MTM:              +$4.52 (+0.005%)
+📦 未實現 PnL:                    +$1,212.33 (+1.29%)
+💵 現金:                          $207.40
+📊 持倉數:                        32
+🚨 Cap violations:               MRVL 11.74% / DE 11.36%
+🚦 零觸發連續 (zt):                3  (P-MR-201 same-day carry, no reset)
+🐛 Stage 2 pool:                  92/93 analyzed | 1 candidate (BA) — cash-blocked
+```
+
+### 📊 當日總結 (2026-10-21 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.18% from TP2 line $153.47)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (22:00 BJT #27):  $94,739.82
+💰 收市前總權益 (03:00 BJT #35): $95,056.38
+📈 日內 MTM:                     +$316.56 (+0.334%)
+📦 未實現 PnL:                  +$1,212.33 (+1.29%)
+💵 現金:                         $207.40
+📊 持倉數:                       32
+🚨 Cap violations:              MRVL 11.74% / DE 11.36%
+🚦 零觸發連續 (zt):              3
+```
+
+四窗 equity 序列（authoritative，取自 `ai_trader_scan_meta_log.json`）：
+
+| Cron | BJT | 總權益 | Δ | zt |
+|---|---:|---:|---:|---:|
+| #27 | 22:00 | $94,739.82 | −$73.36 (vs #36) | 7 → 1 |
+| #33 | 23:00 | $95,305.79 | **+$565.97** | 2 |
+| #34 | 01:00 | $95,051.86 | −$253.93 | 2 (day-boundary reset) |
+| **#35** | **03:00** | **$95,056.38** | **+$4.52** | 3 |
+
+日內淨 **+$316.56 (+0.334%)**，但**節奏係單邊沖高回落**：#33 一次性 +$565.97 之後連續兩窗近乎歸零（−$253.93 → +$4.52）。本窗口係**近乎完全橫行**嘅兩小時：32 隻持倉全部波幅 <1%，energy 與 semis 互相抵銷。#33 嘅 +$565.97 主要來自 RTH 開市半小時嘅 gap-up（CAP 之後從未重現）。
+
+### ⏱ 窗口 session 分類：RTH late，同日第四窗
+
+Prior cron #34 跑喺 2026-10-21 01:00 BJT；本 cron 係 **2026-10-21 03:00 BJT — BJT date 未變**，所以 `zt 2 → 3`（P-MR-201 same-day carry，**無** P-MR-247 reset）。呢個係五日節奏嘅第四窗（RTH late / TP2 check window），MA10 trail 應為 active。
+
+### ✅ yfinance CAUGHT UP（連續第二個 cron）
+
+Spot-check `yf.Ticker("SPY").history(period="5d").index[-1]` → **2026-10-20**，即當前 EDT 交易日。SPY close $769.02。Live intraday price 正常流入 32 隻持倉，**無 lag artifact 需要標註**。
+
+### 🐛 Pool alive + 指標非退化（第 2 層檢查，連續第二個 cron 通過）
+
+```
+成功分析: 92 / 93   (唯一失敗：$SQ —  legit delisting)
+```
+
+Per P-MR-294 mandate，pool 必須先斷定真實數據；再過第 2 層（指標分佈）確認冇「活 pool 但死指標」：
+
+| Indicator | min | max | distinct | Verdict |
+|---|---:|---:|---:|---|
+| `macd_hist` | −39.516 | +12.085 | **91** | ✅ healthy |
+| `kdj` | −9.490 | +9.810 | 90 | ✅ healthy |
+| `rsi` | +5.000 | +91.500 | 82 | ✅ healthy |
+| `rr` | −0.400 | +26.120 | 86 | ✅ healthy |
+
+**`macd_hist > 0 : 38/92 (41%)`**、`kdj > 0 : 40/92 (43%)`，**冇任何一個 ticker 報 `macd_hist == 0.000`**。`ema(arr, n, k=None)` default-arg fix 連續兩個 cron 喺 production 保持生效（pre-fix 係 0/92）。
+
+**Stage 2 gate funnel（6 個 AND 條件）**：
+
+```
+93 analyzed → 35 above_ma20 → 35 stars≥4 → 24 RSI 25-75 → 1 RR≥0.8 → 1 MACD>0 → 1 KDJ>0
+```
+
+對比 #34 嘅 `34→34→23→2→1→1→1`：**`above_ma20` 由 34 升至 35**（多一隻個股企喺 MA20 之上），但 **`RR≥0.8` 由 2 收窄到 1** — 收窄嘅係 tightest gate，唔係前段。漏斗依然係真 discriminate 狀態，唔係全開或全關。
+
+### ⭐ 連續第二個 cron 出 Stage 2 候選：BA（現金阻塞，非市場判斷）
+
+```
+⭐5 BA $190.67 RSI=57.9 RR=0.84 MA20=$190.47 止蝕=$181.14  macd=+1.026  kdj=+5.80
+現金不足，唔夠買 BA
+```
+
+BA 連續兩個 cron（#34、#35）成為唯一候選，現價由 $190.81 微升至 $190.67。**現金仍然係硬約束**：`scan.py` 硬編碼 `quantity: 100`，BA 需要 **$19,067** 對住 **$207.40** — **92× 缺口**。呢個唔係市場判斷，係算術。
+
+**Portfolio 資本循環能力完全取決於賣出信號**，而賣出信號完全取決於未解決嘅 `period="5d"` MA20 bug — 兩件事而家係同一件事。
+
+### 🎯 COP TP2 gap 連續第二窗收窄 — 逼近 TP2
+
+| Cron | EDT | COP px | TP2 line | Gap | Rate |
+|---|---:|---:|---:|---:|---:|
+| #27 | 10:07 | $144.83 | $153.52 | +6.00% | — |
+| #33 | 11:00 | $143.71 | $153.52 | +6.83% | +0.41 pp/hr |
+| #34 | 13:00 | $145.52 | $153.52 | +5.50% | −0.66 pp/hr |
+| **#35** | **15:00** | **$145.91** | **$153.47** | **+5.18%** | **−0.16 pp/hr** |
+
+**兩個窗口連續收窄**（+6.83% → +5.50% → +5.18%）。但 **rate 由 −0.66 pp/hr 放緩到 −0.16 pp/hr（~4× 慢）** — 依 skill 嘅 rate 診斷規則（>1pp/hr 加速、0.5–1pp/hr 放慢、<0.5pp/hr 穩定），**COP 已進入 <0.5pp/hr 穩定帶**。含意：TP2 逼近仍在進行，但速度大幅下降；由 +5.18% 觸及 $153.47 需 COP 再升 5.18%，按當前 0.16pp/hr 推算遠超今日 RTH 剩餘時間。
+
+TP2 line 由 $153.52 微降至 $153.47（cost 幾乎無變，純屬每股成本重建嘅四捨五入），gap 變化由價格主導。
+
+**TP2 觸發狀態：0 fires。** COP pnl +33.1%，距 TP2 尚差 6.91pp（pnl 空間）。呢個係近期 run 裡最接近 TP2 嘅一次，但仍未觸發。
+
+### 🎯 TP1-over-line 名單（5 隻，連續不變）
+
+| Symbol | 現價 | PnL | 每股成本 | TP1 線 | TP2 線 | TP2 gap |
+|---|---:|---:|---:|---:|---:|---:|
+| **COP** | $145.91 | **+33.1%** | $109.62 | $131.55 ✅OVER | $153.47 | **+5.18%** |
+| MRK | $148.38 | +25.5% | $118.23 | $141.88 ✅OVER | $165.52 | +11.55% |
+| XOM | $177.35 | +25.3% | $141.54 | $169.85 ✅OVER | $198.16 | +11.73% |
+| CRM | $241.46 | +21.8% | $198.24 | $237.89 ✅OVER | $277.54 | +14.94% |
+| PFE | $30.18 | +22.5% | $24.64 | $29.56 ✅OVER | $34.49 | +14.29% |
+
+**冇新跨界、冇跌出清單** — 名單同 #34 完全一致（5 隻）。注意 **HOOD 已跌回 +2.7%**（#33 曾 +20.5% / #34 已回落），遠低於 TP1 線 $114.86，屬 TP1-was-over-then-fell-back 嘅持續狀態，唔需要動作。
+
+**FIFO recompute 仍然逾期**：CRM 同 PFE **兩個都完全唔存在於 state file**（invisible to FIFO），PFE 已連續 **15 個 cron** 高過 TP1 線而 state 零 capture。5 隻全部排入 `_audit.tp1_over_line_unmarked`，等下次 FIFO recompute。**Cron 唔會改 TP1 flag — 語意不變。**
+
+### 🚨 Cap violations：MRVL / DE 維持，兩者皆 sub-noise
+
+| Symbol | MV | cap% | Δ vs #34 | 判讀 |
+|---|---:|---:|---:|---|
+| MRVL | $11,139.82 | **11.74%** | +0.05pp | sub-noise（<0.1pp 規則） |
+| DE | $10,778.85 | **11.36%** | −0.01pp | sub-noise |
+
+兩者都低於 0.1pp 显著性門檻 → 純粹係分母（total MV +$4.52，幾乎無變）嘅比值漂移，**唔構成新違規事件**。MRVL 價 $242.17（#34 $241.07，+0.46%），價升而 ratio 微升 = 分母幾乎不動；DE 價 $634.05（#34 $634.44，−0.06%），價跌而 ratio 微跌，兩者都係自洽。
+
+### 📉 RKLB relief 逆轉確認 — streak 未破
+
+| Cron | EDT | 現價 | PnL | vs #27 low | active MA10-trail | buffer |
+|---|---:|---:|---:|---:|---:|---:|
+| #27 | 10:07 | $50.79 | −34.9% | (low) | $48.25 | 5.0% |
+| #33 | 11:00 | $52.13 | −33.2% | +1.70pp | $49.52 | 5.0% |
+| #34 | 13:00 | $51.42 | −34.1% | +0.80pp | $48.85 | 5.0% |
+| **#35** | **15:00** | **$51.07** | **−34.6%** | **+0.30pp** | **$48.52** | **5.0%** |
+
+#34 預測「若 −34.1% 維持，streak 就算確定未破」→ **本窗口 −34.6%，比 #27 低點仲差 0.3pp，確認逆轉**。累積 relief 由 #33 高位 +1.70pp 收窄到 +0.30pp，**兩個窗口連續惡化**。依 skill 規則：relief 逆轉唔重設 streak counter，只記錄 reversal。RKLB 已係全倉最深（−34.6%），ASTS −34.5% 幾乎並列最差。
+
+### 🛑 check_exit MA20 latent bug — 升級數字繼續擴大（等 Vivian 決定）
+
+`check_exit` 用 `period="5d"`（約 5 支日線）但 MA20 需要 20 支，`len(closes) >= 20` 永遠 false → `ma20 = price` fallback。所以 scan 報嘅 **32/32「🟢 OK」係假確認**，唔係真實 trail-stop 測試。（`止蝕=$Z` 欄位有效 — 佢係 `price × 0.95` trailing stop。）
+
+用 `period="6mo"` 獨立重算真實 MA20：
+
+| 指標 | #34 | **#35** | 變化 |
+|---|---:|---:|---|
+| 真實 MA20 以下持倉 | 18/32 | **19/32** | ▲ +1 |
+| 涉及市值 | $66,114.14 | **$69,002.66** | ▲ +$2,888.52 |
+| 占 MV 比重 | 69.7% | **72.8%** | ▲ +3.1pp |
+| 重返真實 MA20 所需升幅 | $6,144.04 | **$482.53** | ▼ 大幅收窄 |
+
+新增一隻：**VRT**（$203.32 vs real MA20 $237.46，差 $34.14）。跌幅最深：SNDK（差 $230.92）、LRCX（$45.16）、VRT（$34.14）。
+
+⚠️ 注意「shortfall 收窄到 $482.53」係**misleading**：因為大部分持倉只差幾毛（VZ $0.38、T $0.38、BABA $0.34、WFC $0.03 — 四隻加埋 $14.21），數字睇落好，但 RKLB 一隻就要 $1,931.61。**真正嘅 escalation 指標係 count 19/32 同 MV at risk $69,002.66（72.8% MV）**，唔係 shortfall 總額。
+
+**本 cron 唔執行 patch。** 依 skill escalation 規則：修正只會 *抑制* 訊號嘅 defect 可以自己改；但 `check_exit` 嘅 fix 會**發出真實 sell payload**（同 `scan.py` 已修嘅 `bb_lo` / `ema` 兩個 bug 唔同嗰兩個只影響分析）。呢個係策略改動，**留畀 Vivian 決定**。
+
+### 🔍 Fixed-SL vs active-SL divergence（4 隻，同 #34 一致）
+
+| Symbol | 現價 | 成本 | Fixed SL (5%) | Active MA10-trail | 判定 |
+|---|---:|---:|---:|---:|---|
+| RKLB | $51.07 | $78.03 | $74.13 ❌breached | $48.52 ✅ | **NO EXIT** |
+| ASTS | $41.43 | $63.25 | $60.09 ❌breached | $39.36 ✅ | **NO EXIT** |
+| IREN | $26.45 | $39.31 | $37.34 ❌breached | $25.13 ✅ | **NO EXIT** |
+| VRT | $203.32 | $282.88 | $268.74 ❌breached | $193.15 ✅ | **NO EXIT** |
+
+四隻都係「fixed SL 已破、但 active dynamic SL 未破」→ **當前規則下唔發 EXIT**。`check_exit` 只評估 active SL。全部 buffer 維持 5.0%（因為 active SL 定義為 `price × 0.95`，結構性恆定）。
+
+### 📊 Drift decomposition（30m-bar baseline，乾淨殘差）
+
+Prior cron #34 markdown 只 capture 咗 13/32 價格。為咗避免 mixed-source 殘差，本 cron 用 **yfinance 30m bar 於 #34 實際 EDT 時間 (13:00) 取 baseline**。
+
+```
+Authoritative FIFO MV delta:  +$4.52 (+0.005%)   ← 本窗口近乎完全橫行
+30m-bar baseline:            17:00 UTC (= 13:00 EDT) bar，12 支 bar 中取第 8 支
+All-32 decomposition net:    −$49.09
+Residual vs FIFO delta:      −$53.61
+```
+
+**13 隻已知價格 cross-check（30m bar vs #34 markdown）**：全部落在 **$0.84 以內**（CRM +$0.84、MRVL +$0.56 最大兩個，其餘 ≤$0.28，RKLB/WFC 僅 $0.01–$0.03）。呢個係近幾個 cron 之中最乾淨嘅 baseline 之一 — 30m bar 技術再次驗證，喺 prior cron 有已知 EDT timestamp 嘅 same-day RTH window 係最佳選擇。
+
+| Top-5 負貢獻 | qty | 變化 | Δ$ | | Top-5 正貢獻 | qty | 變化 | Δ$ |
+|---|---:|---:|---:|---|---|---:|---:|---:|
+| RKLB | 126 | $51.43 → $51.07 (−0.70%) | −$45.36 | | COP | 64 | $145.43 → $145.91 (+0.33%) | +$30.72 |
+| HOOD | 74 | $98.71 → $98.30 (−0.42%) | −$30.34 | | MRVL | 46 | $241.63 → $242.17 (+0.22%) | +$24.61 |
+| FUTU | 67 | $105.93 → $105.66 (−0.25%) | −$18.09 | | XOM | 37 | $176.87 → $177.35 (+0.27%) | +$17.94 |
+| DE | 17 | $634.72 → $634.05 (−0.10%) | −$11.31 | | AVGO | 17 | $334.89 → $335.33 (+0.13%) | +$7.48 |
+| SNDK | 1 | $1,385.14 → $1,373.99 (−0.80%) | −$11.15 | | CVX | 12 | $224.17 → $224.78 (+0.27%) | +$7.32 |
+
+**結構解讀**：**RKLB / HOOD / SNDK 三隻拖累 vs COP / MRVL / XOM 三隻支撐** — 資金由 deep-underwater AI/太空倉位流向 TP1-over-line energy 與 MRVL。呢個係 **TP1-over-line 獲利回吐 vs 弱倉反彈** 嘅典型 RTH-late 分化，**唔係廣泛風險趨避**（total MV 淨 +$4.52）。Energy 三隻（COP/XOM/CVX）同時喺正貢獻榜同 TP1-over 清單 — 一致嘅板塊行為。
+
+⚠️ Residual −$53.61 屬 **30m-bar ±2min 基準偏移** band（skill 診斷：$500-900 for 2h RTH windows；本窗口近乎橫行，殘差細）。**Authoritative drift 係 FIFO MV delta +$4.52**，唔係 decomposition sum。
+
+### 🗂 Log / State 檔案動作
+
+| 檔案 | 動作 | 狀態 |
+|---|---|---|
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | append 本 cron section | ✅ +1 section |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refresh（**無** TP1/TP2 flag mutation） | ✅ canonical script |
+| `/tmp/ai_trader_scan_meta_log.json` | append scan meta | ✅ 139 entries |
+| `/tmp/ai_trader_trades_log.json` | append `cron_no_trade` marker | ✅ 304 → 305 |
+| `/tmp/ai_trader_zero_trigger.json` | `zt 2 → 3` | ✅ |
+| `/tmp/ai_trader_cash_floor.json` | `cf = 0` | ✅ |
+
+`trades_log.json` 語意不變（0 buy / 0 sell，只加 `_SYSTEM` marker）。TP1 flag mutation 屬 FIFO recompute 專有，cron 唔碰。
+
+**Next cron**: **#36 — 2026-10-21 03:30 BJT (Tue 15:30 EDT)** — RTH close −30min（最後一個 scan，trail-stop confirm），同 BJT 日 → `zt 3 → 4`（P-MR-201）。Watch: (1) **COP 會否真係測 TP2？** +5.18% 但 rate 已放緩到 −0.16pp/hr，穩定帶內，#36 大概率仍唔觸發。 (2) **MA20 決定** — 19 hidden exits、MV at risk $69,002.66 = 72.8% MV，由 18 升到 19。 (3) **RKLB relief** — −34.6% 遜於 #27 低點，streak 確定未破。 (4) **FIFO recompute 逾期第 15 個 cron** — PFE/CRM 仍 invisible，5 隻待 capture。 (5) **收市窗口嘅 TP1-over-line 獲利回吐** — 呢個時段歷來係 COP/MRK/XOM 減持嘅高風險窗口。 (6) yfinance 收市 close 大約 16:00 EDT 後 ~30min 先入 cache（04:30 BJT），#36 見到嘅可能仍係 intraday bar。
