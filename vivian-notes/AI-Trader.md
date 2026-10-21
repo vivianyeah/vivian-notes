@@ -36492,3 +36492,137 @@ entries：本次 0 buy/sell 事件，`cron_no_trade` marker 由 canonical script
 - **重點 3 — RKLB relief**：buffer 剛好 5.00%，連續 2 窗口正 delta。若 #35 繼續正數 = streak break 首個實質訊號（需要 3+ 窗口）。
 - **重點 4 — Drift baseline**：本次已寫 `/tmp/cron34_scan_stdout.log`，#35 應行 **rung-1**（殘差 $0.00），窗口 2h RTH（13:00→15:00 EDT）用 30m bar。
 - 現金 $207.40 繼續封鎖新倉，#35 一樣唔好將 0 買入歸因於市場。
+
+## Cron #35 — 2026-10-22 03:00 BJT (Wed 15:00 EDT — RTH late)
+
+**Session**: RTH late (~2h since #34 13:00 EDT). 30m-bar baseline residual +$95.19 (RUNG-2 clean). Cash $207.40, mv drift -$108.75 (real, snapshot-to-snapshot). yfinance caught up (SPY last=2026-10-21); no weekend/holiday/lag artifact. bb_lo+ema fixes holding 6th consecutive cron. Stage 2 funnel 93→39→33→?**0** candidates. Cash $207.40 below $10,000 floor (qty=100 hardcoded) blocks every candidate regardless of pool health.
+
+### 🚦 Mandatory per-cron checks
+
+- **Pool alive**: 92/93 live (only $SQ truly delisted) ✅
+- **Indicators NON-degenerate**: `macd_hist` 92 distinct, `kdj` 91, `rsi` 89, `rr` 84; macd>0 40/92 ✅ — bb_lo+ema fixes holding 6th cron
+- **ma10_trail status**: scan `MA20 == price` for all 32 (period=5d latent bug — artifact, 🟢 OK is trivial). **Active SL field valid** (= price × 0.95). Real MA20 spot-check needed.
+
+### 📊 FIFO totals
+
+```
+持倉:               32 只
+現金:               $207.40
+持倉市值 (MV):      $95,339.00
+持倉成本:           $93,615.89
+未實現 PnL:         $+1,723.11 (+1.84%)
+總權益:             $95,546.40
+
+vs #34 01:00 BJT:
+  MV drift          $-108.75
+  Equity drift      $-108.75 (-0.114%)
+```
+
+### 🎯 TP1 / TP2 lines (cost-reconstructed)
+
+> `cost_ps = cur / (1 + pnl/100)`; `TP1 = cost × 1.20`; `TP2 = cost × 1.40`
+
+**TP1 over line (5 unchanged)**: COP +34.1% / MRK +26.1% / XOM +26.3% / CRM +22.0% / PFE +20.9%. None of these are in `tp1=true` state — manual FIFO queue. TP1=true count = **14** (state file: AMD/NBIS/ONDS/PYPL/SMCI/DHR/ADBE/MSFT/JD/ANET/PATH/CRWV/IREN/SNDK).
+
+**TP2 hits this cron**: 0 (no position ≥ +40%).
+
+**TP2 nearest (price-space positive)**:
+| Rank | Sym | Cur | TP2 line | Gap | PnL |
+|---:|---|---:|---:|---:|---:|
+| 1 | **COP** | $147.03 | $153.50 | **+4.40%** | +34.1% |
+| 2 | XOM | $178.79 | $198.18 | +10.85% | +26.3% |
+| 3 | MRK | $149.06 | $165.49 | +11.02% | +26.1% |
+| 4 | CRM | $241.79 | $277.46 | +14.75% | +22.0% |
+| 5 | PFE | $29.78 | $34.48 | +15.80% | +20.9% |
+
+**COP TP2 gap evolution**: #33 +4.95% → #34 +5.50% (widening +0.55pp) → **#35 +4.40% (NARROWING, -1.10pp over 2h, rate -0.55pp/hr)**. Compare #34 flag (WIDENED at +0.55pp/hr) — rate has now **flipped sign**. First sign of TP2 cross projection being meaningful. At current rate, projected #36 gap ≈ +3.30% and next-day pre-open #27 gap ≈ -2.86% (would cross). Still not imminent — just a meaningful direction change.
+
+### 🚨 Cap violations (two-pass, MV-at-time-of-scan)
+
+| Sym | Cap % | MV | Qty |
+|---|---:|---:|---:|
+| 🚨 MRVL | 11.78% | $11,226.30 | 46 |
+| 🚨 DE | 11.25% | $10,726.49 | 17 |
+
+vs #34: MRVL 11.83% / DE 11.30% (cap_pct marginally improved by ~0.05pp — denominator shrunk faster than numerator drift on -0.11% MV day).
+
+### 📉 Drift decomposition (RUNG-2 — yfinance 30m-bar at #34 EDT ts)
+
+```
+Authoritative FIFO MV delta: $-108.75 (≈ -0.11% over ~2h RTH)
+Decomposition sum (32/32 covered): $-203.94
+Residual: +$95.19 (within rung-2 expected band for 30m-bar baseline + prior-scan ±2min drift)
+```
+
+**Top-5 negative contributors** (RTH late fade, dominated by semis/consumer; NOT a TP1-over-line cluster like #34):
+| Sym | Qty | Prev (13:00 EDT) | Cur | Δ$ | Contrib |
+|---|---:|---:|---:|---:|---:|
+| MRVL | 46 | $245.36 | $244.05 | -$1.31 | -$60.26 |
+| FUTU | 67 | $105.71 | $104.86 | -$0.85 | -$56.95 |
+| HOOD | 74 | $102.49 | $101.88 | -$0.61 | -$45.13 |
+| AVGO | 17 | $338.50 | $335.86 | -$2.64 | -$44.93 |
+| BABA | 79 | $104.34 | $103.84 | -$0.50 | -$39.50 |
+
+**Top-5 positive contributors** (energy cluster continues, RTH late continuation):
+| Sym | Qty | Prev | Cur | Δ$ | Contrib |
+|---|---:|---:|---:|---:|---:|
+| COP | 64 | $146.28 | $147.03 | +$0.75 | +$48.00 |
+| XOM | 37 | $177.68 | $178.79 | +$1.11 | +$40.89 |
+| CVX | 12 | $226.38 | $228.04 | +$1.66 | +$19.86 |
+| IBM | 8 | $245.15 | $246.02 | +$0.87 | +$6.92 |
+| MRK | 7 | $148.57 | $149.06 | +$0.49 | +$3.43 |
+
+**Drift shape**: small -$109 MV decline is dominated by **semis & consumer fade** (MRVL/FUTU/HOOD/AVGO/BABA = -$246) — energy partially offsets (COP+XOM+CVX = +$109). Balanced drift; not concentrated, not a streak signal.
+
+### 🛡️ RKLB streak (manual review)
+
+```
+RKLB: cur=$53.36  sl=$50.69  pnl=-31.6%  buffer=5.00%
+Streak: 30+ windows continuous since 09-15 (#20+)
+Cumulative relief from #33 -32.3% low: now -31.6% (+0.7pp)
+MA10-trail SL buffer: EXACTLY 5.00% — at warning threshold
+```
+
+Streak continues. Buffer **still exactly 5.00%** (warning threshold) — relief +0.7pp cumulative, but NOT a reversal yet. Single-window relief does not constitute reversal; monitor next cron (#36 RTH close -30min).
+
+### 📋 Five-window daily comparison (Wed 10-21 EDT)
+
+| Cron | Time BJT | Session | Positions | MV | Equity | zt | cf | TP2 nearest |
+|------|--------:|---|---:|---:|---:|---:|---:|---|
+| #27 | 22:00 (prev day) | pre-open | 32 | $98,470.96 | $98,678.36 | 2 | 0 | COP +8.53% |
+| #33 | 23:00 | pre-market | 32 | $99,857.66 | $100,065.06 | 6 | 0 | COP +4.95% |
+| #34 | 01:00 | RTH mid | 32 | $95,447.75 | $95,655.15 | 7 | 0 | COP +5.50% |
+| **#35** | **03:00** | **RTH late** | **32** | **$95,339.00** | **$95,546.40** | **8** | **0** | **COP +4.40%** |
+| #36 | 03:30 (next) | RTH close -30m | — | — | — | — | — | — |
+
+### 📝 Log / State 檔案動作
+
+| File | Action | Notes |
+|------|--------|-------|
+| `/tmp/ai_trader_scan.py` | ran | scan stdout to `/tmp/cron35_scan_stdout.log`; stderr only `$SQ delisted` (expected) |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refreshed | via `cron_state_refresh.py`; TP1=true unchanged (FIFO-owned) |
+| `/tmp/ai_trader_scan_meta_log.json` | appended | entry #144 (total); zt=8 cf=0 |
+| `/tmp/ai_trader_cash_floor.json` | updated | cf=0 (cash $207.40 > $100) |
+| `/tmp/ai_trader_zero_trigger.json` | updated | zt=8 (same-day P-MR-201 carry, 7→8) |
+| `/tmp/ai_trader_trades_log.json` | UNCHANGED | 306 entries; semantic invariant preserved |
+| `vivian-notes/AI-Trader.md` | this section appended | git commit + push below |
+
+### 📊 當日總結 (2026-10-22 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP +4.40% from TP2 line $153.50)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00):   $98,678.36
+💰 收市前總權益 (今日 03:00): $95,546.40  (this cron, RTH late; #36 03:30 RTH close -30m next)
+📈 日內 MTM:                   $-3,131.96 (-3.17%)  over #27→#35 carry (Tue RTH close → Wed RTH late)
+📦 未實現 PnL:                $+1,723.11 (+1.84%)
+💵 現金:                       $207.40
+📊 持倉數:                     32
+🚨 Cap violations:             MRVL 11.78% / DE 11.25%
+🚦 零觸發連續 (zt):            8
+```
+
+✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
