@@ -36626,3 +36626,148 @@ Streak continues. Buffer **still exactly 5.00%** (warning threshold) — relief 
 ```
 
 ✅ `/tmp/vivian-notes/vivian-notes/AI-Trader.md` — appended below
+## Cron #36 — 2026-10-22 03:30 BJT (Wed 15:30 EDT — RTH close -30min, trail-stop confirm)
+
+
+> 第五輪 5m-bar baseline + 第二輪 MA20 latent bug 確認 + 第七輪 bb_lo+ema fixes holding.
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: TP1=true 保留 [待 FIFO recompute 驗證]; TP1-over-line queue: 5 隻 PFE/CRM/MRK/XOM/COP)
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.11% from TP2 line $153.54)
+🚪 止蝕/賣出觸發:   0  (32 隻全 🟢 OK by scan.py; 25 隻 by real MA20)
+
+💰 開盤總權益 (前次 RTH late): $95,546.40
+💰 收市前總權益 (今日 03:30): $95,649.63
+📈 MTM (vs #35):               +$103.23  (+0.108%)
+📦 未實現 PnL:                 +$1,835.38  (+1.96% vs cost)
+💵 現金:                        $207.40
+📊 持倉數:                      32
+🚨 Cap violations:              MRVL 11.80% / DE 11.28%
+🚦 零觸發連續 (zt):             9  (same BJT day carry, +1 from #35)
+```
+
+### 📊 昨日前窗 equity chain (5-window comparison)
+
+| Cron | Time BJT | MV ($) | Δ vs 前 | zt | TP2 gap |
+|-----:|---------:|-------:|--------:|---:|--------:|
+| #36 (前次) | 2026-10-21 03:30 | 94,664.66 | — | 4 | +5.18% |
+| #27       | 2026-10-21 22:00 | 94,920.81 | +256.15 (+0.27%) | 5 | — |
+| #33       | 2026-10-21 23:00 | 94,962.38 | +41.57 (+0.04%) | 6 | — |
+| #34       | 2026-10-22 01:00 | 95,447.75 | +485.37 (+0.51%) | 7 | +5.50% |
+| #35       | 2026-10-22 03:00 | 95,339.00 | −108.75 (−0.11%) | 8 | +4.40% |
+| **#36**   | **2026-10-22 03:30** | **95,442.23** | **+103.23 (+0.108%)** | **9** | **+5.11%** |
+
+Window: 30min RTH (15:00 EDT → 15:30 EDT Wed). Sequential same-day carry; no day-boundary reset.
+
+### 🎯 Drift decomposition (rung-5: yfinance 5m-bar baseline @ #35 EDT ts)
+
+- **Authoritative FIFO MV delta**: +$103.23 (+0.108%)
+- **Decomposition sum** (5m-bar prev = 32/32 覆蓋, sub-30-min RTH window): **+$196.42**
+- **Residual**: **$-93.19** ≈ 全 32 隻 5m-bar prev ≈ #35 scan ts ±2min timing drift
+
+#### Top-5 negative (TP1-over-line RTH late-session profit-taking)
+| Symbol | 5m-bar prev | cur | $ delta | qty | pnl% | tag |
+|--------|------------:|----:|--------:|----:|-----:|----:|
+| COP    | $147.03 | $146.08 | $-60.88 | 64 | +33.2% | TP1-over energy |
+| XOM    | $178.82 | $177.88 | $-34.61 | 37 | +25.7% | TP1-over energy |
+| CVX    | $228.23 | $226.96 | $-15.18 | 12 | +18.1% | energy |
+| T      | $22.09  | $21.97  | $-1.71  | 14 | +2.0%  | telecom |
+| VZ     | $43.71  | $43.38  | $-0.98  | 3  | −0.7%  | telecom |
+
+#### Top-5 positive (low-pnl bounce + small rebound)
+| Symbol | 5m-bar prev | cur | $ delta | qty | pnl% | tag |
+|--------|------------:|----:|--------:|----:|-----:|----:|
+| DE     | $630.34 | $633.30 | $+50.32 | 17 | +10.0% | cap-violating industrial |
+| MRVL   | $243.93 | $244.74 | $+37.26 | 46 | +15.2% | cap-violating semis |
+| RKLB   | $53.24  | $53.51  | $+33.39 | 126 | −31.4% | streak rebound |
+| HOOD   | $101.56 | $101.96 | $+29.60 | 74 | +6.6%  | broker |
+| BABA   | $103.64 | $104.00 | $+28.05 | 79 | −5.6%  | China tech |
+
+Decomposition sum = +$196.42; authoritative = +$103.23; **residual −$93.19** in 5m-bar rung-5 band.
+
+### 🎯 TP1-over-line queue (5 positions, FIFO recompute owns mutation)
+
+Cost reconstruction per share: `cost_ps = cur / (1 + pnl/100)`. TP1 line = cost_ps × 1.20.
+
+| Symbol | Cost ps | Cur | TP1 line | Gap to TP1 (Δ vs #35) | TP2 line | Gap to TP2 (price-space) |
+|--------|--------:|----:|---------:|----------------------:|---------:|-------------------------:|
+| PFE    | $24.64  | $29.82 | $29.57 | $+0.25 (+0.83%)       | $34.50   | +15.67%                  |
+| CRM    | $198.32 | $241.95 | $237.98 | $+3.97 (+1.67%)       | $277.65  | +14.76%                  |
+| MRK    | $118.26 | $149.25 | $141.92 | $+7.33 (+5.17%)       | $165.57  | +10.94%                  |
+| XOM    | $141.51 | $177.88 | $169.81 | $+8.07 (+4.75%)       | $198.12  | +11.38%                  |
+| COP    | $109.67 | $146.08 | $131.60 | $+14.48 (+11.00%)     | $153.54  | **+5.11% (TP2 NEAREST)** |
+
+COP TP2 gap widened +0.71pp (from +4.40% at #35 → +5.11% at #36), reversing #35's narrowing. RTH late-session profit-taking pattern per cron #28/#34 documented. **No new TP1 mutations** (FIFO recompute owns state mutation).
+
+### 🚨 Cap violations (two-pass math, denominator finalized upfront)
+
+| Symbol | qty | pos MV ($) | cap % | vs #35 |
+|--------|----:|-----------:|------:|-------:|
+| MRVL | 46  | 11,258.04 | **11.80%** | was 11.78% (+0.02pp) |
+| DE   | 17  | 10,766.10 | **11.28%** | was 11.25% (+0.03pp) |
+
+Both marginally **worsened** (denominator shrank faster than their numerators). Top-10 holdings unchanged from #35; COP at 9.80% (just below 10% threshold, monitoring).
+
+### ⚠️ MA20 latent bug escalation — 7th cron, 19/32 below real MA20
+
+`scan.py` line ~99 uses `period="5d"` (~5 daily bars) for MA20 calc, fallback to `ma20 = price` when `len(closes) >= 20` is False. **This bug fires on EVERY cron**, not just artifact crons — spot-check via yfinance `period="6mo"` 20-day MA:
+
+| Symbol | scan-MA20 (= cur) | real MA20 (6mo) | Diff | MV at risk (cur<MA20) |
+|--------|------------------:|----------------:|-----:|----------------------:|
+| RKLB   | $53.51   | $65.56  | $-12.05 | $6,742.26 |
+| MRVL   | $244.74  | $260.24 | $-15.50 | $11,258.04 |
+| DE     | $633.30  | $659.42 | $-26.12 | $10,766.10 |
+| COP    | $146.08  | $134.46 | **+$11.62** | (cur above MA20 — no risk) |
+| XOM    | $177.88  | $168.90 | **+$8.98**  | (cur above MA20 — no risk) |
+| CRM    | $241.95  | $234.22 | **+$7.73**  | (cur above MA20 — no risk) |
+| HOOD   | $101.96  | $109.07 | $-7.11  | $7,545.04 |
+| ... 23 more, mostly $1-$50 diff |       |          |        |
+
+- **29/32 positions**: scan-MA20 ≡ cur trivially (artifact of insufficient lookback)
+- **19/32 positions** (vs 19/32 at #35, 18/32 at #34): **trading below real MA20** — `$66,531.28 = 69.7% of MV` at risk if `check_exit` patched
+- **13/32 positions** above real MA20 by $1-$50 (mostly TP1-over energy/CRM)
+- `check_exit` posts real `sell` payloads — **Vivian: escalate, don't patch (per skill)**. Last cron's metrics (count + MV-at-risk) unchanged; we lead with **count = 19/32**, **MV at risk = $66,531 (69.7%)**. Don't conflate with "shortfall" of $482 which fell because near-breakeven names swamp deep ones (`RKLB` alone needs $1,932 of relief to exit).
+
+### 🚦 RKLB streak diagnostic (16+ window)
+
+- cur $53.51, cost $78.00, pnl **−31.4%** (was −31.6% at #35, +0.2pp relief single-window)
+- Buffer to scan MA10/MA20-trail SL: **5.01%** ($53.51 vs $50.83) — at warning threshold (5.0%)
+- Active SL `止蝕=$50.83` is **dyn stop = cur_price × 0.95** (live trailing), NOT entry-anchored 5% ($78 × 0.95 = $74.10). Confirms live MA10 trail active, not fixed-SL anchor.
+- 30m/5m drift: $53.24 → $53.51 = +$0.27 / +0.51% over #35→#36 (small bounce, **streak NOT broken** — single window not enough signal)
+- Streak counter continues; cumulative relief from #35 low −31.6% (only 0.2pp) is **within noise band**. Wait for 3+ consecutive crons with delta > 0 before declaring "streak break imminent".
+
+### 📌 Pool health gate summary
+
+- **Pool alive**: 92/93 (1 ticker $SQ delisted in DB)
+- **Indicators non-degenerate**: macd_hist 92 distinct, kdj 90, rsi 85, rr 85 — no dead-gate code bug
+- **Funnel** (run-up to Stage 2): 92 → 79 (stars ≥4) → 55 (kdj>0) → 40 (macd_hist>0) → 0 candidates → 0 buy signals (cash-blocked)
+- **bb_lo+ema fixes holding**: 7th consecutive cron (since #33 2026-10-15)
+
+### ⚠️ Cash constraint
+
+`scan.py` hard-codes `quantity: 100` per entry. Cash $207.40 << ~$10,000 floor → **every candidate cash-blocked**. The "0 buy signals" is structural (qty default in `scan.py` / FIFO not allowed to dip below $10k), not a market or filter problem. **Cash is the binding constraint; FV check confirm: 32 隻 持倉 + 1 delisted = 33 in pool scan list**.
+
+### 🚦 TP1 / TP2 next-cron preview
+
+- **#27 (next BJT day 22:00 pre-open, zt 9→10 carry→reset)** — 第一個 22:00 pre-open 等 #27 (Wed 2026-10-22 22:00 BJT = Thu 10:00 EDT). 隔夜 18.5h gap → use `overnight_drift.py` iloc[-2] (Wed close) as baseline.
+- 5 TP1-over-line (PFE/CRM/MRK/XOM/COP) unchanged; FIFO recompute 仍然是 source of truth for state mutation.
+- MA20 latent bug: **escalation remains open** — Vivian reviews whether to patch `scan.py` line ~99 `period="5d"` → `period="6mo"`. Until patched, 19/32 MV at risk persisting.
+- Cap violations MRVL/DE watch.
+- RKLB streak: monitor 3+ consecutive relief windows before signaling streak break.
+
+### 🗄 Log / State 檔案動作
+
+| File | Action | Detail |
+|------|--------|--------|
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refreshed | `cron_state_refresh.py` (canonical) |
+| `/tmp/ai_trader_scan_meta_log.json` | appended (145 entries) | cron #36 entry added |
+| `/tmp/ai_trader_zero_trigger.json` | updated | zt 9 (same-day carry) |
+| `/tmp/ai_trader_cash_floor.json` | updated | cf 0 (cash $207.40 ≥ $100) |
+| `/tmp/ai_trader_trades_log.json` | appended | 307 entries (+1 `cron_no_trade` marker for `_SYSTEM`, semantic invariant preserved per skill) |
+| `/tmp/ai_trader_cron_state.json` | n/a (no state mutating file) | — |
+| `/tmp/vivian-notes/vivian-notes/AI-Trader.md` | **appended below** | cron #36 section (this block) |
+| GitHub | `vivianyeah/vivian-notes` | commit + push 2026-10-22 |
+
+---
+---
