@@ -36771,3 +36771,250 @@ Both marginally **worsened** (denominator shrank faster than their numerators). 
 
 ---
 ---
+
+
+## Cron #27 — 2026-10-22 22:00 BJT (Thu 10:00 EDT) — Next-day pre-open (RTH +30min)
+
+> **Same-BJT-day carry, NOT a day-boundary reset.** Prior cron #36 ran at 2026-10-22 03:30 BJT; this cron is 2026-10-22 22:00 BJT — same BJT calendar date, so `zt` carries **9 → 10** (P-MR-201). P-MR-247 does **not** apply. This is the documented "same-BJT-day carry" exception to the usual #27 pre-open reset pattern.
+> **Overnight window is 18.5h and spans a cross-session boundary** (Wed 15:30 EDT → Thu 10:00 EDT), so the drift below is a genuine next-session move, not a same-day RTH slice.
+
+### 🚨 DATA-INTEGRITY ANOMALY — yfinance daily series is missing the 2026-10-21 bar
+
+**This is the headline finding of this cron and it is new — not an existing known artifact.**
+
+Spot-checking `yf.Ticker(sym).history(period="1mo")` shows **no 2026-10-21 daily bar for ANY ticker tested** (SPY, CRM, MRVL, FUTU all skip straight from 10-20 → 10-22). However:
+
+```
+yf.download(["SPY"], period="5d", interval="30m") bar dates:
+  ['2026-10-16', '2026-10-19', '2026-10-20', '2026-10-21', '2026-10-22']
+```
+
+The **30m intraday series contains 2026-10-21** — so the session *did* trade. The gap is in the **daily** series only.
+
+**Consequence (silent, and material):**
+- `scan.py`'s `get_price()` builds MA20 / MACD / KDJ / Bollinger from `period="6mo"` **daily closes**. With the 10-21 bar absent, those windows silently span a 2-calendar-day hole. The indicators are *not wrong by much*, but they are computed over a series that is missing a real trading session.
+- Cross-checking prior cron #36 prices against daily closes: **only 1/32 (XOM) matched 10-20, 0/32 matched 10-22** — i.e. #36's prices were an intraday snapshot, not any daily close. This confirms rung-1 remains the correct baseline choice.
+- **This is NOT the classic "yfinance 1-day lag" artifact.** That artifact means today's bar hasn't cached yet. Here the *opposite* is true: today's (10-22) bar **is** present, and an *interior* bar is missing. Lag has been over-corrected into a data hole.
+
+**Per skill discipline — do NOT extrapolate a cause.** Three candidate explanations remain open and need Vivian's judgment:
+1. A genuine data-provider outage/partial-rollback specific to 2026-10-21 daily closes.
+2. A bad print on 10-21 that Yahoo later purged (only that day's close dropped, intraday retained).
+3. An exchange-side session that produced intraday bars but no valid official daily close (unlikely but not excluded).
+
+**Recommended check for the next cron:** re-run `yf.Ticker("SPY").history(period="1mo")` and see whether the 10-21 bar is still absent. If it returns, this was a transient provider-side issue and no action is needed. If it persists, the 20-day MA window is effectively 19 real sessions and should be treated as a known-degraded input until fixed.
+
+### 🚦 Pool health gate — PASSED (2 layers)
+
+| Check | Result | Verdict |
+|---|---:|---|
+| POOL flattened size | 93 (nested `{sector: [tickers]}`, flattened correctly) | ✅ 80 < 93 < 120 |
+| Successfully analyzed | **91 / 93** | ✅ (only `$SQ` genuinely delisted) |
+| stderr content | 1 line: `$SQ: possibly delisted` | ✅ code-bug signature, **not** rate-limit cascade |
+| `macd_hist` distinct | **91** (min −35.30, max +13.85) | ✅ non-degenerate |
+| `kdj` distinct | 89 (min −17.54, max +13.76) | ✅ |
+| `rsi` distinct | 87 (min 5.1, max 91.7) | ✅ |
+| `rr` distinct | 84 (min −0.71, max 25.64) | ✅ |
+| `macd_hist > 0` | **38 / 91 (41.8%)** | ✅ not 0% / not 100% |
+
+`bb_lo` + `ema(k=None)` fixes now holding for the **8th consecutive cron**. No `NameError: bb_lo`, no MACD blackout.
+
+⚠️ One self-correction worth recording: my first pass probed `r["ma10"] > r["ma20"]`, which doesn't exist — `get_price()` returns `above_ma20` (bool), not `ma10`. That bogus probe printed `0/91` and looked like a 0%-gate bug. It was a bad probe, not a degenerate indicator. The correct field is `above_ma20` → **34/91 (37.4%)**, healthy.
+
+### 📊 Stage 2 funnel (93 → 0 scan / 1 on re-run)
+
+```
+Pool                     93
+  analyzed               91   (2 dropped: $SQ delisted)
+  above_ma20             34   (37.4%)
+  stars >= 4             78
+  rsi 25-75              63
+  rr >= 0.8              59
+  macd_hist > 0          38
+  kdj > 0                39
+  --------------------------
+  FULL Stage 2 qualified  1   <- JNJ, on re-run only
+```
+
+**Scan reported `Stage 2 候選: 0 只`, but re-running the identical funnel returns 1 (JNJ).** JNJ sits at `RR=0.81` against a `>= 0.8` gate — a **threshold-sensitivity artifact**, not a strategy change. The `macd_hist` and `kdj` values move between the scan's fetch and my re-fetch (live intraday ticks), so a name can cross the boundary within seconds.
+
+This is benign in outcome (JNJ would have been cash-blocked anyway, see below), but it means **`Stage 2 候選: 0` should not be read as "no candidate was even close"** — a candidate can exist and still print 0.
+
+**Near-miss (failed exactly one gate) — 18 names, RR is the dominant blocker:**
+
+| Ticker | ⭐ | Blocked by | Detail |
+|---|---:|---|---|
+| AAPL | 5 | `rr>=0.8` | RR=0.10, macd=0.016 |
+| ADBE | 5 | `rr>=0.8` | RR=−0.35 (negative — price above upper Bollinger) |
+| CMCSA | 5 | `rr>=0.8` | RR=−0.35 |
+| CRM | 5 | `rr>=0.8` | RR=0.23, macd=1.043 |
+| GS | 5 | `rr>=0.8` | RR=0.58 |
+| TSLA | 5 | `rr>=0.8` | RR=0.16 |
+| WFC | 5 | `rr>=0.8` | RR=0.21 |
+| PFE / MRK / DHR / TMO / BA / ROST / JPM / PATH | 5 | `rr>=0.8` | RR range −0.16 … 0.62 |
+| TXN | 5 | `macd>0` | macd=−1.274 |
+| PDD | 5 | `kdj>0` | kdj=−5.26 |
+| MS, VZ | 5 | `above_ma20` | price below MA20 |
+
+**Why RR is blocking everything (structural, not a market call):** `rr = upside/5.0` where `upside = (bb_up − last)/last × 100`. Bollinger upper band compresses as volatility falls, so in a low-vol regime almost nothing has ≥0.8 RR. Several RR values are **negative** (ADBE −0.35, CMCSA −0.35, MRK −0.16, DHR −0.04, PFE −0.00) — those names are trading *above* the upper band, so the formula yields negative "upside". **A negative-RR name is not a short signal; it's an overextension flag.** 13 of 18 near-misses blocked on RR.
+
+### 💰 FIFO totals (authoritative)
+
+```
+Cash              $      207.40
+持倉 MV          $  93,842.53   (32 positions)
+總成本           $  93,640.65
+未實現 PnL       $     +201.88  (+0.22%)
+總權益           $  94,049.93
+```
+
+### 📉 Drift decomposition — authoritative −$1,599.70
+
+> **Authoritative (FIFO MV delta): −$1,599.70** ($95,442.23 → $93,842.53, −1.68%)
+> **Baseline**: rung 1 — prior cron #36's logged scan stdout (`/tmp/cron36_scan_stdout.log`), **32/32 coverage**
+> **Decomposition sum: −$1,599.70 → Residual: $0.00** ✅
+
+Rung 1 is the cleanest possible baseline (the prior cron's prices came from a *logged stdout file*, not markdown re-parsing), hence the exact $0.00 residual.
+
+**Top 5 negative contributors:**
+
+| Symbol | Δ MV | Price Δ |
+|---|---:|---:|
+| MRVL | −$425.96 | −3.78% |
+| FUTU | −$292.79 | −4.16% |
+| RKLB | −$182.70 | −2.71% |
+| AVGO | −$120.36 | −2.10% |
+| BABA | −$88.48 | −1.08% |
+
+**Top 5 positive contributors:**
+
+| Symbol | Δ MV | Price Δ |
+|---|---:|---:|
+| WFC | +$35.28 | +1.19% |
+| MRK | +$24.15 | +2.31% |
+| T | +$6.86 | +2.23% |
+| VZ | +$3.84 | +2.95% |
+| CRM | +$3.15 | +1.30% |
+
+**Shape**: this is a **broad, tech-led selloff**, not the TP1-profit-taking pattern that normally dominates negative drift. Note only **COP** (−, not in top 5) and **CRM** (+$3.15, marginal positive) come from the TP1-over-line cohort. The top 3 negative contributors (MRVL, FUTU, RKLB) are **all sub-TP1 names** — MRVL at +10.8%, FUTU at +0.2%, RKLB at −33.3%. Positive side is weak too (top mover only +$35.28), i.e. this is a **down move with no offsetting bid**, not a rotation.
+
+Context: the 18.5h window spans the missing-10-21 daily-bar hole, so part of this move is simply **one full session that the daily indicator series never saw**. Treat the decomposition as accurate for prices but note the indicator window behind it is degraded.
+
+### 🎯 TP1 / TP2 lines (recomputed from scratch — never carried forward)
+
+Cost reconstructed per-share as `cost_ps = cur_price / (1 + pnl/100)`:
+
+| Symbol | PnL | Price | Cost/sh | TP1 (×1.20) | TP2 (×1.40) | TP2 gap (price-space) |
+|---|---:|---:|---:|---:|---:|---:|
+| **COP** | +32.4% | $145.16 | $109.68 | $131.56 | **$153.49** | **+5.74%** ← nearest |
+| MRK | +29.1% | $152.70 | $118.22 | $141.94 | $165.59 | +8.44% |
+| XOM | +25.0% | $176.99 | $141.59 | $169.91 | $198.23 | +12.00% |
+| CRM | +23.6% | $245.10 | $198.32 | $237.96 | $277.62 | +13.27% |
+| PFE | +22.6% | $30.20 | $24.64 | $29.56 | $34.49 | +14.19% |
+
+**5 TP1-over-line positions, unchanged from #36** (COP / MRK / XOM / CRM / PFE) — same five names, same order. All five remain **unmarked in state** and await manual FIFO recompute; this cron does **not** mutate TP1 flags.
+
+**COP TP2 gap: +5.74% — WIDENED +0.63pp** from #36's +5.11%. Trajectory across the last four windows: #33 +4.95% → #34 +5.50% → #35 +4.40% → #36 +5.11% → **#27 +5.74%**. That's chop around a ~5% mean, no trend. The earlier "3-window narrowing streak reversal" narrative from #33/#34 is **not** supported by the fuller series — this looks like ordinary noise near a stable level, so I would **not** describe COP as approaching TP2 on a directional basis.
+
+### 🚨 Cap violations
+
+| Symbol | Cap % | MV | Prev % | Δ |
+|---|---:|---:|---:|---:|
+| MRVL | **11.54%** | $10,832.08 | 11.80% | **−0.25pp** |
+| DE | **11.44%** | $10,736.86 | 11.28% | **+0.16pp** |
+
+**Ratio decoupling in both directions this window** — a clean illustration of the skill's ratio-vs-price rule:
+- **MRVL price fell −3.78% but its cap ratio *improved* −0.25pp.** Not good news: the denominator shrank faster (whole portfolio −1.68%). MRVL got worse; the *rest* got worse faster.
+- **DE price fell −$1.72 but its cap ratio *worsened* +0.16pp.** DE held up better than the portfolio, so it now occupies a larger share of a smaller pie.
+
+Neither reflects a change in the position itself — both are artifacts of denominator movement.
+
+### ⚠️ MA20 escalation — 21/32 below real MA20
+
+```
+Positions below REAL MA20 (period=6mo, computed here):  21 / 32
+MV at risk:                                             $66,348.54  (70.7% of MV)
+Shortfall:                                              $6,763.10
+```
+
+- Prior #36: **29/32** below, MV at risk $66,531 (69.7%)
+- This cron: **21/32** below, MV at risk $66,348 (70.7%)
+
+The **count improved sharply (29 → 21)** while **MV-at-risk stayed essentially flat** (69.7% → 70.7%). Read this carefully: 8 names recovered above real MA20, but they were small positions, so the *exposure* barely moved. The escalation metric that matters for risk is **MV-at-risk (70.7%)**, and that is flat-to-marginally-worse.
+
+**Report count + MV-at-risk, not the shortfall.** The shortfall moved $6,763.10 while exposure held steady — a few near-breakeven names dominate it (RKLB alone accounts for a large share), so a falling shortfall here is **not** evidence of improving risk.
+
+Below real MA20: AMZN, ASTS, AVGO, BABA, CSCO, DE, FUTU, HON, HOOD, INTC, IREN, KLAC, LRCX, MRVL, PDD, QCOM, RKLB, SNDK, T, VRT, VZ
+
+**This remains an escalation, not something to patch.** `check_exit()` posts real `sell` payloads, so the fix is Vivian's call. The `period="5d"` bug in `check_exit` is still unpatched (line ~106: `ma20 = sum(closes[-20:])/20 if len(closes) >= 20 else price` — with `period="5d"` that condition is never true, so MA20 **always** falls back to `price`).
+
+⚠️ **Which is why every position printed `MA20=$X` identical to `現價=$X` this run** — all 32. The `🟢 OK` status is therefore an **artifact of insufficient lookback, NOT a live trail-stop confirmation.** The `止蝕=$Z` field *is* valid (it's `price × 0.95`, a live trailing stop).
+
+### 🛑 Buy signals: 0 — and cash is the binding constraint
+
+```
+Cash                 $207.40
+scan.py hardcodes    quantity: 100
+Minimum ticket       ~$3,000 (cheapest pool name) up to $26,000 (SNDK)
+→ CASH BLOCKS EVERY CANDIDATE
+```
+
+`scan.py` hard-codes `quantity: 100`, so **any** candidate needs ≥ $2,200 of cash (JNJ at $262.31 × 100 = $26,231). Cash is $207.40 — roughly **1/100th of what's needed**. Even JNJ, the one re-run candidate, could not be bought.
+
+**Cash, not the market or the filters, is why this is a 0-buy cron.** The pool is healthy, indicators are healthy, and a qualified candidate exists. The only thing standing between this system and a position is $207.40 of cash.
+
+Consecutive 0-buy crons: this is the **8th in a row** blocked by cash rather than by an empty pool.
+
+### RKLB streak — deteriorated
+
+```
+Current        -33.3%  ($52.06, was $53.51 at #36)
+Delta vs #36   -1.9pp  (deterioration)
+Buffer to active MA10-trail SL ($49.46)   5.26%  (was 5.01%)
+```
+
+Streak continues; the **cumulative relief observed at #36 (+0.5pp) fully reversed and then some**. RKLB is now the **worst large-loss position in the portfolio** (−33.3%, 126 shares, MV $6,559.56 — the 3rd-largest negative drift contributor at −$182.70). Note buffer *widened* to 5.26% even as pnl fell — because the trailing stop is price-anchored (`price × 0.95`), it falls with the position. A widening buffer here is **not** improving risk; it's the stop chasing a declining price.
+
+### 📋 Log / State 檔案動作
+
+| File | Action | Detail |
+|---|---|---|
+| `/tmp/ai_trader_scan_meta_log.json` | **append** | 145 → **146** entries, cron `#27` |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` refresh only | zt=10, cf=0, `tp1_over_line_unmarked` 5 names. **TP1 flags NOT mutated** (FIFO owns them) |
+| `/tmp/ai_trader_zero_trigger.json` | update | zt 9 → **10** |
+| `/tmp/ai_trader_cash_floor.json` | update | cf=0 (cash $207.40 ≥ $100 floor) |
+| `/tmp/ai_trader_trades_log.json` | **UNCHANGED** | 307 entries, 0 buy/sell events. Task body says "append"; per skill exception a `cron_no_trade` marker is **not** added here because the canonical script reports the invariant is preserved and no trade event occurred |
+| `/tmp/cron27_scan_stdout.log` | **written** | rung-1 baseline for the next cron (this is what made residual $0.00 possible) |
+
+TP1=true in state: **14** (`AMD, NBIS, ONDS, PYPL, SMCI, DHR, ADBE, MSFT, JD, ANET, PATH, CRWV, IREN, SNDK`); TP1=false: 3 (`AVAV, CIFR, SYM`); `HOOD` = `FULLY_CLOSED` object.
+
+### 🧭 Next cron — #33, 2026-10-22 23:00 BJT (Thu 11:00 EDT, RTH +1.5h)
+
+Open questions, not assertions:
+
+- **Does the 2026-10-21 daily bar come back?** Re-check `yf.Ticker("SPY").history(period="1mo")`. This is the single most consequential unknown — if it's still missing, the 20-day windows feeding MA20/MACD/KDJ/Bollinger are degraded for every scan.
+- **Does MRVL keep bleeding?** −3.78% today, cap ratio improving only because the portfolio shrank. Will it re-test the 11.8% cap, or does the 46-share position keep leaking?
+- **Does COP's TP2 gap hold near +5.7%, or break out of the 4.4–5.7% chop band?** Five windows is enough to stop calling a trend in it.
+- **RKLB relief — third reversal or new streak low?** −33.3% is a fresh low. Per skill guidance, relief needs **3+ consecutive improving windows** before any "streak break" language is warranted.
+- **Will cash ever be above the ~$10,000 floor?** At $207.40 the buy path is closed indefinitely. That's a portfolio decision, not a scan decision.
+
+### 📊 當日總結 (2026-10-22 BJT)
+
+```
+🔔 買入信號:         0  (Stage 2 re-run 找到 1 隻 JNJ，但現金 $207.40 不足)
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留)
+🎯 TP2 觸發:        0  (CLOSEST: COP −5.74% from TP2 line $153.49)
+🚪 止蝕/賣出觸發:   0  (32/32 🟢 OK，但係 MA20==price 假象)
+
+💰 開盤總權益 (本日 22:00 pre-open):  $94,049.93
+💰 前日 RTH 收市 (#36 03:30 BJT):     $95,649.63
+📈 日內 MTM:                           −$1,599.70 (−1.68%)
+📦 未實現 PnL:                        +$201.88 (+0.22%)
+💵 現金:                              $207.40
+📊 持倉數:                            32
+🚨 Cap violations:                    MRVL 11.54% / DE 11.44%
+🚦 零觸發連續 (zt):                   10  (同日 P-MR-201 carry，無 P-MR-247 reset)
+
+⚠️ DATA-INTEGRITY:  yfinance daily series 缺 2026-10-21 bar（全股票池），
+                     但 30m intraday bars 顯示該日有交易 → 日線指標窗口有 2 日空洞
+⚠️ ESCALATION:      21/32 持倉低於真實 MA20，MV at risk $66,348.54 (70.7%)
+```
