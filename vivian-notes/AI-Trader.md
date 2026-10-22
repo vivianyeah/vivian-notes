@@ -37018,3 +37018,184 @@ Open questions, not assertions:
                      但 30m intraday bars 顯示該日有交易 → 日線指標窗口有 2 日空洞
 ⚠️ ESCALATION:      21/32 持倉低於真實 MA20，MV at risk $66,348.54 (70.7%)
 ```
+
+## Cron #33 — 2026-10-22 23:00 BJT (Thu 11:00 EDT) — RTH 開市後 1.5 小時
+
+**#33 = RTH open +1.5h，唔係 pre-market。** 23:00 BJT = 11:00 EDT = 開市後 1.5 個鐘。
+`references/pre-market-follow-through-cron.md` 嘅「RTH 未開市 / 28-of-32 frozen」描述係錯嘅，本 cron 用正常分解路徑。
+
+### 掃描結果
+
+```
+🔔 買入信號:            0
+🎯 Stage 2 候選:        0
+🚪 止蝕/賣出觸發:      0
+💵 現金:                $207.40
+📦 持倉:                32 只
+```
+
+**0 買入信號嘅原因係現金，唔係市場。** `scan.py` 寫死 `quantity: 100`，現金 $207.40 遠低於 ~$10,000 門檻，
+**無論股票池幾健康、filter 幾寬鬆，每一個候選都會被擋**。呢個係 binding constraint，唔好歸因於 Stage 2 或大市。
+
+### 股票池健康閘（兩層，第 5 次連續驗證）
+
+```
+第一層  POOL 展平 = 93 (nested {sector:[tickers]} dict)
+        成功分析 91/93 — stderr 只有 `$SQ: possibly delisted`（真實退市）
+第二層  macd_hist distinct=87  kdj distinct=91  rsi distinct=88  rr distinct=89   (全部 ≠ 1 ✅)
+        macd>0 = 37/91 ✅    rsi>50 = 32/91 ✅
+```
+
+`bb_lo` + `ema(k=None)` 修正連續第 **5** 個 cron 有效。37/91 macd>0 確認 pool 冇被靜默 gate 死。
+Stage 2 回 0 係真實市場結果，唔係 bug。
+
+### FIFO 權益（權威數字）
+
+| 項目 | #33 (23:00) | #27 (22:00) | 變動 |
+|---|---:|---:|---:|
+| 總市值 MV | **$92,666.49** | $93,842.53 | **−$1,176.04 (−1.253%)** |
+| 總權益 equity | **$92,873.89** | $94,049.93 | −$1,176.04 |
+| 總成本 cost | $93,615.67 | — | — |
+| 未實現 PnL | **−$949.18 (−1.01%)** | — | 深度虧損但仍可控 |
+| 現金 | $207.40 | $207.40 | — |
+| 持倉數 | 32 | 32 | 不變 |
+
+前一日 equity 從 `ai_trader_scan_meta_log.json` 讀取（#27 = $94,049.93），**唔係靠記憶**。
+
+### Drift 分解 — rung-1 基準，殘差 $0.00
+
+```
+權威 (FIFO MV delta): −$1,176.04  ($93,842.53 → $92,666.49, −1.253%)
+基準來源: #27 tee'd stdout (/tmp/cron27_scan_stdout.log) — 32/32 覆蓋，rung 1
+分解合計: −$1,176.04   殘差: $0.00   movers: 32/32
+```
+
+**Drift shape：廣泛下跌（broad-based down）** — 26 down / 6 up，唔係 TP1-fade pattern。
+兩個 window 都冇出現 30%+ delta 由單一個股帶動嘅「broad-based move」，而係一個**中位數幅度、方向一致**嘅分布。
+傳統 RTH mid-session 「TP1-over-line 止賺帶動負 drift」嘅敘事**今次唔適用**。
+
+```
+Top-5 負貢獻                        Top-5 正貢獻
+  MRVL  $235.48→$226.94  −3.63%  −$392.84  pnl  +6.8%     IBM  +$17.84  +0.91%  pnl  +3.8%
+  HOOD  $101.26→ $98.42  −2.80%  −$210.16  pnl  +2.9%     HON  +$16.80  +1.61%  pnl  −7.7%
+  AVGO  $330.03→$324.37  −1.71%   −$96.22  pnl −15.6%     PATH +$15.41  +1.68%  pnl +16.6%
+  RKLB  $ 52.06→ $51.50  −1.08%   −$70.56  pnl −34.0%     CRM  +$3.83  +1.56%  pnl +25.6%
+  FUTU  $100.72→ $99.67  −1.04%   −$70.35  pnl  −0.8%     MRK  +$0.56  +0.05%  pnl +29.2%
+```
+
+兩個最大拖累 MRVL (−3.63%) 同 HOOD (−2.80%) PnL 都係 **+6.8% / +2.9%**，遠低於 TP1 線 —— 呢個係
+**低 PnL 倉位嘅均值回歸**，唔係止賺。留意 MRVL 同時係 cap-violating 倉位（見下）。
+
+### TP1 / TP2 線
+
+5 隻持倉喺 TP1 線之上，同 #27 **完全一致**（無新穿、無跌回）：
+
+| 持倉 | PnL | TP1 線 | TP2 線 | 距 TP2 (price-space) |
+|---|---:|---:|---:|---:|
+| **COP** | +31.9% | $131.58 | $153.51 | **+6.14%** ← 最近 |
+| MRK | +29.2% | $141.90 | $165.55 | +8.36% |
+| CRM | +25.6% | $237.83 | $277.47 | +11.46% |
+| XOM | +24.2% | $169.81 | $198.11 | +12.72% |
+| PFE | +22.8% | $29.56 | $34.49 | +14.01% |
+
+**COP TP2 gap 由 #27 +5.58% 擴闊至 +6.14%**（+0.56pp / 1 小時）。
+但注意：#33 呢個 1 小時 window 係**下跌** drift 之下發生，而 COP 本身今日係 −0.37%。
+即係 COP 跑贏大市，但**距離 TP2 實際上愈行愈遠**。呢個係 widening rate 由負轉正嘅第一個 window，
+單窗唔足以宣稱反轉 —— 記錄為「待確認」，唔係「TP2 imminent」。
+
+### Cap 違規（two-pass 數學，MV 定案後先計比率）
+
+| 持倉 | 市值 | cap% | #27 cap% | Δ |
+|---|---:|---:|---:|---:|
+| **DE** | $10,706.09 | **11.55%** | 11.44% | +0.11pp |
+| **MRVL** | $10,439.24 | **11.27%** | 11.54% | −0.28pp |
+| COP | $9,256.32 | 9.99% | 9.90% | +0.09pp |
+
+2 隻違規（P-MR-124 block 門檻 >10%）。**COP 9.99% 貼住門檻**，下個 window 一升就會變第 3 隻。
+
+兩個比率變化都唔反映價格方向：MRVL 價格跌 3.63% 但 cap 改善 0.28pp（其餘倉位跌得更快），
+DE 價格跌 0.29% 但 cap 惡化 0.11pp（其餘倉位跌幅較細）。**cap% 係比率唔係價格水平**，唔好當成方向指標讀。
+
+### SL 診斷：15 隻「fixed SL 觸線」其實係同一件事
+
+15/32 持倉 `pnl ≤ −5%` 但 `現價 > active SL`。全部 buffer 落在 **5.25%–5.27%**，
+因為 `止蝕` = `現價 × 0.95` 係**動態移動止蝕**，唔係 entry-anchored 固定止蝕。
+跨咗 TP1 嘅倉位會轉 trailing stop，所以深虧倉保持恆定相對緩衝。
+
+```
+實際 EXIT 觸發: 0/32  (無一隻 現價 ≤ active SL)
+```
+
+**結論：current rules 下冇任何 EXIT signal。** 唔需要逐隻寫 15 行診斷。
+
+### ⚠️ MA20 escalation（escalate，唔好 patch）
+
+```
+低於真實 MA20:   20/32 持倉
+MV at risk:     $64,203.52  =  69.3% 總市值
+趨勢:           #27 21/32 (70.7%) → #33 20/32 (69.3%)  ← 首次回落
+```
+
+`check_exit` 會發出真實 `sell` payload，所以**只報告、不修補**，由 Vivian 決定。
+只報 count + MV-at-risk，**唔報 shortfall 總額**（接近打和嘅名字會淹沒深虧倉，例如 RKLB 單隻就要 $1,931.61）。
+
+`scan.py` position-check 依然用 `period="5d"`（≤5 根日線，永遠唔夠 20），所以 `ma20 = price` fallback，
+輸出嘅 `MA20=$X` 等於現價。**獨立用 pandas 6mo 重算：scan MA20 == real MA20 只得 0/32**，
+所以 scan 顯示嘅 🟢 OK **唔係真實 MA20 trail 確認**。`止蝕=$Z` 欄位有效（price × 0.95）。
+
+### ⚠️ 數據完整性：2026-10-21 日線 bar 仍然缺失（全股票池）
+
+#27 已標記，今日仍然未修復。用 `SPY` + 逐票 10d 序列核對：
+
+```
+SPY 日線:   10-16, 10-19, 10-20, 10-22      ← 10-21 缺失
+MRVL 30m:   10-21 有 13 根 bar，收 $241.18 → $244.67   ← 當日真實有交易
+```
+
+即係 **10-21 有真實交易但日線序列整日缺失**，MA20 視窗存在 1 日空洞。
+
+**本 cron 已做修正驗證**：用 30m bar 最後 close 補回 32/32 隻嘅 10-21 收市價，再重算 MA20 —
+
+```
+naive   (缺 bar):  20/32 below, MV-at-risk $64,203.52 (69.3%)
+repaired (補 bar):  20/32 below, MV-at-risk $64,203.52 (69.3%)
+翻轉倉位: 0        MA20 位移 $-18.77 … $+1.22 (平均 $-0.94)
+```
+
+**結論：計數對缺失 bar 穩健（0 隻翻轉）**，所以上面嘅 20/32 數字可靠。
+但缺口依然影響 scan.py 內部嘅指標計算，建議由 yfinance 數據源修復，唔喺 cron 層面繞。
+
+### RKLB streak
+
+```
+#27  −34.6% → #33 −34.0%   (+0.6pp 單窗 relief)
+streak 累計未斷，但仍未見 ≥3 連續正 delta
+buffer 5.3% (現價 $51.50 vs active SL $48.92)
+```
+
+未達 skill 嘅「3 連續正 delta」門檻，**唔宣告 streak break**。累積 relief 唔重設。
+
+### Log / State 檔案動作
+
+| 檔案 | 動作 |
+|---|---|
+| `/tmp/cron33_scan_stdout.log` | **新寫** — 供 #34 用 rung-1 基準（殘差可再達 $0.00） |
+| `/tmp/ai_trader_tp1_state.json` | `_audit` via canonical script；**TP1 flag 14 隻完全冇動**（FIFO recompute 先有權改） |
+| `/tmp/ai_trader_scan_meta_log.json` | 146 → **147**（本 cron 只 1 條，script 只行一次） |
+| `/tmp/ai_trader_zero_trigger.json` | zt 10 → **11**（同日 carry，P-MR-201，**無** P-MR-247 reset） |
+| `/tmp/ai_trader_cash_floor.json` | cf = **0** |
+| `/tmp/ai_trader_trades_log.json` | 307 → 308（+1 `cron_no_trade` marker，語意不變） |
+
+`tp1_over_line_unmarked` 驗證：**5 條獨立 entry**（唔係駁埋一條）—— COP/MRK/CRM/XOM/PFE。
+trades_log 驗證：真實 buy/sell event **286 → 286** 冇變，marker 21 → 22。
+
+### Notes / Pitfalls encountered
+
+- **#33 session class**：11:00 EDT = RTH 開市後 1.5h，唔係 pre-market。26/32 down 係真實 RTH drift。
+- **rung-1 可用**：#27 有 tee stdout，所以分解殘差 $0.00（唔使行 yfinance 30m/5m bar fallback）。
+- **cash 先行**：0 買入信號先講現金門檻，唔好誤導成市場結論。
+- **CAP 貼線**：COP 9.99%，一個 window 之內可能變第 3 隻違規。
+- **數據 bug 延續**：10-21 日線缺失仍未修，已做 32/32 修正重算確認對計數無影響。
+
+**Next cron** → **#34**，2026-10-23 01:00 BJT（Fri 13:00 EDT，RTH mid-session）。
+可用 `/tmp/cron33_scan_stdout.log` 做 rung-1 基準（32/32 覆蓋）。
