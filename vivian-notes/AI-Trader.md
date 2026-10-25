@@ -38648,3 +38648,252 @@ Shortfall 細項:     $6,859.44  (僅供參考，不作標題)
 🤖 **AI-Trader Cron #35 完成** — **真·凍結 artifact 確認**（#34 嘅 $0.00 對照實驗成立，32/32 價格相同）；0 交易；TP2 check window 冇觸發（零成交，COP 距 TP2 僅 +1.81%）；6 隻 TP1-over 名單連續兩窗對 FIFO 雙重隱形。
 
 📡 **下一窗**：#36 — 2026-10-26 03:30 BJT（Sun 15:30 EDT）— RTH close -30min / trail-stop confirm，預期同樣凍結
+
+
+## Cron #36 — 2026-10-26 03:30 BJT (Sun 15:30 EDT) — RTH close -30min / trail-stop confirm（週末真·凍結 artifact #2）
+
+> **Session**：Sun 15:30 EDT，美股**休市**（週末）。窗口 = **Fri 10-23 定案收市價 → Fri 10-23 定案收市價（同一根 bar）**，零成交。
+> **形狀**：**null / frozen** — 本窗**唔製造 Top-5 分解表**（每項貢獻都係 $0.00，製造出嚟只會係噪音）。
+> **Rung-1**：本 cron 已 `tee` 寫入 `/tmp/cron36_scan_stdout.log`（下個 cron 可直接用 rung-1 baseline）。
+
+### 📊 本窗指標
+
+| 指標 | #36 本窗 | #35 前窗 | 變動 |
+|---|---:|---:|---:|
+| 總市值 MV | **$93,391.19** | $93,391.19 | **$0.00** (0.000%) |
+| 總權益 Equity | **$93,598.59** | $93,598.59 | **$0.00** |
+| 現金 | $207.40 | $207.40 | $0.00 |
+| 未實現 PnL | **−$236.10** (−0.252%) | −$236.10 | $0.00 |
+| 持倉數 | 32 | 32 | — |
+| 買入信號 | 0 | 0 | — |
+| Stage 2 候選 | 1 (VZ) | 1 (VZ) | 凍結 |
+| zt 零觸發連續 | **4** | 3 | +1 (P-MR-201) |
+
+**zt 語意**：same-BJT-day carry **3 → 4**（P-MR-201，**無** P-MR-247 日界重置 —— #34 與 #35 同屬 BJT 2026-10-26）。
+
+### 🧊 真·凍結 artifact — #35 嘅 falsifiable 對照實驗**驗證成立**
+
+| 測試 | 結果 |
+|---|---|
+| stdout log diff (`cron35` vs `cron36`) | **逐位元完全相同（diff 為空）** |
+| 價格變動 | **0/32** |
+| FIFO MV | $93,391.19 兩窗一致 |
+| **權威 drift** | **$0.00 (0.000%)** |
+| 對 Fri 10-23 定案收市價匹配 | **32/32**（<0.4% 門檻，non-match = 0） |
+| 週末 30m bar | **無**（只見 10-19 … 10-23） |
+| 日線序列 | 完整無洞（SPY 10 日曆 10-12 … 10-23，32/32 齊全，**0 隻缺 bar**） |
+
+三方消歧：
+
+| 假設 | 測試 | 結果 |
+|---|---|---|
+| **凍結 artifact** | MV drift == $0.00 | ✅ **命中** |
+| 一個交易日（Thu→Fri close） | 可分解且非零 | ❌ 已於 #34 排除（分解 +$758.47 vs 實際 −$33.02） |
+| 同日 bar 改寫（Fri 11:00→16:00） | #35 必須 ≠ #36 | ❌ 排除（0/32 變動） |
+
+**結論**：#35 留下嘅「若同樣讀 Fri 定案 bar，drift 應為 $0.00」乾淨對照實驗**完整驗證成立** —— 週末凍結係**第二次**確認（#35、#36）。
+
+> ⚠️ **重要**：本窗所有「TP1/TP2 gap」「cap%」「MA20 破位」「RKLB streak」數字都係**凍結值**，與 #35 完全相同。若 #27（下窗）出現**非零 drift**，代表 yfinance 開始推送新 bar —— 呢個係**預期**（見下窗預告），唔係異常。
+
+### 🚦 Drift decomposition — null
+
+```
+Δ vs #35: 32/32 倉位價格變動 = 0
+gross drift: $0.00   net drift: $0.00   up/down: 0/0   max |貢獻|: $0.00
+```
+
+**不製造 Top-5 表**（全部 $0.00，只會係噪音）。Rung-1 baseline 完整（`/tmp/cron35_scan_stdout.log`）→ **residual $0.00**。
+
+### 🎯 TP1 / TP2 線（凍結值，6 隻 over TP1 line）
+
+**全部 UNMARKED —— state file 內完全冇對應 key，FIFO recompute 擁有 mutation 權。本 cron 未改動任何 TP1 flag。**
+
+| 股票 | 現價 | PnL | TP1 線 | TP2 線 | TP2 gap（price-space） |
+|---|---:|---:|---:|---:|---:|
+| **COP** ⭐ | $150.80 | +37.5% | $131.61 | **$153.54** | **+1.82%** ← 最近 |
+| XOM | $183.21 | +29.4% | $169.90 | $198.22 | +8.19% |
+| CRM | $248.57 | +25.4% | $237.87 | $277.51 | +11.64% |
+| MRK | $145.27 | +22.9% | $141.84 | $165.48 | +13.91% |
+| PFE | $30.03 | +21.9% | $29.56 | $34.49 | +14.85% |
+| CVX | $233.21 | +21.3% | $230.71 | $269.16 | +15.42% |
+
+- **TP2 觸發 = 0**：**零成交 ⇒ 唔係「訊號唔夠」，係「根本冇成交可以觸發」**。COP 距 TP2 線只 **+1.82%（$2.73/share）**，觸發時機完全押後到有真實成交嘅窗口。
+- **TP2 擴闊/收窄 streak 狀態暫停裁決**：+5.26%（#35）→ +4.87% → +1.89%（#27）→ +1.08%（#33）→ +1.82%（#34 轉擴闊）→ **+1.82%（本窗凍結）**。#34 提出嘅「若下一窗再度擴闊，四窗收窄 streak 正式失效」—— **本窗因零成交而無法測試**，streak 暫停裁決，**唔算失效**。
+- 接近 TP1（未過線）：PATH +18.4%（距 +20% 尚 1.6pp / $0.19）。
+
+### 🚨 NEW ESCALATION — 14 隻 `TP1=true` 之中，**11 隻係 stale flag**
+
+本次首次將 state file 同 positions API 做完整對帳，發現：
+
+| 類別 | 數量 | 說明 |
+|---|---:|---|
+| state file ticker key | **18** | vs API 持倉 **32** |
+| `TP1=true`（裸 boolean） | **14** | 其中 **11 隻已唔喺持倉** |
+| `TP1=false` | 3 | AVAV / CIFR / SYM（全部亦唔喺持倉） |
+| `FULLY_CLOSED` closure_record 物件 | 1 | **只有 HOOD** 有正確 closure 記錄 |
+| **唔喺持倉嘅 key 合計** | **13** | 11 bare-true + HOOD + CIFR |
+
+**11 隻 stale `TP1=true`**：`AMD / NBIS / ONDS / PYPL / SMCI / DHR / ADBE / MSFT / JD / ANET / CRWV`
+- 全部**唔喺** `/api/positions` 嘅 32 隻之內
+- `trades_log.json` 尾段**全部係 `sell`**（已平倉）—— e.g. AMD `buy→sell→sell`、SMCI `buy→sell→buy→sell→sell`、CRWV `buy→sell→sell→sell`
+- 但 state file 仍然留**裸 `true`**，而**冇**改成 closure_record 物件
+
+**對照 HOOD**（唯一正確處理）：`{"status":"FULLY_CLOSED","closure_method":"MA10_stop","qty_sold":117,"remaining_qty":0,...}`
+
+**為何要升報**：schema 規定平倉時 ticker entry 應轉為 closure_record 物件。11 隻 stale bare-`true` 令「TP1=true 保留 14 隻」呢個 headline 數字**嚴重失真** —— 真正仍然持倉而且 TP1 曾經 trigger 嘅只有 **3 隻**（IREN / PATH / SNDK）。**cron 唔可以改 TP1 flag**（FIFO recompute 擁有 mutation 權），所以呢個係 **escalate，唔係 patch** —— 請 Vivian 指示 FIFO recompute 做一次 state 對帳。
+
+**仍然持倉嘅 3 隻 `TP1=true`**（IREN / PATH / SNDK）現況：
+
+| 股票 | entry | 現價 | PnL | TP1 線 | 狀態 |
+|---|---:|---:|---:|---:|---|
+| IREN | $39.32 | $24.91 | **−36.6%** | $47.18 | 現價低於 TP1 線 |
+| SNDK | $1,372.20 | $1,238.03 | **−9.8%** | $1,646.64 | 現價低於 TP1 線 |
+| PATH | $11.94 | $14.13 | +18.4% | $14.32 | 低於 TP1 線 $0.19 |
+
+> 按 schema，`true` 代表**先前 lot 曾經 trigger TP1，跨 cron 持久保留** —— 現價跌返落 TP1 線以下**屬正常 mark-to-market，唔係 bug**。唔需要動作。
+
+### 📌 TP1-over 6 隻 —— 連續第三個 cron 對 FIFO 雙重隱形（未解）
+
+COP / XOM / CRM / MRK / PFE / CVX **喺 `tp1_state.json` 完全冇 key**（唔係 `true`、唔係 `false`、唔係 closure_record）。若 FIFO recompute 只讀 state file，呢 6 隻**永遠唔會有 TP1 fire**。COP 已 +37.5%、距 TP2 只 +1.82%。**第三個 cron 仍未解決，正式升報。**
+
+### 🎯 Stage 2 突破回調（漏斗正常，現金係綁定約束）
+
+```
+92 分析成功 → 31 above_ma20 → 31 stars≥4 → 20 RSI 25-75 → 2 RR≥0.8 → 1 macd>0 → 1 kdj>0 = 1 候選
+```
+
+| 候選 | 現價 | ⭐ | RSI | RR | MA20 | 止蝕 | 需現金 (100 股) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **VZ** | $44.66 | 5 | 48.0 | 0.87 | $44.59 | $42.43 | **$4,466.00** |
+
+- **買入信號 = 0**：現金 **$207.40** 遠低於所需 **$4,466.00**。`scan.py` 硬編碼 `quantity: 100`，所以**現金係綁定約束，唔係市場或 filter 問題** —— 技術上漏斗**成功產生**候選。
+- 被卡喺 macd 閘門嘅係 TSLA（macd_hist −0.13 / kdj −0.86）。
+- Pool 健康：92/93 分析成功（只有 `$SQ` 真正 delisted），指標**非退化**：macd_hist distinct **92/92**、kdj 88、rsi 85、rr 87；macd>0 35/92 (38.0%)。bb_lo + ema 修正**連續第 18 個 cron 生效**。
+
+### 🚨 Cap violations（集中度違規）— 3 隻，全部凍結
+
+| 股票 | cap% | MV | vs 10% 門檻 |
+|---|---:|---:|---|
+| **DE** | **11.76%** | $10,984.55 | +1.76pp |
+| **MRVL** | **11.26%** | $10,511.46 | +1.26pp |
+| **COP** | **10.33%** | $9,651.20 | **+0.33pp** ← 最貼線 |
+
+**三隻全部與 #35 逐位相同** —— 分子（股價）同分母（總 MV）都冇變動，比率自然零變化。**COP 只差 0.33pp** 就跌返落 10% 以內 —— 下個有真實成交嘅窗口需重算（比率與股價脫鉤機制依然有效：分子同分母各自變動）。
+
+### 🛡️ 止蝕雙方法（三種口徑並存，只報不選）
+
+**（a）方法論 active SL**（post-TP1 → `max(MA10, MA20)`；pre-TP1 → `cost × 0.95`）:
+
+| 口徑 | 破位數 | 說明 |
+|---|---:|---|
+| 固定入場錨定 −5% SL 已破 | **14/32** | AMZN, ASTS, AVGO, BA, BABA, CSCO, INTC, IREN, KLAC, LRCX, PDD, RKLB, SNDK, VRT |
+| post-TP1 MA10/MA20 trail 破位 | **1/32** | MRK（−0.52%，**既有破位持續，非本窗新增**，與 #34/#35 相同） |
+| 實際 EXIT 信號（scan `check_exit`） | **0** | `check_exit` 只評估 `period="5d"` MA20（= 現價偽陽性） |
+
+- **MRK**：pnl +22.9%，活躍 SL = `max(MA10 $146.03, MA20 $145.20)` = **$146.03**，現價 $145.27 低於 trail 線 **−0.52%**。#33 時 −1.16% → #34 −0.52% → 本窗 −0.52%（凍結）。
+- **RKLB fixed-SL vs active-SL 分歧**（延續）：現價 $52.60、entry $78.05 → fixed SL $74.15 **已破**（−29.06%）；scan 活躍 SL $49.97 **未破**（buffer **+5.00%**）→ **`check_exit` 不會發 EXIT**。真實 MA10-trail SL = $55.50 × 0.95 = **$52.72**，現價 $52.60 在其下方 **−0.23%**（與 #35 完全相同）→ 依方法論屬破位但**幾乎收復**。
+
+**（b）scan `止蝕=` 欄位**：**32/32 全部 `price × 0.95`**，即係**動態跟隨**止蝕，唔係入場錨定。
+
+**（c）β/ATR 雙方法**（task body 規則）：
+
+| 錨定解讀 | 破位 | MV-at-risk |
+|---|---:|---:|
+| 錨定入場價（stop = entry − 1.5×ATR×max(β,.5)） | **9/32** | **$25,247.90 (27.0%)** — RKLB, AMZN, VRT, KLAC, BA, CSCO, AVGO, BABA（ATR 分支）+ PDD（5% 分支） |
+| 跟隨現價（stop = price − distance） | **0/32** | — |
+
+- Pool 內 **β≥1 者 55/92 (59.8%)** —— ATR 分支係**主流路徑**，唔係邊角情況。
+- **錨定基準（anchor basis）在方法論內未定義** —— 同一份輸入，兩種解讀得出相反結論。**只報不選，交 Vivian 裁決。**（連續第二個 cron 升報）
+
+### ⚠️ MA20 escalation（escalate, don't patch）
+
+`check_exit` 會**實際發出 sell payload**，所以**只升報、唔自行修補**。
+
+**scan 自身口徑**：32/32 位置 MA20 == 現價 → 「🟢 OK」為**偽陽性**（`scan.py` position-check 用 `period="5d"`，MA20 需 20 bars → `ma20 = price` fallback）。**連續第 18 個 cron 未修**。
+
+**真實 MA20（6mo 序列，32/32 完整無洞）**：
+
+| 指標 | 本窗 | #35 | 變動 |
+|---|---:|---:|---|
+| 低於真實 MA20 | **20/32 (62.5%)** | 20/32 | 0 |
+| **MV-at-risk** | **$64,941.81 (69.5%)** | $64,941.81 | **$0.00** |
+| shortfall to MA20（細項） | $6,858.82 | — | — |
+
+**flips = 0**（股價同 MA 序列**兩邊都逐位相同** —— 同一根 Fri 定案 bar，冇新 bar 推入視窗）。呢個係**最強形態**嘅穩健性結論：**唔係口徑巧合，而係輸入根本無變嘅必然結果**。（對照 #34 嘅 2 flips —— 嗰 2 隻係由 MA 序列推進造成，唔係股價穿線。）
+
+**真實 MA10**：低於者 **19/32**，MV-at-risk **$54,798.24 (58.7%)**，flips = 0。MA10 貼線：BA $0.62 / MRK $0.76。
+
+最大 shortfall（細項）：SNDK $292.94 / LRCX $69.84 / KLAC $37.36 / VRT $35.88 / MRVL $28.25 / AVGO $27.03。
+**貼線名單（距 MA20 ≤ $1）**：PDD $0.35 / BA $0.78。
+
+> ⚠️ **MA 序列位移**：**本窗零位移**（與 #35 同一根 bar）—— #34 錄得嘅最大位移（SNDK MA20 −$26.99 / MA10 −$34.38）**唔會再重複**，因為冇新 bar 推入視窗。
+
+### 🏷️ RKLB streak（持續跟蹤 — 凍結）
+
+```
+#33 (10-23 23:00)  pnl -34.5%   ← +0.8pp relief
+#34 (10-26 01:00)  pnl -32.6%   ← +1.9pp relief
+#35 (10-26 03:00)  pnl -32.6%   ← 凍結（本窗無第三個 delta）
+#36 (10-26 03:30)  pnl -32.6%   ← 凍結
+```
+
+**累計 relief vs streak low (−35.7%)：+3.1pp**（與 #34/#35 相同，本窗零變化）。
+**streak break 宣告門檻（3 窗連續 delta > 0）維持「未達成」狀態（仍係 2 窗）** —— 本窗因零成交而**無法提供第三個 delta**，所以係 **「未測試」，唔係「失敗」**。累計 relief +3.1pp 已越過「>2pp = 重大緩解」門檻 —— **建議 Vivian 檢視 RKLB lot**（126 股，MV $6,627.60，entry $78.05）。
+
+### 📋 Log / State 檔案動作
+
+| 檔案 | 動作 |
+|---|---|
+| `/tmp/cron36_scan_stdout.log` | 已寫入（**rung-1**，for next cron） |
+| `/tmp/ai_trader_scan_meta_log.json` | append → **155 entries**（本窗 +1，exactly one；已驗證） |
+| `/tmp/ai_trader_tp1_state.json` | 只刷新 `_audit`；**TP1 flag 零改動**（14 隻 TP1=true 保留）；`tp1_over_line_unmarked` 驗證 **6 條獨立 entry**（非拼接字串） |
+| `/tmp/ai_trader_trades_log.json` | 315 → **316**（+1 `cron_no_trade` marker，`_SYSTEM`）；**真實 buy/sell 維持 286**（語意不變式已驗證） |
+| `/tmp/ai_trader_zero_trigger.json` | zt 3 → **4**（same-BJT-day carry，P-MR-201 — **無** P-MR-247 reset） |
+| `/tmp/ai_trader_cash_floor.json` | cf = 0 |
+| `vivian-notes/AI-Trader.md` | 本 section（git commit + push） |
+
+### 📊 當日總結 (2026-10-26 BJT)
+
+```
+🔔 買入信號:         0
+🎯 TP1 觸發:        0  (state file: 14 隻 TP1=true 保留 — 其中 11 隻 stale，實際仍持倉且曾 trigger 只有 3 隻)
+🎯 TP2 觸發:        0  (CLOSEST: COP +1.82% from TP2 line $153.54 — 零成交，未能觸發)
+🚪 止蝕/賣出觸發:   0
+
+💰 開盤總權益 (前日 22:00 #27):   $93,125.66
+💰 收市前總權益 (今日 03:30 #36): $93,598.59
+📈 日內 MTM:                     +$472.93 (+0.508%)   ← #27→#36 累積（含週末凍結三窗）
+📦 未實現 PnL:                  -$236.10 (-0.252%)
+💵 現金:                         $207.40
+📊 持倉數:                       32
+🚨 Cap violations:              DE 11.76% / MRVL 11.26% / COP 10.33%
+🚦 零觸發連續 (zt):              4
+```
+
+**日內復盤**：本窗係**真·凍結 artifact（第二次確認）** —— #35 留下嘅「drift 應為 $0.00」乾淨對照實驗**完整驗證成立**（stdout log **逐位元完全相同**、32/32 價格相同、32/32 命中 Fri 定案收市價、週末無 30m bar、日線序列無洞）。形狀為 **null / frozen**，**不製造 Top-5 分解表**。
+
+今日（BJT 10-26）四窗（#34 01:00 → #35 03:00 → #36 03:30）全部**讀同一根 Fri 定案 bar**，所以今日淨變化 = 0。**0 買入嘅約束係現金 $207.40**（`quantity` 硬編碼 100，VZ 需 $4,466.00），非市場或 filter 問題 —— 漏斗技術上**成功產生 1 隻候選**。**TP2 check window 冇觸發並非因為訊號唔夠，而係因為零成交 —— COP 距 TP2 線只 +1.82%（$2.73/share）**。
+
+**本窗新發現（升報）**：**11 隻 stale `TP1=true` flag** —— 對帳顯示 state file 18 個 key vs API 32 隻持倉，AMD/NBIS/ONDS/PYPL/SMCI/DHR/ADBE/MSFT/JD/ANET/CRWV 全部已平倉（trades_log 尾段皆 `sell`）但 state 仍留裸 `true`，而**只有 HOOD** 有正確 closure_record。令「14 隻 TP1=true」呢個 headline 嚴重失真（真正有效只有 IREN/PATH/SNDK 3 隻）。**cron 無權改 TP1 flag** → 請指示 FIFO recompute 做一次對帳。
+
+### 📡 下一窗：#27 — 2026-10-26 22:00 BJT（Mon 10:00 EDT）— next-day pre-open
+
+> ⚠️ **呢個係「凍結鏈」之後第一個有真實成交嘅窗口** —— 預期 drift **非零**（Mon 09:30 → 10:00 EDT 新 bar 寫入），**唔應該**再出現 $0.00。若仍為 $0.00，反而要警惕 yfinance 快取有問題。
+
+- **zt 預告**：#27 同 #36 **共享 BJT 日期 2026-10-26** → **P-MR-201 same-day carry zt 4 → 5**（**唔係** P-MR-247 reset）
+- 需重點監控：
+  1. **COP**（距 TP2 線 +1.82%，TP2 check window 尾聲）—— 會唔會終於有真實 TP2 觸發
+  2. **6 隻 TP1-over 雙重隱形名單**（連續三窗未解）
+  3. **11 隻 stale `TP1=true`**（新升報，等 FIFO 對帳）
+  4. **RKLB streak 第三窗 delta** —— 有真實成交先推得動 3 窗門檻
+  5. **COP cap%**（只差 0.33pp 跌返落 10% 以內？）
+- **MA20 escalation 續報基準**：20/32 · $64,941.81 (69.5%) · MA10 19/32 · $54,798.24 (58.7%) · flips=0 為基準
+- rung-1 基線已就緒（`/tmp/cron36_scan_stdout.log`，32/32）
+
+> **Rung-1 交接**：本 cron 已 `tee` 寫入 `/tmp/cron36_scan_stdout.log`，下次 #27 可直接用 rung-1 baseline（預期 residual $0.00）。
+
+---
+
+🤖 **AI-Trader Cron #36 完成** — **真·凍結 artifact 第二次確認**（#35 嘅 $0.00 對照實驗驗證成立，stdout log 逐位元相同）；0 交易；TP2 check window 冇觸發（零成交，COP 距 TP2 僅 +1.82%）；**新發現 11 隻 stale `TP1=true` flag**（已平倉但 state 仍留裸 true）正式升報。
+
+📡 **下一窗**：#27 — 2026-10-26 22:00 BJT（Mon 10:00 EDT）— next-day pre-open，**凍結鏈後第一個真實成交窗口**，預期 drift 非零；zt 4 → 5（P-MR-201 carry）
