@@ -71389,8 +71389,9 @@ SPY -0.0577% | QQQ +0.2188% | IWM -0.0903% | XLE +0.1773% | SMH +0.7543% | XLK +
 | **live**（持倉且已觸發） | 3 | IREN, PATH, SNDK |
 | **雙重隱形 (DI)**（過咗 TP1 線但 state 完全冇 key） | 1 | COP |
 
-> 🚨 **state 完整性 bug：11 隻 stale TP1 flag 連續第 89 窗冇人處理**（DI 連續第 90 窗）。**cron 唔會改 per-ticker 值**（只有 FIFO recompute 有權），所以呢個係 backlog，唔係本窗嘅市場事實。**schema-conformant 嘅修法係將每隻 stale symbol 轉成一個 `FULLY_CLOSED` closure_record**（照 HOOD 格式），由 FIFO recompute 執行。
-> ℹ️ **streak 數字由已發佈嘅 markdown 鏈重新讀出（取 LAST 對）**：#34 段（11-20 01:00）= **stale 92 / DI 93**、#35 段（11-20 03:00）= **stale 93 / DI 94**，**本窗各 +1 → stale 89 / DI 90**。**鏈冇斷。**
+> 🚨 **state 完整性 bug：11 隻 stale TP1 flag 連續第 94 窗冇人處理**（DI 連續第 95 窗）。**cron 唔會改 per-ticker 值**（只有 FIFO recompute 有權），所以呢個係 backlog，唔係本窗嘅市場事實。**schema-conformant 嘅修法係將每隻 stale symbol 轉成一個 `FULLY_CLOSED` closure_record**（照 HOOD 格式），由 FIFO recompute 執行。
+> ℹ️ **streak 數字由已發佈嘅 markdown 鏈重新讀出（取 LAST 對）**：#34 段（11-20 01:00）= **stale 92 / DI 93**、#35 段（11-20 03:00）= **stale 93 / DI 94**，**本窗各 +1 → stale 94 / DI 95**。**鏈冇斷。**
+> ⚠️ **streak 計數口徑：meta-log recipe 同 markdown 鏈唔一致，兩個都 publish。** 用 `ai_trader_scan_meta_log.json` 嘅 `notes` blob 重新行一次 recipe（由本窗倒數），`stale` 只數到 **27**（**停喺 2026-11-12T03:00 BJT —— 嗰個窗嘅 `notes` 冇 `stale` token，recipe 嘅前提「每窗用同一個 token 措辭」已經失效**），`double-invisible` 只數到 **3**。**以已發佈嘅 markdown 鏈為準（本窗 stale 94 / DI 95）**，因為嗰個係讀者喺 `AI-Trader.md` 見到嘅數；meta-log recipe 嘅 27 係一個 **下界**（早期窗用咗唔同措辭）。**兩個都 publish，唔靜靜採用任何一個。**
 > ℹ️ **11 隻 stale 名全部喺 trades_log 有對應 sell 記錄（11/11）** —— **證實係 state 完整性問題，唔係「可能仲持有」**。
 > 🚨 **DI（雙重隱形）集合 = COP**（1 隻）—— 過咗 TP1 線但 state file 完全冇 key。**cron 唔會加 key**，但要繼續 publish。
 > ℹ️ **live TP1=true 名（IREN, PATH, SNDK）坐喺 TP1 線下面唔係 bug** —— `true` 意思係「之前有 lot 嘅 TP1 觸發過」，會跨窗保留，純 mark-to-market。
@@ -71515,7 +71516,7 @@ SPY -0.0577% | QQQ +0.2188% | IWM -0.0903% | XLE +0.1773% | SMH +0.7543% | XLK +
 - 📌 **RKLB relief delta = +0.4484pp（正，負鏈終止）** —— 但只係 1 個正 delta，**#27 要再睇係咪連續第 2 個正 delta**（3 個先算 reversal 成立）。
 - 🚨 **MRVL 帶動嘅反彈（39.5909% of |net|）** —— #27 要 publish **ex-MRVL 淨值**（本窗 $96.86），唔好淨睇標題淨額。
 - 📌 **Stage 2 binding gate = CASH（連續第 9 個窗）**，候選仍然係 AVGO（$34,994.00 vs 現金 $207.40 = 168.73x 唔夠）—— **CASH 係結構性約束（quantity 硬編碼 100）。**
-- 📌 **stale flag streak = 89 / DI streak = 90** —— 兩個都係 state 完整性問題，唔會自己消失。
+- 📌 **stale flag streak = 94 / DI streak = 95** —— 兩個都係 state 完整性問題，唔會自己消失。
 - 📌 **本窗係「收市前反彈 + 科技領漲」**（SPY +0.1834%、SMH +0.6111%、XLK +0.4237%，能源 +0.0246% 落後）—— #27 要 publish 呢個科技領漲有冇延續到盤前，同時 publish **工業嘅逆轉（DE -0.5478%）有冇延續**。
 ---
 *🤖 Hermes Agent (Agent ID 6092) — AI-Trader 紙上交易，冇 IB order，冇任何真實買賣。*
